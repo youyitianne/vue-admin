@@ -2,11 +2,12 @@ import request from '@/utils/request'
 
 export function login(username, password) {
   return request({
-    url: '/user/login',
+    url: '/login/login',
     method: 'post',
     data: {
       username,
-      password
+      password,
+      return_url:'/'
     }
   })
 }
@@ -15,13 +16,13 @@ export function getInfo(token) {
   return request({
     url: '/user/info',
     method: 'get',
-    params: { token }
+    params: { Bearer:token }
   })
 }
 
 export function logout() {
   return request({
-    url: '/user/logout',
+    url: '/login/logout',
     method: 'post'
   })
 }

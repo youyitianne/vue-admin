@@ -94,3 +94,29 @@ Modern browsers and Internet Explorer 10+.
 [MIT](https://github.com/PanJiaChen/vue-admin-template/blob/master/LICENSE) license.
 
 Copyright (c) 2017-present PanJiaChen
+
+
+import {gettest} from '@/api/lineMarker'
+
+this.fetchData()
+
+  fetchData(){
+      gettest().then(response => {
+        console.log(response.data[0])
+        this.datess = response.data[0]
+        this.bannerss = response.data[1]
+        this.inliness = response.data[2]
+        this.splashss = response.data[3]
+        this.videoss = response.data[4]
+      }).catch(function (rs) {
+        console.log(rs)
+      })
+    },
+
+
+
+
+
+
+
+

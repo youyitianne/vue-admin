@@ -29,123 +29,310 @@ export const constantRouterMap = [
     path: '/',
     component: Layout,
     redirect: '/dashboard',
+    // redirect: '/dashboard',
     name: 'Dashboard',
     hidden: true,
     children: [{
       path: 'dashboard',
-      component: () => import('@/views/dashboard/index')
+      component: () => import('@/views/dashboard/index'),
     }]
   },
+  // {
+  //   path: '/form',
+  //   component: Layout,
+  //   name: 'form',
+  //   meta: {
+  //     title: '首页',
+  //     icon: 'example',
+  //     roles: ['aaa']
+  //   },
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       name: 'Form',
+  //       component: () => import('@/views/form/index'),
+  //       meta: {
+  //         title: 'Form',
+  //         icon: 'form',
+  //         roles: ['aaa']
+  //       }
+  //     }
+  //   ]
+  // },
 
+]
+
+export default new Router({
+   mode: 'history', //后端支持可开
+  scrollBehavior: () => ({ y: 0 }),
+  routes: constantRouterMap
+})
+
+//异步挂载的路由
+//动态需要根据权限加载的路由表
+export const asyncRouterMap = [
+  {
+    path:'/component',
+    component:Layout,
+    redirect: '/component/dropzone',
+    name:'Component',
+    meta: {
+      title: '组件',
+      icon: 'component',
+      roles: ['operator']
+    },
+    children: [
+      {
+        path: 'dropzone',
+        component: () => import('@/views/dropZone/dropzone'),
+        name: 'DropzoneDemo',
+        meta: {
+          title: '上传文件',
+          roles: ['operator'],
+        }
+      }]
+  },
   {
     path: '/example',
     component: Layout,
     redirect: '/example/table',
     name: 'Example',
-    meta: { title: 'Example', icon: 'example' },
+    meta: {
+      title: '数据管理',
+      icon: 'example',
+      roles: ['operator','planner','developer','market','leader']
+    },
     children: [
       {
-        path: 'table',
-        name: 'Table',
-        component: () => import('@/views/table/index'),
-        meta: { title: 'Table', icon: 'table' }
+        path: 'cline',
+        hidden: true,
+        component: () => import('@/views/complexChart/index'),
+        name: 'ComplexLineChart',
+        meta: {
+          title: '统计图表',
+          noCache: true ,
+          icon: 'chart',
+          roles: ['operator','planner','developer','market','leader']
+        }
       },
       {
         path: 'tree',
         name: 'Tree',
+        hidden: true,
         component: () => import('@/views/tree/index'),
-        meta: { title: 'Tree', icon: 'tree' }
-      }
-    ]
-  },
-
-  {
-    path: '/form',
-    component: Layout,
-    children: [
+        meta: {
+          title: '树状图',
+          icon: 'tree',
+          roles: ['operator','planner','developer','market','leader']
+        }
+      },
       {
-        path: 'index',
-        name: 'Form',
-        component: () => import('@/views/form/index'),
-        meta: { title: 'Form', icon: 'form' }
-      }
+        path: 'line',
+        component: () => import('@/views/charts/line'),
+        name: 'LineChart',
+        hidden: true,
+        meta: {
+          title: '线形表',
+          noCache: true ,
+          icon: 'chart',
+          roles: ['operator','planner','developer','market','leader']
+        }
+      },
+      {
+        path: 'table',
+        name: 'Table',
+        component: () => import('@/views/table/select'),
+        meta: {
+          title: '广告数据管理',
+          icon: 'table',
+          roles: ['operator','planner','developer','market','leader']
+        }
+      },
+      {
+        path: 'yixin',
+        component: () => import('@/views/table/yixin'),
+        name: 'YixinTable',
+        meta: {
+          title: '移信数据下载',
+          noCache: true ,
+          icon: 'table',
+          roles: ['operator','planner','developer','market','leader']
+        }
+      },
     ]
   },
-
   {
-    path: '/nested',
+    path: '/appmanager',
     component: Layout,
-    redirect: '/nested/menu1',
-    name: 'Nested',
+    redirect: '/appmanager/appTable',
+    name: 'Example',
     meta: {
-      title: 'Nested',
-      icon: 'nested'
+      title: '项目管理',
+      icon: 'example',
+      roles: ['operator'],
     },
     children: [
       {
-        path: 'menu1',
-        component: () => import('@/views/nested/menu1/index'), // Parent router-view
-        name: 'Menu1',
-        meta: { title: 'Menu1' },
-        children: [
-          {
-            path: 'menu1-1',
-            component: () => import('@/views/nested/menu1/menu1-1'),
-            name: 'Menu1-1',
-            meta: { title: 'Menu1-1' }
-          },
-          {
-            path: 'menu1-2',
-            component: () => import('@/views/nested/menu1/menu1-2'),
-            name: 'Menu1-2',
-            meta: { title: 'Menu1-2' },
-            children: [
-              {
-                path: 'menu1-2-1',
-                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-1'),
-                name: 'Menu1-2-1',
-                meta: { title: 'Menu1-2-1' }
-              },
-              {
-                path: 'menu1-2-2',
-                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-2'),
-                name: 'Menu1-2-2',
-                meta: { title: 'Menu1-2-2' }
-              }
-            ]
-          },
-          {
-            path: 'menu1-3',
-            component: () => import('@/views/nested/menu1/menu1-3'),
-            name: 'Menu1-3',
-            meta: { title: 'Menu1-3' }
-          }
-        ]
+        path: 'appTable',
+        component: () => import('@/views/table/appTable'),
+        name: 'AppTable',
+        meta: {
+          title: '应用管理',
+          noCache: true ,
+          icon: 'table',
+          roles: ['operator'],
+        }
       },
       {
-        path: 'menu2',
-        component: () => import('@/views/nested/menu2/index'),
-        meta: { title: 'menu2' }
+        path: 'channelTable',
+        component: () => import('@/views/table/channelTable'),
+        name: 'ChannelTable',
+        meta: {
+          title: '渠道管理',
+          noCache: true ,
+          icon: 'table',
+          roles: ['operator'],
+        }
+      },
+      {
+        path: 'adTypeTable',
+        component: () => import('@/views/table/adTypeTable'),
+        name: 'AdTypeTable',
+        meta: {
+          title: '广告类型管理',
+          noCache: true ,
+          icon: 'table' ,
+          roles: ['operator'],
+        }
       }
     ]
   },
-
   {
-    path: 'external-link',
+    path: '/accountmanager',
     component: Layout,
+    redirect: '/accountmanager/appTable',
+    name: 'Example',
+    meta: {
+      title: '系统管理',
+      icon: 'example',
+      roles: ['leader']
+    },
     children: [
       {
-        path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
-        meta: { title: 'External Link', icon: 'link' }
+        path: 'accountTable',
+        component: () => import('@/views/table/accountTable'),
+        name: 'AccountTable',
+        meta: {
+          title: '用户管理',
+          noCache: true ,
+          icon: 'table',
+          roles: ['admin']
+        }
+      },
+      {
+        path: 'user_role_Table',
+        component: () => import('@/views/table/user_role_Table'),
+        name: 'User_Role_Table',
+        meta: {
+          title: '角色管理',
+          noCache: true ,
+          icon: 'table',
+          roles: ['admin']
+        }
+      },
+      {
+        path: 'role_perms_Table',
+        component: () => import('@/views/table/role_perms_Table'),
+        name: 'Role_Perms_Table',
+        meta: {
+          title: '权限管理',
+          noCache: true ,
+          icon: 'table' ,
+          roles: ['admin']
+        }
+      },
+      {
+        path: 'resourceTable',
+        component: () => import('@/views/table/resourceTable'),
+        name: 'ResourceTable',
+        meta: {
+          title: '资源管理',
+          noCache: true ,
+          icon: 'table' ,
+          roles: ['leader']
+        }
       }
     ]
   },
 
-  { path: '*', redirect: '/404', hidden: true }
-]
+  { path: '*', redirect: '/404'}
+];
 
-export default new Router({
-  // mode: 'history', //后端支持可开
-  scrollBehavior: () => ({ y: 0 }),
-  routes: constantRouterMap
-})
+
+//   path: '/nested',
+//   component: Layout,
+//   redirect: '/nested/menu1',
+//   name: 'Nested',
+//   meta: {
+//     title: 'Nested',
+//     icon: 'nested'
+//   },
+//   children: [
+//     {
+//       path: 'menu1',
+//       component: () => import('@/views/nested/menu1/index'), // Parent router-view
+//       name: 'Menu1',
+//       meta: { title: 'Menu1' },
+//       children: [
+//         {
+//           path: 'menu1-1',
+//           component: () => import('@/views/nested/menu1/menu1-1'),
+//           name: 'Menu1-1',
+//           meta: { title: 'Menu1-1' }
+//         },
+//         {
+//           path: 'menu1-2',
+//           component: () => import('@/views/nested/menu1/menu1-2'),
+//           name: 'Menu1-2',
+//           meta: { title: 'Menu1-2' },
+//           children: [
+//             {
+//               path: 'menu1-2-1',
+//               component: () => import('@/views/nested/menu1/menu1-2/menu1-2-1'),
+//               name: 'Menu1-2-1',
+//               meta: { title: 'Menu1-2-1' }
+//             },
+//             {
+//               path: 'menu1-2-2',
+//               component: () => import('@/views/nested/menu1/menu1-2/menu1-2-2'),
+//               name: 'Menu1-2-2',
+//               meta: { title: 'Menu1-2-2' }
+//             }
+//           ]
+//         },
+//         {
+//           path: 'menu1-3',
+//           component: () => import('@/views/nested/menu1/menu1-3'),
+//           name: 'Menu1-3',
+//           meta: { title: 'Menu1-3' }
+//         }
+//       ]
+//     },
+//     {
+//       path: 'menu2',
+//       component: () => import('@/views/nested/menu2/index'),
+//       meta: { title: 'menu2' }
+//     }
+//   ]
+// },
+//
+// {
+//   path: 'external-link',
+//   component: Layout,
+//   children: [
+//     {
+//       path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
+//       meta: { title: 'External Link', icon: 'link' }
+//     }
+//   ]
+// },
