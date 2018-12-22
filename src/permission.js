@@ -34,7 +34,7 @@ router.beforeEach((to, from, next) => {
             console.log("rs:"+rs)
             console.log("err:"+err)
             Message.error(err || '验证失败，请重新登录！')
-            next({ path: '/' })
+            next({ path: '/login' })
           })
         })
       } else {
@@ -52,7 +52,9 @@ router.beforeEach((to, from, next) => {
     if (whiteList.indexOf(to.path) !== -1) { // 在免登录白名单，直接进入
       next()
     } else {
-      next(`/login?redirect=${to.path}`) // 否则全部重定向到登录页
+      next(`/login`) // 否则全部重定向到登录页
+      //next(`/login?redirect=${to.path}`) // 否则全部重定向到登录页
+
       NProgress.done() // if current page is login will not trigger afterEach hook, so manually handle it
     }
   }

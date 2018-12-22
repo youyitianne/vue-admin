@@ -11,9 +11,9 @@
           :picker-options="pickerOptions0">>
         </el-date-picker>
 
-      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ searchName }}</el-button>
+      <el-button :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ searchName }}</el-button>
 
-      <el-button :loading="downloadLoading" type="primary" icon="el-icon-download"  @click="handleDownload" >{{'下载'}}</el-button>
+      <el-button v-waves :loading="downloadLoading" type="primary" icon="el-icon-download"  @click="handleDownload" >{{'下载'}}</el-button>
     </div>
     <el-table
       v-loading="listLoading"
@@ -117,11 +117,12 @@
 </template>
 
 <script>
-  import {getyixindata} from '@/api/yixin'
+  import {getyixindata} from '@/api/table/datamanager/yixin'
   import waves from '@/directive/waves'
   import { parseTime } from '@/utils'
 
   export default {
+    directives: { waves },
     filters: {
       statusFilter(status) {
         const statusMap = {
@@ -164,40 +165,36 @@
       }
     },
     methods: {
-      open3() {
-        this.$message({
-          message: '记得选择查询范围~',
-          type: 'warning'
-        });
-      },
-      open4() {
-        this.$message({
-          message: '没有信息可以打印~',
-          type: 'warning'
-        });
-      },
       handleFilter(){
-        this.listParam.start=this.timevalue[0]
-        this.listParam.end=this.timevalue[1]
-        if (this.listParam.start==='undefined'||this.listParam.end==='undefined') {
-          this.open3()
+        this.downloadLoading=true
+        if (this.timevalue===''||this.timevalue==null||this.timevalue[0]==='undefined'||this.timevalue[1]==='undefined') {
+          this.$message({
+            message: '记得选择查询范围~',
+            type: 'warning'
+          });
+          this.downloadLoading=false
           return
         }
+        this.listParam.start=this.timevalue[0]
+        this.listParam.end=this.timevalue[1]
         this.listLoading = true
+        let tothis=this
         getyixindata(this.listParam).then(response => {
-          console.log(response)
           this.list = response.data
-          console.log(this.list)
           this.listLoading = false
+          this.downloadLoading=false
         }).catch(function (rs) {
-          console.log(rs)
+          tothis.listLoading = false
+          tothis.downloadLoading=false
         })
       },
-
       handleDownload() {   //下载请求
         this.downloadLoading = true
         if (this.list===null) {
-          this.open4()
+          this.$message({
+            message: '没有信息可以打印~',
+            type: 'warning'
+          });
           this.downloadLoading = false
           return
         }

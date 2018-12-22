@@ -29,3 +29,11 @@ export function getListdata(param) {
     })
 
 }
+
+export function getResourceName(param) {
+  return request({
+    url: '/api/getresourcelist',
+    method: 'post',
+    params:param
+  })
+}

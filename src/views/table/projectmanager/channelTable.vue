@@ -4,7 +4,7 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit"
                  @click="handleCreate">{{addButton}}
       </el-button>
-
+      <el-input placeholder="根据渠道名称查找" v-model="inputName" style="width: 200px;margin-bottom: 15px" class="filter-item" clearable @blur="getDatawithName"/>
     </div>
     <el-table
       v-loading="listLoading"
@@ -12,6 +12,7 @@
       element-loading-text="Loading"
       border
       fit
+      stripe
       highlight-current-row>
       <el-table-column align="center" label="ID" width="95">
         <template slot-scope="scope" prop="id">
@@ -23,28 +24,23 @@
       <!--{{ scope.row.id }}-->
       <!--</template>-->
       <!--</el-table-column>-->
-      <el-table-column label="广告类型名称" width="110" align="center" prop="date">
+      <el-table-column label="渠道名称" width="110" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="广告类型标记" width="110" align="center" prop="app_name">
+      <el-table-column label="渠道标记" width="110" align="center">
         <template slot-scope="scope">
           {{ scope.row.program_mark }}
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="备注" prop="channel">
+      <el-table-column align="center" label="备注">
         <template slot-scope="scope">
           <span>{{ scope.row.note }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="介绍" prop="advertising_type">
-        <template slot-scope="scope">
-          <span>{{ scope.row.introduce }}</span>
-        </template>
-      </el-table-column>
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ '编辑' }}</el-button>
@@ -55,19 +51,21 @@
 
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :model="adtype" label-position="left" label-width="90px"
+      <el-form ref="dataForm" :model="channel" label-position="left" label-width="90px"
                style="width: 400px; margin-left:50px;">
-        <el-form-item label="广告类型名称">
-          <el-input v-model="adtype.name" placeholder="请输入游戏名字~"/>
+        <el-form-item label="渠道名称">
+          <el-input v-model="channel.name" placeholder="请输入渠道名字~"/>
         </el-form-item>
-        <el-form-item label="广告类型标记">
-          <el-input v-model="adtype.program_mark" placeholder="默认填写安卓~"/>
+
+        <el-form-item label="渠道标记" v-if="this.dialogStatus==='create'">
+          <el-input v-model="channel.program_mark" placeholder="渠道的英文名称~"/>
         </el-form-item>
+        <el-form-item label="渠道标记" v-if="this.dialogStatus==='update'">
+          <el-input v-model="channel.program_mark" placeholder="渠道的英文名称~" disabled/>
+        </el-form-item>
+
         <el-form-item label="备注">
-          <el-input v-model="adtype.note" placeholder="暂无此功能~" value="无"/>
-        </el-form-item>
-        <el-form-item label="介绍">
-          <el-input v-model="adtype.introduce" placeholder="比如别称~"/>
+          <el-input v-model="channel.note" placeholder="介绍一个这个渠道吧~" value="无"/>
         </el-form-item>
       </el-form>
 
@@ -94,11 +92,10 @@
 </template>
 
 <script>
-  import {getAdType, createAdType, updateAdType, deleteAdType} from '@/api/adTypeTable'
+  import {getChannel, createChannel, updateChannel, deleteChannel} from '@/api/table/projectmanager/channelTable'
   import waves from '@/directive/waves'
   import {parseTime} from '@/utils'
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
-
 
   export default {
     components: {Pagination},
@@ -115,18 +112,21 @@
     },
     data() {
       return {
+        create_flag:true,
+        update_flag:true,
+        inputName:'',
+        hidlist:[],
         introduce: '介绍',
         pickerOptions0: {
           disabledDate(time) {
             return time.getTime() > Date.now() - 8.64e6
           }
         },
-        addButton:'添加广告类型',
+        addButton:'添加渠道',
         directives: {waves},
         downloadLoading: false,
         layout: '',
         timevalue: '',
-        searchName: '搜索',
         tableKey: 0,
         list: null,
         total: 0,
@@ -137,12 +137,11 @@
         statusOptions: ['published', 'draft', 'deleted'],
         dialogStatus: '',
         dialogFormVisible: false,
-        adtype: {
+        channel: {
           id: undefined,
           name: undefined,
           program_mark: undefined,
           note: undefined,
-          introduce: undefined,
         },
         textMap: {
           update: '编辑',
@@ -161,13 +160,27 @@
     },
     methods: {
       createData() {
-        if (this.adtype.introduce === '' || this.adtype.program_mark === '' || this.adtype.note === '' || this.adtype.system === '') {
+        let tothis=this;
+        for (let i=0;i<this.hidlist.length;i++){
+          if (this.hidlist[i].name===this.channel.name) {
+            this.$message({
+              message: '该渠道已存在~',
+              type: 'warning'
+            });
+            return
+          }
+        }
+        if (this.channel.name === '' || this.channel.program_mark === '' || this.channel.note === '') {
           this.open3()
           return
         }
-        createAdType(this.adtype).then(() => {
+        if (!this.create_flag) {
+          return
+        }
+        this.create_flag=false
+        createChannel(this.channel).then(() => {
           this.handleFilter();
-          this.list.unshift(this.adtype)
+          this.list.unshift(this.channel)
           this.dialogFormVisible = false
           this.$notify({
             title: '成功',
@@ -175,22 +188,32 @@
             type: 'success',
             duration: 2000
           })
-        }).catch(function () {
-          this.$notify({
+          this.create_flag=true
+        }).catch(function (rs) {
+          tothis.dialogFormVisible = false
+          tothis.$notify({
             title: '失败',
-            message: '请检查网络',
-            type: 'warning',
+            message: '请稍后重试',
+            type: 'error',
             duration: 2000
           })
+          this.create_flag=true
         })
+
+
       },
       updateData() {
-        const tempData = Object.assign({}, this.adtype)
-        if (tempData.introduce === '' || tempData.note === '' || tempData.program_mark === '' || tempData.system === '') {
+        let tothis=this
+        const tempData = Object.assign({}, this.channel)
+        if (tempData.program_mark === '' || tempData.name === '' || tempData.note === '') {
           this.open3()
           return
         }
-        updateAdType(tempData).then(() => {
+        if (!this.update_flag) {
+          return
+        }
+        this.update_flag=false
+        updateChannel(tempData).then(() => {
           this.dialogFormVisible = false
           this.handleFilter();
           this.$notify({
@@ -199,13 +222,16 @@
             type: 'success',
             duration: 2000
           })
-        }).catch(function () {
-          this.$notify({
+          this.update_flag=true
+        }).catch(function (rs) {
+          tothis.dialogFormVisible = false
+          tothis.$notify({
             title: '失败',
-            message: '请检查网络',
-            type: 'warning',
+            message: '请稍后重试',
+            type: 'error',
             duration: 2000
           })
+          this.update_flag=true
         })
       },
       handleCreate() {
@@ -217,7 +243,7 @@
         })
       },
       handleUpdate(row) {
-        this.adtype = Object.assign({}, row) // copy obj
+        this.channel = Object.assign({}, row) // copy obj
         this.dialogStatus = 'update'
         this.dialogFormVisible = true
         this.$nextTick(() => {
@@ -225,52 +251,64 @@
         })
       },
       handleDelete(row) {
-        deleteAdType(row).then(() => {
-          this.handleFilter();
-          this.$notify({
-            title: '成功',
-            message: '删除成功',
-            type: 'success',
-            duration: 2000
+        let tothis=this
+        this.$confirm('是否确定删除?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          deleteChannel(row).then(() => {
+            this.handleFilter();
+            this.$notify({
+              title: '成功',
+              message: '删除成功',
+              type: 'success',
+              duration: 2000
+            })
+          }).catch(function (rs) {
+            tothis.$notify({
+              title: '失败',
+              message: '请稍后重试',
+              type: 'success',
+              duration: 2000
+            })
           })
-        }).catch(function () {
-          this.$notify({
-            title: '失败',
-            message: '请检查网络',
-            type: 'warning',
-            duration: 2000
-          })
-        })
+        });
       },
       resetTemp() {
-        this.adtype = {
+        this.channel = {
           id: undefined,
           name: '',
-          system: '安卓',
-          icon: '无',
-          introduce: '无',
+          program_mark: '',
+          note: '无',
         }
       },
-      open3() {
-        this.$message({
-          message: '记得选择查询范围~',
-          type: 'warning'
-        });
-      },
-      open4() {
-        this.$message({
-          message: '没有信息可以打印~',
-          type: 'warning'
-        });
-      },
       handleFilter() {
-        getAdType().then(response => {
+        let tothis=this
+        getChannel().then(response => {
           this.list = response.data
-          console.log(this.list)
+          this.hidlist = response.data
           this.listLoading = false
         }).catch(function (rs) {
-          console.log(rs)
+          tothis.listLoading = false
         })
+      },
+      getDatawithName(){
+        this.listLoading=true
+        let param=this.inputName
+        if (param==''){
+          this.list=this.hidlist;
+          this.listLoading=false
+          return
+        }
+        let data=[]
+        for (let i=0;i<this.hidlist.length;i++){
+          if (this.hidlist[i].name.search(param)!=-1){
+            data.push(this.hidlist[i])
+          }
+        }
+        this.list = data
+        this.listLoading=false
       },
       formatJson(filterVal, jsonData) {
         return jsonData.map(v => filterVal.map(j => v[j]))

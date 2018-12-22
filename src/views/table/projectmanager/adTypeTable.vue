@@ -12,6 +12,7 @@
       element-loading-text="Loading"
       border
       fit
+      stripe
       highlight-current-row>
       <el-table-column align="center" label="ID" width="95">
         <template slot-scope="scope" prop="id">
@@ -23,23 +24,28 @@
       <!--{{ scope.row.id }}-->
       <!--</template>-->
       <!--</el-table-column>-->
-      <el-table-column label="帐号" width="300" align="center" prop="date">
+      <el-table-column label="广告类型名称" width="110" align="center" prop="date">
         <template slot-scope="scope">
-          <span>{{ scope.row.username }}</span>
+          <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="角色" width="300" align="center" prop="app_name">
+      <el-table-column label="广告类型标记" width="110" align="center" prop="app_name">
         <template slot-scope="scope">
-          {{ scope.row.role }}
+          {{ scope.row.program_mark }}
         </template>
       </el-table-column>
 
-      <el-table-column label="备注" align="center" prop="channel">
+      <el-table-column align="center" label="备注" prop="channel">
         <template slot-scope="scope">
           <span>{{ scope.row.note }}</span>
         </template>
       </el-table-column>
 
+      <el-table-column align="center" label="介绍" prop="advertising_type">
+        <template slot-scope="scope">
+          <span>{{ scope.row.introduce }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ '编辑' }}</el-button>
@@ -50,18 +56,25 @@
 
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :model="app" label-position="left" label-width="90px"
+      <el-form ref="dataForm" :model="adtype" label-position="left" label-width="90px"
                style="width: 400px; margin-left:50px;">
-        <el-form-item label="帐号">
-          <el-input v-model="app.username" placeholder="请填写帐号~"/>
-        </el-form-item>
-        <el-form-item label="角色">
-          <el-input v-model="app.role" placeholder="请填写要帐号的角色名~"/>
-        </el-form-item>
-        <el-form-item label="备注">
-          <el-input v-model="app.note" placeholder="写点什么备忘吧~" value="无"/>
+        <el-form-item label="广告类型名称" v-if="this.dialogStatus==='update'">
+          <el-input v-model="adtype.name" placeholder="请输入广告类型名称~" disabled/>
         </el-form-item>
 
+        <el-form-item label="广告类型名称" v-if="this.dialogStatus==='create'">
+          <el-input v-model="adtype.name" placeholder="请输入广告类型名称~"/>
+        </el-form-item>
+
+        <el-form-item label="广告类型标记">
+          <el-input v-model="adtype.program_mark" placeholder="默认填写安卓~"/>
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input v-model="adtype.note" placeholder="暂无此功能~" value="无"/>
+        </el-form-item>
+        <el-form-item label="介绍">
+          <el-input v-model="adtype.introduce" placeholder="比如别称~"/>
+        </el-form-item>
       </el-form>
 
       <div slot="footer" class="dialog-footer">
@@ -87,7 +100,7 @@
 </template>
 
 <script>
-  import {getRole, creatRole, updateRole, deleteRole} from '@/api/user_role_Table'
+  import {getAdType, createAdType, updateAdType, deleteAdType} from '@/api/table/projectmanager/adTypeTable'
   import waves from '@/directive/waves'
   import {parseTime} from '@/utils'
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
@@ -114,7 +127,7 @@
             return time.getTime() > Date.now() - 8.64e6
           }
         },
-        addButton:'添加资源',
+        addButton:'添加广告类型',
         directives: {waves},
         downloadLoading: false,
         layout: '',
@@ -130,11 +143,11 @@
         statusOptions: ['published', 'draft', 'deleted'],
         dialogStatus: '',
         dialogFormVisible: false,
-        app: {
+        adtype: {
           id: undefined,
           name: undefined,
-          system: undefined,
-          icon: undefined,
+          program_mark: undefined,
+          note: undefined,
           introduce: undefined,
         },
         textMap: {
@@ -147,6 +160,8 @@
         dialogPvVisible: false,
         pvData: [],
         sortOptions: [{label: 'ID Ascending', key: '+id'}, {label: 'ID Descending', key: '-id'}],
+        create_flag:true,
+        update_flag:true,
       }
     },
     mounted() {
@@ -154,13 +169,27 @@
     },
     methods: {
       createData() {
-        if (this.app.username === '' || this.app.role === '' || this.app.note === '') {
+        let tothis=this
+        for (let i=0;i<this.list.length;i++){
+          if (this.list[i].name===this.adtype.name) {
+            this.$message({
+              message: '该广告类型已存在~',
+              type: 'warning'
+            });
+            return
+          }
+        }
+        if (this.adtype.name === '' ||this.adtype.introduce === '' || this.adtype.program_mark === '' || this.adtype.note === '' || this.adtype.system === '') {
           this.open3()
           return
         }
-        creatRole(this.app).then(() => {
+        if (!this.create_flag){
+          return
+        }
+        this.create_flag=false
+        createAdType(this.adtype).then(() => {
           this.handleFilter();
-          this.list.unshift(this.app)
+          this.list.unshift(this.adtype)
           this.dialogFormVisible = false
           this.$notify({
             title: '成功',
@@ -168,23 +197,30 @@
             type: 'success',
             duration: 2000
           })
-        }).catch(function () {
-          this.$notify({
+          this.create_flag=true
+        }).catch(function (rs) {
+          tothis.dialogFormVisible = false
+          tothis.$notify({
             title: '失败',
-            message: '请检查网络',
-            type: 'warning',
+            message: '请稍后重试',
+            type: 'error',
             duration: 2000
           })
+          this.create_flag=true
         })
       },
       updateData() {
-
-        const tempData = Object.assign({}, this.app)
-        if (tempData.introduce === '' || tempData.name === '' || tempData.icon === '' || tempData.system === '') {
+        let tothis=this;
+        const tempData = Object.assign({}, this.adtype)
+        if (tempData.introduce === '' || tempData.note === '' || tempData.program_mark === '' || tempData.system === ''|| tempData.name === '') {
           this.open3()
           return
         }
-        updateRole(tempData).then(() => {
+        if (!this.update_flag){
+          return
+        }
+        this.update_flag=false
+        updateAdType(tempData).then(() => {
           this.dialogFormVisible = false
           this.handleFilter();
           this.$notify({
@@ -193,13 +229,16 @@
             type: 'success',
             duration: 2000
           })
-        }).catch(function () {
-          this.$notify({
+          this.update_flag=true
+        }).catch(function (rs) {
+          this.dialogFormVisible = false
+          tothis.$notify({
             title: '失败',
-            message: '请检查网络',
-            type: 'warning',
+            message: '请稍后重试',
+            type: 'error',
             duration: 2000
           })
+          this.update_flag=true
         })
       },
       handleCreate() {
@@ -211,7 +250,7 @@
         })
       },
       handleUpdate(row) {
-        this.app = Object.assign({}, row) // copy obj
+        this.adtype = Object.assign({}, row) // copy obj
         this.dialogStatus = 'update'
         this.dialogFormVisible = true
         this.$nextTick(() => {
@@ -219,25 +258,32 @@
         })
       },
       handleDelete(row) {
-        deleteRole(row).then(() => {
-          this.handleFilter();
-          this.$notify({
-            title: '成功',
-            message: '删除成功',
-            type: 'success',
-            duration: 2000
+        let tothis=this
+        this.$confirm('是否确定删除?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          deleteAdType(row).then(() => {
+            this.handleFilter();
+            this.$notify({
+              title: '成功',
+              message: '删除成功',
+              type: 'success',
+              duration: 2000
+            })
+          }).catch(function (rs) {
+            tothis.$notify({
+              title: '失败',
+              message: '请稍后重试',
+              type: 'error',
+              duration: 2000
+            })
           })
-        }).catch(function () {
-          this.$notify({
-            title: '失败',
-            message: '请检查网络',
-            type: 'warning',
-            duration: 2000
-          })
-        })
+        });
       },
       resetTemp() {
-        this.app = {
+        this.adtype = {
           id: undefined,
           name: '',
           system: '安卓',
@@ -258,12 +304,14 @@
         });
       },
       handleFilter() {
-        getRole().then(response => {
+        let tothis=this
+        getAdType().then(response => {
           this.list = response.data
           console.log(this.list)
           this.listLoading = false
         }).catch(function (rs) {
           console.log(rs)
+          this.listLoading = false
         })
       },
       formatJson(filterVal, jsonData) {

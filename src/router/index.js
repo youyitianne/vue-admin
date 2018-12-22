@@ -77,8 +77,8 @@ export const asyncRouterMap = [
     redirect: '/component/dropzone',
     name:'Component',
     meta: {
-      title: '组件',
-      icon: 'component',
+      title: '上传',
+      icon: 'excel',
       roles: ['operator']
     },
     children: [
@@ -99,7 +99,7 @@ export const asyncRouterMap = [
     name: 'Example',
     meta: {
       title: '数据管理',
-      icon: 'example',
+      icon: 'documentation',
       roles: ['operator','planner','developer','market','leader']
     },
     children: [
@@ -141,7 +141,7 @@ export const asyncRouterMap = [
       {
         path: 'table',
         name: 'Table',
-        component: () => import('@/views/table/select'),
+        component: () => import('@/views/table/datamanager/select'),
         meta: {
           title: '广告数据管理',
           icon: 'table',
@@ -149,14 +149,25 @@ export const asyncRouterMap = [
         }
       },
       {
+        path: 'userdata',
+        component: () => import('@/views/table/datamanager/userdata'),
+        name: 'UserdataTable',
+        meta: {
+          title: '用户数据管理',
+          noCache: true ,
+          icon: 'table',
+          roles: ['operator','planner','developer','market','leader']
+        }
+      },
+      {
         path: 'yixin',
-        component: () => import('@/views/table/yixin'),
+        component: () => import('@/views/table/datamanager/yixin'),
         name: 'YixinTable',
         meta: {
           title: '移信数据下载',
           noCache: true ,
           icon: 'table',
-          roles: ['operator','planner','developer','market','leader']
+          roles: ['operator','leader']
         }
       },
     ]
@@ -168,13 +179,13 @@ export const asyncRouterMap = [
     name: 'Example',
     meta: {
       title: '项目管理',
-      icon: 'example',
+      icon: 'list',
       roles: ['operator'],
     },
     children: [
       {
         path: 'appTable',
-        component: () => import('@/views/table/appTable'),
+        component: () => import('@/views/table/projectmanager/appTable'),
         name: 'AppTable',
         meta: {
           title: '应用管理',
@@ -185,7 +196,7 @@ export const asyncRouterMap = [
       },
       {
         path: 'channelTable',
-        component: () => import('@/views/table/channelTable'),
+        component: () => import('@/views/table/projectmanager/channelTable'),
         name: 'ChannelTable',
         meta: {
           title: '渠道管理',
@@ -196,7 +207,7 @@ export const asyncRouterMap = [
       },
       {
         path: 'adTypeTable',
-        component: () => import('@/views/table/adTypeTable'),
+        component: () => import('@/views/table/projectmanager/adTypeTable'),
         name: 'AdTypeTable',
         meta: {
           title: '广告类型管理',
@@ -213,14 +224,14 @@ export const asyncRouterMap = [
     redirect: '/accountmanager/appTable',
     name: 'Example',
     meta: {
-      title: '系统管理',
-      icon: 'example',
+      title: '人员管理',
+      icon: 'peoples',
       roles: ['leader']
     },
     children: [
       {
         path: 'accountTable',
-        component: () => import('@/views/table/accountTable'),
+        component: () => import('@/views/table/personalmanager/accountTable'),
         name: 'AccountTable',
         meta: {
           title: '用户管理',
@@ -231,7 +242,7 @@ export const asyncRouterMap = [
       },
       {
         path: 'user_role_Table',
-        component: () => import('@/views/table/user_role_Table'),
+        component: () => import('@/views/table/personalmanager/user_role_Table'),
         name: 'User_Role_Table',
         meta: {
           title: '角色管理',
@@ -242,8 +253,9 @@ export const asyncRouterMap = [
       },
       {
         path: 'role_perms_Table',
-        component: () => import('@/views/table/role_perms_Table'),
+        component: () => import('@/views/table/personalmanager/role_perms_Table'),
         name: 'Role_Perms_Table',
+        hidden:true,
         meta: {
           title: '权限管理',
           noCache: true ,
@@ -253,21 +265,56 @@ export const asyncRouterMap = [
       },
       {
         path: 'resourceTable',
-        component: () => import('@/views/table/resourceTable'),
+        component: () => import('@/views/table/personalmanager/resourceTable'),
         name: 'ResourceTable',
         meta: {
           title: '资源管理',
-          noCache: true ,
           icon: 'table' ,
           roles: ['leader']
         }
       }
     ]
   },
-
+  {
+    path:'/sdkmanager',
+    component:Layout,
+    redirect: '/sdkmanager/sdklist',
+    name:'Component',
+    meta: {
+      title: 'SDK管理',
+      icon: 'excel',
+      roles: ['operator']
+    },
+    children: [
+      {
+        path: 'sdklist',
+        component: () => import('@/views/table/sdkmanager/sdklisttable'),
+        name: 'SDKManager',
+        meta: {
+          title: 'SDK模版管理',
+          //roles: ['operator'],
+        }
+      },
+      {
+        path: 'projectconfig',
+        component: () => import('@/views/table/sdkmanager/projectconfigtable'),
+        name: 'ProjectConfigManager',
+        meta: {
+          title: '项目配置表管理',
+          //roles: ['operator'],
+        }
+      },{
+        path: 'projectconfiglist',
+        component: () => import('@/views/table/sdkmanager/projectconfigtable_publish'),
+        name: 'ProjectConfigList',
+        meta: {
+          title: '项目配置表',
+          //roles: ['operator'],
+        }
+      }, ]
+  },
   { path: '*', redirect: '/404'}
 ];
-
 
 //   path: '/nested',
 //   component: Layout,

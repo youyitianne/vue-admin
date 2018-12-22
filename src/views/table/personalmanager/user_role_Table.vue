@@ -4,8 +4,13 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit"
                  @click="handleCreate">{{addButton}}
       </el-button>
+
+      <el-input placeholder="根据账号查找" v-model="inputName" style="width: 200px;" class="filter-item" clearable @blur="getRolewithName"/>
+
+
     </div>
     <el-table
+      stripe
       v-loading="listLoading"
       :data="list"
       element-loading-text="Loading"
@@ -46,7 +51,7 @@
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
           <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
-          <el-button size="mini" type="primary" @click="handlePerm(scope.row)">{{ '权限' }}</el-button>
+          <el-button size="mini" type="primary" @click="handlePerm(scope.row)">权限</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -54,14 +59,18 @@
       <el-form ref="dataForm" :model="app" label-position="left" label-width="90px"
                style="width: 400px; margin-left:50px;">
         <el-form-item label="帐号">
-          <el-select v-model="app.username" class="filter-item" placeholder="帐号">
+          <el-select v-model="app.username" class="filter-item" placeholder="帐号" v-if="dialogStatus==='create'">
+            <el-option v-for="item in userlist" :key="item.username" :label="item.username" :value="item.username"/>
+          </el-select>
+          <el-select v-model="app.username" class="filter-item" placeholder="帐号" v-if="dialogStatus==='update'"
+                     disabled>
             <el-option v-for="item in userlist" :key="item.username" :label="item.username" :value="item.username"/>
           </el-select>
         </el-form-item>
-
         <el-form-item label="角色名字">
           <el-input v-model="app.role_name" placeholder="必填" value="无"/>
         </el-form-item>
+
         <el-form-item label="角色标识">
           <el-select v-model="app.role" class="filter-item" placeholder="请选择权限">
             <el-option v-for="item in roleOptions" :key="item.key" :label="item.key" :value="item.val"/>
@@ -90,8 +99,9 @@
         <el-button type="primary" @click="dialogPvVisible = false">{{ '219' }}</el-button>
       </span>
     </el-dialog>
+    <!--权限-->
 
-    <el-dialog :title="textMap.perm" :visible.sync="permFormVisible">
+    <el-dialog :title="textMap.perm" :visible.sync="permFormVisible" :detectionid="detectionid" v-if="hackReset">
       <el-tree
         ref="tree"
         :data="data2"
@@ -110,10 +120,11 @@
 
   </div>
 </template>
-<script>
 
-  import {getAccount} from '@/api/accountTable'
-  import {getRole, creatRole, updateRole, deleteRole, getPerms, createPerms} from '@/api/user_role_Table'
+
+<script>
+  import {getAccount} from '@/api/table/personalmanager/accountTable'
+  import {getRole, creatRole, updateRole, deleteRole, getPerms, createPerms} from '@/api/table/personalmanager/user_role_Table'
   import waves from '@/directive/waves'
   import {parseTime} from '@/utils'
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
@@ -126,6 +137,7 @@
     {key: '技术', val: 'developer'},
     {key: '组长', val: 'leader'},
   ]
+
 
   export default {
     components: {Pagination},
@@ -142,7 +154,14 @@
     },
     data() {
       return {
-        checkedlist:[],
+        create_flag_perm:true,
+        create_flag_role:true,
+        update_flag_role:true,
+        inputName:'',
+        detectionid: 12,
+        hackReset: false,
+        checkedlist: [],
+        hidlist:[],
         data2: [{
           id: 'fileupload-operate',
           label: '上传文件',
@@ -168,7 +187,7 @@
             }, {
               id: 'app-canEdit',
               label: '应用修改'
-            },{
+            }, {
               id: 'app-canDelete',
               label: '应用删除'
             }]
@@ -183,7 +202,7 @@
             }, {
               id: 'channel-canEdit',
               label: '渠道修改'
-            },{
+            }, {
               id: 'channel-canDelete',
               label: '渠道删除'
             }]
@@ -198,8 +217,8 @@
             }, {
               id: 'adtype-canEdit',
               label: '广告类型修改'
-            },{
-              id: 'adtype-canDelete ',
+            }, {
+              id: 'adtype-canDelete',
               label: '广告类型删除'
             }]
           }]
@@ -216,7 +235,7 @@
             }, {
               id: 'user-canEdit',
               label: '用户修改'
-            },{
+            }, {
               id: 'user-canDelete',
               label: '用户删除'
             }]
@@ -231,7 +250,7 @@
             }, {
               id: 'role-canEdit',
               label: '角色修改'
-            },{
+            }, {
               id: 'role-canDelete',
               label: '角色删除'
             }]
@@ -246,11 +265,11 @@
             }, {
               id: 'permission-canEdit',
               label: '权限修改'
-            },{
+            }, {
               id: 'permission-canDelete',
               label: '权限删除'
             }]
-          },{
+          }, {
             label: '资源管理管理',
             children: [{
               id: 'resource-canList',
@@ -261,11 +280,24 @@
             }, {
               id: 'resource-canEdit',
               label: '资源修改'
-            },{
+            }, {
               id: 'resource-canDelete',
               label: '资源删除'
             }]
-          }]
+          }, {
+            label: 'SDK管理',
+            children: [{
+              id: 'sdk-canList',
+              label: 'SDK展示'
+            }, {
+              id: 'sdk-canCreate',
+              label: 'SDK创建'
+            },{
+              id: 'sdk-canEdit',
+              label: 'SDK编辑'
+            }]
+          }
+          ],
         }],
         defaultProps: {
           children: 'children',
@@ -275,8 +307,8 @@
         grade: {
           box: false,
           check: []
-        } ,
-        permFormVisible:false,
+        },
+        permFormVisible: false,
         roleOptions,
         introduce: '介绍',
         pickerOptions0: {
@@ -294,7 +326,7 @@
         list: null,
         userlist: null,
         total: 0,
-        listLoading: false,
+        listLoading: true,
         importanceOptions: [1, 2, 3],
         names: [],
         sortOptions: [{label: 'ID Ascending', key: '+id'}, {label: 'ID Descending', key: '-id'}],
@@ -309,13 +341,14 @@
         },
         textMap: {
           update: '编辑',
-          create: '创建'
+          create: '创建',
+          perm: '权限编辑',
         },
         rules: {
           title: [{required: true, message: '必须有名字！', trigger: 'blur'}]
         },
         dialogPvVisible: false,
-        permlist:null,
+        permlist: null,
         pvData: [],
         sortOptions: [{label: 'ID Ascending', key: '+id'}, {label: 'ID Descending', key: '-id'}],
       }
@@ -325,16 +358,21 @@
       this.getUsernames();
     },
     methods: {
-      permFormClose(){
+      permFormClose() {
         this.permFormVisible = false
       },
-      handleUpdatePerm(){
-        var tothis=this;
-        let data={
-          username:this.permlist.username,
-          username_mark:this.permlist.id,
-          permissions:this.$refs.tree.getCheckedKeys().toString(),
+      handleUpdatePerm() {
+        let tothis = this;
+        let data = {
+          username: this.permlist.username,
+          id: this.permlist.id,
+          username_mark: this.permlist.username_mark,
+          permissions: this.$refs.tree.getCheckedKeys().toString(),
         }
+        if (!this.create_flag_perm) {
+          return
+        }
+        this.create_flag_perm=false
         createPerms(data).then(() => {
           this.handleFilter();
           this.permFormVisible = false
@@ -344,33 +382,32 @@
             type: 'success',
             duration: 2000
           })
-        }).catch(function () {
+          this.create_flag_perm=true
+        }).catch(function (rs) {
+          tothis.permFormClose();
           tothis.$notify({
             title: '失败',
-            message: '请检查网络',
-            type: 'warning',
+            message: '请稍后重试',
+            type: 'error',
             duration: 2000
           })
+          this.create_flag_perm=true
         })
       },
       handlePerm(row) {
-        var tothis=this;
-        this.permlist=row;
+        this.hackReset = false
+        let tothis = this;
+        this.permlist = row;
         this.dialogStatus = 'update'
         getPerms(row).then(rs => {
-          if (this.$refs.tree!=undefined){
-           this.$refs.tree.setCheckedKeys([]);
+          if (this.$refs.tree != undefined) {
+            this.$refs.tree.store.setCheckedKeys([])
           }
-          this.grade.check=rs.data;
+          this.grade.check = rs.data;
+          this.hackReset = true
           this.permFormVisible = true;
         }).catch(function (rs) {
-          console.log(rs)
-          tothis.$notify({
-            title: '失败',
-            message: '请检查网络',
-            type: 'warning',
-            duration: 2000
-          })
+          console.err(rs)
         })
       },
       getUsernames() {
@@ -378,16 +415,27 @@
           this.userlist = response.data
           this.listLoading = false
         }).catch(function (rs) {
-          console.log(rs)
+          console.err(rs)
         })
       },
       createData() {
-        if (this.app.username === '' || this.app.role === '' || this.app.note === ''|| this.app.role_name === '' || this.app.role_describe === '') {
+        if (this.app.username === '' || this.app.role === '' || this.app.note === '' || this.app.role_name === '' || this.app.role_describe === '') {
           this.open3()
           return
         }
-        var tothis=this;
-        creatRole(this.app).then(() => {
+        let username = this.app.username
+        let username_mark = null
+        for (let i = 0; i < this.userlist.length; i++) {
+          if (username == this.userlist[i].username) {
+            username_mark = this.userlist[i].id
+          }
+        }
+        let tothis = this;
+        if (!this.create_flag_role){
+          return
+        }
+        this.create_flag_role=false
+        creatRole(this.app, username_mark).then(() => {
           this.handleFilter();
           this.list.unshift(this.app)
           this.dialogFormVisible = false
@@ -397,24 +445,30 @@
             type: 'success',
             duration: 2000
           })
-        }).catch(function () {
+          this.create_flag_role=true
+        }).catch(function (rs) {
+          tothis.dialogFormVisible = false
           tothis.$notify({
             title: '失败',
-            message: '请检查网络',
-            type: 'warning',
+            message: '请稍后重试',
+            type: 'error',
             duration: 2000
           })
+          this.create_flag_role=true
         })
       },
       updateData() {
         const tempData = Object.assign({}, this.app)
-        if (tempData.username === '' || tempData.role === '' || tempData.note === ''|| tempData.role_name === '' || tempData.role_describe === '' ) {
+        if (tempData.username === '' || tempData.role === '' || tempData.note === '' || tempData.role_name === '' || tempData.role_describe === '') {
           this.open3()
           return
         }
-        var tothis=this;
+        let tothis = this;
+        if (!this.update_flag_role){
+          return
+        }
+        this.update_flag_role=false
         updateRole(tempData).then(() => {
-          this.dialogFormVisible = false
           this.handleFilter();
           this.$notify({
             title: '成功',
@@ -422,13 +476,17 @@
             type: 'success',
             duration: 2000
           })
-        }).catch(function () {
+          this.update_flag_role=true
+          this.dialogFormVisible = false
+        }).catch(function (rs) {
+          tothis.dialogFormVisible = false
           tothis.$notify({
             title: '失败',
-            message: '请检查网络',
-            type: 'warning',
+            message: '请稍后重试',
+            type: 'error',
             duration: 2000
           })
+          this.update_flag_role=true
         })
       },
       handleCreate() {
@@ -448,23 +506,29 @@
         })
       },
       handleDelete(row) {
-        var tothis=this;
-        deleteRole(row).then(() => {
-          this.handleFilter();
-          this.$notify({
-            title: '成功',
-            message: '删除成功',
-            type: 'success',
-            duration: 2000
+        let tothis = this;
+        this.$confirm('是否确定删除?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          deleteRole(row).then(() => {
+            this.handleFilter();
+            this.$notify({
+              title: '成功',
+              message: '删除成功',
+              type: 'success',
+              duration: 2000
+            })
+          }).catch(function (rs) {
+            tothis.$notify({
+              title: '失败',
+              message: '请稍后重试',
+              type: 'error',
+              duration: 2000
+            })
           })
-        }).catch(function () {
-          tothis.$notify({
-            title: '失败',
-            message: '请检查网络',
-            type: 'warning',
-            duration: 2000
-          })
-        })
+        });
       },
       resetTemp() {
         this.app = {
@@ -488,12 +552,32 @@
         });
       },
       handleFilter() {
+        let tothis = this
         getRole().then(response => {
           this.list = response.data
+          this.hidlist= response.data
           this.listLoading = false
         }).catch(function (rs) {
           console.log(rs)
+          tothis.listLoading = false
         })
+      },
+      getRolewithName(){
+        this.listLoading=true
+        let param=this.inputName
+        if (param==''){
+          this.list=this.hidlist;
+          this.listLoading=false
+          return
+        }
+        let data=[]
+        for (let i=0;i<this.hidlist.length;i++){
+          if (this.hidlist[i].username.search(param)!=-1){
+            data.push(this.hidlist[i])
+          }
+        }
+        this.list = data
+        this.listLoading=false
       },
       formatJson(filterVal, jsonData) {
         return jsonData.map(v => filterVal.map(j => v[j]))

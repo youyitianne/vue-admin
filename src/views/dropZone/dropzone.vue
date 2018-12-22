@@ -1,7 +1,11 @@
 <template>
   <div class="components-container">
     <div class="editor-container">
-      <dropzone id="myVueDropzone" url="http://192.168.1.144:8083/fileupload" @dropzone-removedFile="dropzoneR" @dropzone-success="dropzoneS"/>
+      <dropzone id="myVueDropzone"
+                url="http://192.168.1.144:8083/fileupload"
+                @dropzone-removedFile="dropzoneR"
+                @dropzone-success="dropzoneS"
+                style="margin: 0 auto;margin-top: 30px"/>
     </div>
     <div class="uploadresponse" v-html="value" style="padding: 30px;font-family: 微软雅黑;line-height: 22px;font-size: 15px" ></div>
   </div>
@@ -30,3 +34,5 @@ export default {
   }
 }
 </script>
+
+

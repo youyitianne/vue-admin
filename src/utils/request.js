@@ -32,17 +32,26 @@ service.interceptors.response.use(
     /**
      * code为非20000是抛错 可结合自己业务进行修改
      */
-
     const res = response.data
+    if (res.msg=='Unauthorized'||res.status==status){
+      Message({
+        message:'权限不足',
+        type: 'error',
+        duration: 5 * 1000
+      })
+    }
+    if (res.code === 50020) {           //登录失败 自定义
+      return Promise.reject('登录失败，请检查帐号密码是否正确')
+    }
     if (res.code===50009) {
       Message({
-        message: '用户名或者密码错误！',
+        message: res.data,
         type: 'error',
         duration: 5 * 1000
       })
       return
     }
-    if (res.code !== 20000) {
+    if (res.code !== 20000) {     //下载文件跳过 自定义
       if (response.statusText=="wenjian"){
         return response.data
       }
@@ -63,6 +72,10 @@ service.interceptors.response.use(
           })
         })
       }
+      //下载文件根据datatype辨认 跳过拦截
+      if (response.data.type==='application/octet-stream'){
+        return response.data
+      }
       return Promise.reject('bad code')
     } else {
       return response.data
@@ -71,7 +84,7 @@ service.interceptors.response.use(
   error => {
     console.log( "请检查网络连接"+error) // for debug
     Message({
-      message:'请重新登录，刷新试试！',
+      message:'请检查网络连接 ！',
       type: 'error',
       duration: 5 * 1000
     })

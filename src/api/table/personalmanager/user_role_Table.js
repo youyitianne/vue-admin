@@ -8,11 +8,18 @@ export function getRole() {
   })
 }
 
-export function creatRole(param) {
+export function creatRole(param,username_mark) {
   return request({
     url: '/api/role',
     method: 'post',
-    params:param
+    data:{
+      username:param.username,
+      username_mark:username_mark,
+      role:param.role,
+      note:param.note,
+      role_name:param.role_name,
+      role_describe:param.role_describe,
+    }
   })
 }
 
@@ -21,7 +28,6 @@ export function updateRole(param) {
     url: '/api/role/'+param.id,
     method: 'patch',
     data:{
-      username:param.username,
       role:param.role,
       note:param.note,
       role_name:param.role_name,
@@ -39,7 +45,7 @@ export function deleteRole(param) {
 
 export function getPerms(param) {
   return request({
-    url: '/api/perms/'+param.id,
+    url: '/api/perms/'+param.username_mark,
     method: 'get',
   })
 }

@@ -4,9 +4,10 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit"
                  @click="handleCreate">{{addButton}}
       </el-button>
-
+      <el-input placeholder="根据账号查找" v-model="inputName" style="width: 200px" class="filter-item" clearable @blur="getDatawithName"/>
     </div>
     <el-table
+      stripe
       v-loading="listLoading"
       :data="list"
       element-loading-text="Loading"
@@ -33,7 +34,6 @@
           {{ scope.row.system }}
         </template>
       </el-table-column>
-
       <el-table-column align="center" label="图标" prop="channel">
         <template slot-scope="scope">
           <span>{{ scope.row.icon }}</span>
@@ -52,14 +52,16 @@
         </template>
       </el-table-column>
     </el-table>
-
-
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :model="app" label-position="left" label-width="90px"
                style="width: 400px; margin-left:50px;">
-        <el-form-item label="应用名">
-          <el-input v-model="app.name" placeholder="请输入游戏名字~"/>
+        <el-form-item label="应用名" v-if="this.dialogStatus === 'update'">
+          <el-input v-model="app.name" placeholder="请输入游戏名字~" disabled/>
         </el-form-item>
+        <el-form-item label="应用名" v-if="this.dialogStatus === 'create'">
+          <el-input v-model="app.name" placeholder="请输入游戏名字~" />
+        </el-form-item>
+
         <el-form-item label="平台">
           <el-input v-model="app.system" placeholder="默认填写安卓~"/>
         </el-form-item>
@@ -70,13 +72,11 @@
           <el-input v-model="app.introduce" placeholder="比如别称~"/>
         </el-form-item>
       </el-form>
-
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">{{ '取消'}}</el-button>
         <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">{{ '确认' }}</el-button>
       </div>
     </el-dialog>
-
     <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
       <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
         <el-table-column prop="key" label="Channel"/>
@@ -86,15 +86,11 @@
         <el-button type="primary" @click="dialogPvVisible = false">{{ '219' }}</el-button>
       </span>
     </el-dialog>
-
-
   </div>
-
-
 </template>
 
 <script>
-  import {getApp, createApp, updateApp, deleteApp} from '@/api/appTable'
+  import {getApp, createApp, updateApp, deleteApp} from '@/api/table/projectmanager/appTable'
   import waves from '@/directive/waves'
   import {parseTime} from '@/utils'
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
@@ -114,6 +110,10 @@
     },
     data() {
       return {
+        create_flag:true,
+        update_flag:true,
+        inputName:'',
+        hidlist:[],
         introduce: '介绍',
         pickerOptions0: {
           disabledDate(time) {
@@ -160,10 +160,24 @@
     },
     methods: {
       createData() {
+        for (let i=0;i<this.hidlist.length;i++){
+          if (this.hidlist[i].name===this.app.name) {
+            this.$message({
+              message: '该应用已存在~',
+              type: 'warning'
+            });
+            return
+          }
+        }
         if (this.app.introduce === '' || this.app.name === '' || this.app.icon === '' || this.app.system === '') {
           this.open3()
           return
         }
+        let tothis=this
+        if (!this.create_flag) {
+          return
+        }
+        this.create_flag=false
         createApp(this.app).then(() => {
           this.handleFilter();
           this.list.unshift(this.app)
@@ -174,22 +188,30 @@
             type: 'success',
             duration: 2000
           })
-        }).catch(function () {
-          this.$notify({
+          this.create_flag=true
+        }).catch(function (rs) {
+          tothis.dialogFormVisible = false
+          tothis.$notify({
             title: '失败',
-            message: '请检查网络',
-            type: 'warning',
+            message: '请稍后重试',
+            type: 'error',
             duration: 2000
           })
+          this.create_flag=true
         })
       },
       updateData() {
-
+        let tothis=this
         const tempData = Object.assign({}, this.app)
         if (tempData.introduce === '' || tempData.name === '' || tempData.icon === '' || tempData.system === '') {
           this.open3()
           return
         }
+
+        if (!this.update_flag){
+          return
+        }
+        this.update_flag=false
         updateApp(tempData).then(() => {
           this.dialogFormVisible = false
           this.handleFilter();
@@ -199,13 +221,16 @@
             type: 'success',
             duration: 2000
           })
-        }).catch(function () {
-          this.$notify({
+          this.update_flag=true
+        }).catch(function (rs) {
+          tothis.dialogFormVisible = false
+          tothis.$notify({
             title: '失败',
-            message: '请检查网络',
-            type: 'warning',
+            message: '请稍后重试',
+            type: 'error',
             duration: 2000
           })
+          this.update_flag=true
         })
       },
       handleCreate() {
@@ -225,22 +250,29 @@
         })
       },
       handleDelete(row) {
-        deleteApp(row).then(() => {
-          this.handleFilter();
-          this.$notify({
-            title: '成功',
-            message: '删除成功',
-            type: 'success',
-            duration: 2000
+        let tothis=this
+        this.$confirm('是否确定删除?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          deleteApp(row).then(() => {
+            this.handleFilter();
+            this.$notify({
+              title: '成功',
+              message: '删除成功',
+              type: 'success',
+              duration: 2000
+            })
+          }).catch(function (rs) {
+            tothis.$notify({
+              title: '失败',
+              message: '请稍后重试',
+              type: 'error',
+              duration: 2000
+            })
           })
-        }).catch(function () {
-          this.$notify({
-            title: '失败',
-            message: '请检查网络',
-            type: 'warning',
-            duration: 2000
-          })
-        })
+        });
       },
       resetTemp() {
         this.app = {
@@ -264,13 +296,31 @@
         });
       },
       handleFilter() {
+        let tothis=this;
         getApp().then(response => {
+          this.hidlist = response.data
           this.list = response.data
-          console.log(this.list)
           this.listLoading = false
         }).catch(function (rs) {
           console.log(rs)
         })
+      },
+      getDatawithName(){
+        this.listLoading=true
+        let param=this.inputName
+        if (param==''){
+          this.list=this.hidlist;
+          this.listLoading=false
+          return
+        }
+        let data=[]
+        for (let i=0;i<this.hidlist.length;i++){
+          if (this.hidlist[i].name.search(param)!=-1){
+            data.push(this.hidlist[i])
+          }
+        }
+        this.list = data
+        this.listLoading=false
       },
       formatJson(filterVal, jsonData) {
         return jsonData.map(v => filterVal.map(j => v[j]))
