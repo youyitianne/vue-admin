@@ -8,18 +8,19 @@
       <el-select v-model="secondary_game" @change="getDatawithParam">
         <el-option key="全部" label="全部" value="">
         </el-option>
-        <el-option  v-for="item in app_name_list" :key="item" :label="item" :value="item">
+        <el-option v-for="item in app_name_list" :key="item" :label="item" :value="item">
         </el-option>
       </el-select>
       <span style="margin-left: 15px;margin-right: 5px">渠道:</span>
       <el-select v-model="secondary_channel" @change="getDatawithParam">
         <el-option key="全部" label="全部" value="">
         </el-option>
-        <el-option v-for="item in channel_mark_list" :key="item"  :label="item" :value="item">
+        <el-option v-for="item in channel_mark_list" :key="item" :label="item" :value="item">
         </el-option>
       </el-select>
-      <el-checkbox v-model="checked" border style="margin-left: 15px" @change="getDatawithParam">展示可见</el-checkbox>
-      <el-checkbox v-model="checked1" border style="margin-left: 15px" @change="getDatawithParam">展示隐藏</el-checkbox>
+      <!--<el-checkbox v-model="checked" border style="margin-left: 15px" @change="getDatawithParam">展示正常</el-checkbox>-->
+      <el-checkbox v-model="checked1" border style="margin-left: 15px" @change="getDatawithParam">显示删除状态配置表
+      </el-checkbox>
     </div>
     <el-table
       v-loading="listLoading"
@@ -36,7 +37,7 @@
         <template slot-scope="props">
           <el-form label-position="left" inline class="demo-table-expand">
             <el-form-item label="时间:">
-              <span>{{ props.row.date}}</span>
+              <span>{{ props.row.date1}}</span>
             </el-form-item>
             <el-form-item label="游戏名:">
               <span>{{ props.row.app_name }}</span>
@@ -63,8 +64,8 @@
               <span>{{ props.row.sdk_config }}</span>
             </el-form-item>
             <el-form-item label="状态:">
-              <span v-if="props.row.sdk_status===0"><el-button size="mini" type="danger">隐藏</el-button></span>
-              <span v-if="props.row.sdk_status===1"><el-button size="mini" type="success">可见</el-button></span>
+              <span v-if="props.row.sdk_status===0"><el-button size="mini" type="danger">删除</el-button></span>
+              <span v-if="props.row.sdk_status===1"><el-button size="mini" type="success">正常</el-button></span>
             </el-form-item>
             <el-form-item label="渠道特别要求:">
               <span>{{ props.row.sdk_require }}</span>
@@ -86,7 +87,7 @@
                 style="width: 15%">
               </el-table-column>
               <el-table-column
-                prop="param_name"
+                prop="param_name1"
                 label="参数名"
                 style="width: 15%">
               </el-table-column>
@@ -94,11 +95,6 @@
                 prop="param"
                 label="参数"
                 style="width: 25%">
-              </el-table-column>
-              <el-table-column
-                prop="note"
-                label="说明"
-                style="width: 30%">
               </el-table-column>
             </el-table>
           </div>
@@ -109,7 +105,7 @@
           {{ ++scope1.$index }}
         </template>
       </el-table-column>
-      <el-table-column label="时间" prop="date" width="200px">
+      <el-table-column label="时间" prop="date1" width="200px">
       </el-table-column>
       <el-table-column label="应用名" prop="app_name">
       </el-table-column>
@@ -126,8 +122,8 @@
       <el-table-column label="状态" align="center" width="130" class-name="small-padding fixed-width" prop="sdk_status"
                        v-if="checkPermission(['operator', 'planner','admin','leader'])">
         <template slot-scope="scope">
-          <el-button size="mini" type="success" v-if="scope.row.sdk_status===1">可见</el-button>
-          <el-button size="mini" type="danger" v-if=" scope.row.sdk_status===0">隐藏</el-button>
+          <el-button size="mini" type="success" v-if="scope.row.sdk_status===1">正常</el-button>
+          <el-button size="mini" type="danger" v-if=" scope.row.sdk_status===0">删除</el-button>
         </template>
       </el-table-column>
 
@@ -140,7 +136,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="80%">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="80%" :close-on-click-modal=false>
       <el-form ref="dataForm" :model="sdk" label-position="left" label-width="150px" :inline="true"
                style="margin-left:50px;" status-icon id="form-custom">
         <el-form-item label="时间" class="filter-item" v-if="this.dialogStatus === 'create'">
@@ -156,7 +152,7 @@
           <el-input v-model="sdk.package_name" placeholder="必填~" class="dia-input"/>
         </el-form-item>
         <el-form-item label="渠道标记" :rules="[{ required: true, message: '渠道不能为空'}]" prop="channel_mark">
-          <el-select v-model="sdk.channel_mark" placeholder="请选择">
+          <el-select v-model="sdk.channel_mark">
             <el-option
               v-for="item in channel_mark_list_dia"
               :key="item.name"
@@ -165,19 +161,19 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="外部版本-在线" class="filter-item" :rules="[{ required: true, message: '线上版本—版本-在线版本不能为空'}]"
+        <el-form-item label="外部版本-在线" class="filter-item" :rules="[{ required: true, message: '外部版本-在线不能为空'}]"
                       prop="version_online_version">
           <el-input v-model="sdk.version_online_version" placeholder="必填~" class="dia-input"/>
         </el-form-item>
-        <el-form-item label="内部版本-在线" :rules="[{ required: true, message: '线上版本-versioncode-在线版本'}]"
-                      prop="versioncode_online_version">
-          <el-input v-model="sdk.versioncode_online_version" placeholder="必填~" class="dia-input"/>
-        </el-form-item>
-        <el-form-item label="外部版本-更新" :rules="[{ required: true, message: '线上版本-版本-更新版本不能为空'}]"
+        <el-form-item label="外部版本-更新" :rules="[{ required: true, message: '外部版本-更新不能为空'}]"
                       prop="version_update_version">
           <el-input v-model="sdk.version_update_version" placeholder="必填~" class="dia-input"/>
         </el-form-item>
-        <el-form-item label="内部版本_更新" :rules="[{ required: true, message: '线上版本-versioncode-更新版本'}]"
+        <el-form-item label="内部版本-在线" :rules="[{ required: true, message: '内部版本-在线不能为空'}]"
+                      prop="versioncode_online_version">
+          <el-input v-model="sdk.versioncode_online_version" placeholder="必填~" class="dia-input"/>
+        </el-form-item>
+        <el-form-item label="内部版本_更新" :rules="[{ required: true, message: '内部版本_更新不能为空'}]"
                       prop="versioncode_update_version">
           <el-input v-model="sdk.versioncode_update_version" placeholder="必填~" class="dia-input"/>
         </el-form-item>
@@ -187,56 +183,70 @@
         <el-form-item label="状态">
           <el-switch v-model="sdk.sdkstatus" active-color="#13ce66" inactive-color="#ff4949"
                      active-value="1" inactive-value="0"
-                     active-text="可见" inactive-text="隐藏" >
+                     active-text="正常" inactive-text="删除">
           </el-switch>
         </el-form-item>
         <el-form-item label="渠道特别要求">
           <el-input type="textarea" v-model="sdk.sdk_require" class="dia-input" maxlength="150" :autosize="{maxRows: 5}"
                     placeholder=""/>
         </el-form-item>
-        <el-form-item label="备注">
-          <el-input type="textarea" v-model="sdk.note" class="dia-input" maxlength="150" :autosize="{maxRows: 5}"
-                    placeholder=""/>
-        </el-form-item>
         <br/>
-        <!--<el-button @click="addDomain" style="margin-bottom: 15px" type="primary">新增</el-button>-->
+        <!--筛选输入框-->
         <el-input placeholder="SDK模版筛选" v-model="sdk_template_name"
                   style="width: 200px;margin-bottom: 10px" class="filter-item" clearable
-                  @blur="getchannelmarklist"/>
-        <el-checkbox-group
-          v-model="checkedSdkTemplate">
-          <!--v-if="this.dialogStatus === 'create'">-->
-          <el-checkbox v-for="name in sdkTemplate" :label="name" :key="name" @change="getSdkTemplate">{{name}}
+                  @change="getchannelmarklist"/>
+        <!--多选框 sdk模版控制-->
+        <el-checkbox-group v-model="checkedSdkTemplate" style="border-bottom: 15px" size="mini">
+          <el-checkbox v-for="name in sdkTemplate" :label="name" :key="name" @change="findSdkTemplate" border>
+            <div class="grid-content bg-purple-light" style="width: 107px;margin-bottom: 15px">{{name}}</div>
           </el-checkbox>
         </el-checkbox-group>
+
         <br/>
-        <el-tabs tab-position="left" style="width: 95%;background-color: #f4f4f5;height: 500px;padding: 1px"
+        <!--标签页-->
+        <el-tabs tab-position="left" style="width: 95%;background-color: #f4f4f5;height: 500px;padding: 1px" id="test1"
                  @tab-click="findtabname" type="border-card">
           <el-tab-pane v-for="name in checkedSdkTemplate" :label="name" :key="name"
                        style="font-size: 14px;font-family: Microsoft YaHei;width: 100%">
             <div name="pane_form" style="height: 500px;overflow: auto;">
-              <!--对话框内层多选框-->
+              <!--标签页内多选框-->
               <el-checkbox-group
+                size="mini"
                 v-model="dialog_secondary_checked"
-                v-if="dialog_secondary_visual">
-                <el-checkbox v-for="name in dialog_secondary_list" :label="name" :key="name" @change="dialog_secondary_checked_changed">{{name}}
-                </el-checkbox>
+                v-if="dialog_secondary_visual"
+                style="margin-bottom: 15px">
+                <el-checkbox-button v-for="name in dialog_secondary_list" :label="name" :key="name"
+                                    style="margin-left: 0px">{{name}}
+                </el-checkbox-button>
               </el-checkbox-group>
-              <!--对话框内层多选框-->
-              <!--动态增减表单项-->
-              <el-form-item v-for="(domain, index) in sdk.form.domains" :key="domain.key+index"
-                            v-if="form_item_filter(domain.param_name)" style="margin-right: 1px"
-                            inline=true>
 
-                <span style="margin-right: 20px;font-size: 14px;font-family: Microsoft YaHei">{{domain.param_name}}：</span>
-                <el-input v-model="domain.param" style="width: 300px;margin-right: 25px" placeholder="必填"/>
-                <span style="font-size: 14px;font-family: Microsoft YaHei">备注：</span>
-                <el-input type="textarea" v-model="domain.note" style="width: 300px;margin-right: 20px" placeholder="必填"/>
+              <template v-for="option in options">
+                <div style="font-size: 16px;font-family: Microsoft YaHei;margin-top: 8px;margin-bottom: 8px"
+                     v-if="test1(option.sdk_name)">
+                  {{option.param_name}}:
+                  <el-select v-model="option.value" @change="test(option.param_name,option.value)">
+                    <el-option
+                      v-for="item in option.param"
+                      :key="item.value"
+                      :value="item.value">
+                    </el-option>
+                  </el-select>
+                </div>
+              </template>
+              <!--标签页内表单-->
+              <el-form-item v-for="(domain, index) in sdk.form.domains" :key="domain.key+index"
+                            v-if="form_item_filter(domain)" style="margin-right: 1px"
+                             v-model="page_name">
+                <div>
+                  <span style="margin-right: 20px;font-size: 14px;font-family: Microsoft YaHei">
+                    {{domain.param_name}}：
+                  </span>
+                  <el-input v-model="domain.param" style="width: 300px;margin-right: 25px" placeholder="必填"/>
+                </div>
               </el-form-item>
             </div>
           </el-tab-pane>
         </el-tabs>
-
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">{{ '取消'}}</el-button>
@@ -273,9 +283,13 @@
     },
     data() {
       return {
-        dialog_secondary_checked:[],
-        dialog_secondary_list:[],
-        dialog_secondary_visual:false,
+        tag_name: '',
+        options: [],
+        value: [],
+        page_name: '',  //初始值  一直为 ''
+        dialog_secondary_checked: [],
+        dialog_secondary_list: [],
+        dialog_secondary_visual: false,
         app_name_list: [],
         spanArr: [],
         filter_form_name: '无',
@@ -328,10 +342,7 @@
           start: '',
           end: ''
         },
-        importanceOptions: [1, 2, 3],
         names: [],
-        sortOptions: [{label: 'ID Ascending', key: '+id'}, {label: 'ID Descending', key: '-id'}],
-        statusOptions: ['published', 'draft', 'deleted'],
         dialogStatus: '',
         dialogFormVisible: false,
         textMap: {
@@ -355,10 +366,11 @@
           publish: '0',
           form: {
             domains: [],
+            select: []
           }
         },
         hidlist: '',
-        channel_mark_list_dia:[],
+        channel_mark_list_dia: [],
         publishlist: [],
         expands: [],
         getRowKeys(row) {
@@ -368,42 +380,24 @@
     },
     created() {
       //this.fetchName()
-      this.initchannel()
-      this.initTemplate()
-      this.initDate()
+      this.initchannel()  //获取渠道
+      this.initTemplate()   //获取sdk模版
+      this.initDate()   //初始化日期查询数据
     },
     methods: {
-      dialog_secondary_checked_changed(){
+      test1(name) {
+        if (name === this.tag_name) {
+          return true
+        }
+        return false
+      },
+      test() {
 
       },
       findtabname(tab, event) {
-        this.dialog_secondary_visual=false
-        this.dialog_secondary_list=[]
-        let visual=this.dialog_secondary_visual;
-        let list=this.dialog_secondary_list;
-        for (let i=0;i<this.sdk.form.domains.length;i++){
-          let data=this.sdk.form.domains[i].param_name
-          if (data.split('-').length>2&&data.split('-')[0]===tab.label) {
-            visual=true
-            if (list.length===0){
-              list.push(data.split('-')[1])
-            } else {
-              let flag=true
-              for (let x=0;x<list.length;x++){
-                if (list[x].search(data.split('-')[1])!=-1){
-                  flag=false
-                }
-              }
-              if (flag){
-                list.push(data.split('-')[1])
-              }
-            }
-          }
-        }
-        this.dialog_secondary_visual=visual;
-        this.dialog_secondary_list=list;
-        this.filter_form_name = tab.label
-      },//获取点击的标签页名
+        this.tag_name = tab.label
+        this.change_pagename(tab.label)
+      },//获取对话框内标签页 名触发事件
       publish(param) {
         let tothis = this
         this.sdk.id = param.id
@@ -438,6 +432,7 @@
               type: 'success',
               duration: 2000
             })
+            this.handleFilter()
           }).catch(rs => {
             this.create_flag = true
             tothis.$notify({
@@ -447,7 +442,6 @@
               duration: 2000
             })
           })
-
         }).catch(function (rs) {
           tothis.$notify({
             title: '警告！',
@@ -457,169 +451,82 @@
           })
           return false
         })
-      },
+      },//发布按钮
       valideSdkForm() {
-        let flag = true
-        let tothis = this
-        let difference = false
-        let out_code = ''
-        let in_code = -1
         for (let i = 0; i < this.publishlist.length; i++) {
+          if (isNaN(parseInt(this.sdk.versioncode_online_version)) || isNaN(parseInt(this.sdk.versioncode_update_version))) {
+            this.$notify({
+              title: '警告！',
+              message: '内部版本号格式错误,请及时修改！',
+              type: 'warning',
+              duration: 2000
+            })
+            return false
+          }
+
+          let arr2 = this.sdk.version_update_version.split('.');//外版本号
+          if (arr2.length < 3) {
+            this.$notify({
+              title: '警告！',
+              message: '外部版本号格式不正确,请及时修改！',
+              type: 'warning',
+              duration: 2000
+            })
+            return false
+          }
+
+          if (parseInt(this.sdk.versioncode_update_version) <= parseInt(this.sdk.versioncode_online_version)) {
+            this.$notify({
+              title: '警告！',
+              message: '内部版本号更新必须大于在线,请及时修改！',
+              type: 'warning',
+              duration: 2000
+            })
+            return false
+          }
+
           if (this.publishlist[i].channel_mark === this.sdk.channel_mark && this.publishlist[i].package_name === this.sdk.package_name) {
-            if (this.publishlist[i].version_update >= this.sdk.version_update_version) {  //外版本号
-              let arr1 = this.publishlist[i].version_update.split('.');
-              let arr2 = this.sdk.version_update_version.split('.');
-              if (arr2.length < 2) {
-                this.$notify({
-                  title: '警告！',
-                  message: '外部版本号格式不正确,请及时修改！',
-                  type: 'warning',
-                  duration: 2000
-                })
-                return false
-              }
-              let diff = this.compareVersion(this.publishlist[i].version_update, this.sdk.version_update_version)
+            let diff = this.compareVersion(this.publishlist[i].version_update, this.sdk.version_update_version)
+            if (diff >= 0) {
+              let out_code = this.publishlist[i].version_update
+              this.$notify({
+                title: '警告！',
+                message: '最高外版本号为' + out_code + ',请及时修改！',
+                type: 'warning',
+                duration: 2000
+              })
+              return false
+            }
 
-              if (diff >= 0) {
-                if (out_code === '') {
-                  out_code = this.publishlist[i].version_update
-                } else {
-                  let diff1 = this.compareVersion(this.publishlist[i].version_update, out_code)
-                  if (diff1 > 0) {
-                    out_code = this.publishlist[i].version_update
-                  }
-                }
-                difference = true
-              }
-            }
-            if (!parseInt(this.sdk.versioncode_update_version) || !parseInt(this.sdk.versioncode_online_version)) {
+            if (parseInt(this.publishlist[i].versioncode_update_version) >= parseInt(this.sdk.versioncode_update_version)) {//内版本号
               this.$notify({
                 title: '警告！',
-                message: '内部版本号格式不正确,请及时修改！',
+                message: '目前最大的内部版本号为：' + this.publishlist[i].versioncode_update_version + ',请及时修改！',
                 type: 'warning',
                 duration: 2000
               })
               return false
             }
-            if (parseInt(this.sdk.versioncode_update_version) <= parseInt(this.sdk.versioncode_online_version)) {
-              this.$notify({
-                title: '警告！',
-                message: '内部版本号更新必须大于在线,请及时修改！',
-                type: 'warning',
-                duration: 2000
-              })
-              return false
-            }
-            if (this.publishlist[i].versioncode_update_version >= this.sdk.versioncode_update_version) { //内版本号
-              if (parseInt(this.publishlist[i].versioncode_update_version) > parseInt(in_code)) {
-                in_code = this.publishlist[i].versioncode_update_version
-              }
-              difference = true
-            }
           }
         }
-        if (difference) {
-          let message = ''
-          if (out_code != '') {
-            message = '最高外版本号为：' + out_code + ' 。';
-          }
-          if (in_code > 0) {
-            message = message + '最高内版本号为：' + in_code + ' 。';
-          }
-          this.$notify({
-            title: '警告！',
-            message: '更新版本必须高于在线版本,请及时修改！' + message,
-            type: 'warning',
-            duration: 2000
-          })
-          flag = false
-        }
-        let emptylist = [];
-        for (let i = 0; i < this.sdk.form.domains.length; i++) {
-          if (this.sdk.form.domains[i].param_name === '' || this.sdk.form.domains[i].param === '' || this.sdk.form.domains[i].note === '') {
-            emptylist.push(i + 1)
-          }
-        }
-        if (this.sdk.sdk_require === '') {
-          this.sdk.sdk_require = '暂无'
-        }
-        if (this.sdk.note === '') {
-          this.sdk.note = '暂无'
-        }
-        if (this.sdk.sdk_config === '') {
-          this.sdk.sdk_config = '暂无'
-        }
-        if (emptylist.length != 0) {
-          this.$notify({
-            title: '警告！',
-            message: 'KEY表有参数没填！',
-            type: 'error',
-            duration: 2000
-          })
-          this.listLoading = false
-          flag = false
-        }
-        return flag
+
+        return true
       },  //发布验证
-      expandrowhandler(row, expandedRows) {
-        let that = this
-        if (expandedRows.length) {
-          that.expands = []
-          if (row) {
-            that.expands.push(row.id)
-          }
-        } else {
-          that.expands = []
-        }
-        if (expandedRows.length < 1) {
-          return
-        }
-        let index = expandedRows.length - 1
-        this.getSpanArr(expandedRows[index].paramter)
-      },//展开行变化时触发
-      getSpanArr(data) {
-        this.spanArr.length = 0
-        for (let i = 0; i < data.length; i++) {
-          if (i === 0) {
-            this.spanArr.push(1);
-            this.pos = 0
-          } else {
-            // 判断当前元素与上一个元素是否相同
-            if (data[i].mark === data[i - 1].mark) {
-              this.spanArr[this.pos] += 1;
-              this.spanArr.push(0);
-            } else {
-              this.spanArr.push(1);
-              this.pos = i;
-            }
-          }
-        }
-      },//获取合并单元格判断数据
-      objectSpanMethod({row, column, rowIndex, columnIndex}) {
-        if (columnIndex === 0) {
-          const _row = this.spanArr[rowIndex];
-          const _col = _row > 0 ? 1 : 0;
-          return {
-            rowspan: _row,
-            colspan: _col
-
-          }
-        }
-      },//合并单元格
-      form_item_filter(param) {
-        let checked=this.dialog_secondary_checked
+      form_item_filter(domain) {
+        let param = domain.param_name
+        let checked = this.dialog_secondary_checked
         let names = param.split('-')
         if (names[0] === this.filter_form_name) {
-          if (names.length<3){
+          if (names.length < 3) {
             return true
-          }else {
-            let flag=false
-            for (let i=0;i<checked.length;i++){
-              if (names[1]===checked[i]) {
-                flag=true
+          } else {
+            let flag = false
+            for (let i = 0; i < checked.length; i++) {
+              if (names[1] === checked[i]) {
+                flag = true
               }
             }
-            if (flag){
+            if (flag) {
               return true
             } else {
               return false
@@ -631,15 +538,26 @@
       },//根据sdk名称展示对话框内sdk列表
       getchannelmarklist() {
         let list = []
+        let name = ''
+        if (this.sdk_template_name === 'base') {
+          name = '屏蔽系统bugly统计分享互推广告锁屏广告支付广告'
+        }
+        for (let i = 0; i < this.hidsdkTemplate.length; i++) {
+          if (name.search(this.hidsdkTemplate[i]) != -1) {
+            list.push(this.hidsdkTemplate[i])
+          }
+        }
+
+
         for (let i = 0; i < this.hidsdkTemplate.length; i++) {
           if (this.hidsdkTemplate[i].search(this.sdk_template_name) != -1) {
             list.push(this.hidsdkTemplate[i])
           }
         }
         this.sdkTemplate = list
-      },//标签页随动展示
+      },//根据对话框内搜索框改变sdk多选框
       handleCreateByTemplate(param) {
-        this.dialog_secondary_checked=[]
+        this.dialog_secondary_checked = []
         this.handleCreate()
         this.handleUpdate(param)
         const date = new Date();
@@ -656,17 +574,48 @@
         date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
         this.timevalue = [this.formatDate(date, 'yyyy-MM-dd'), this.formatDate(new Date(), 'yyyy-MM-dd')]
         this.handleFilter()
-      },  //默认展示
+      },  //初始化日期，用于获取数据
       initTemplate() {
         this.listLoading = true
         getSdkTemplate().then(response => {
-          this.sdkTemplate = response.name_list
+          this.sdkTemplate = response.name_list     //对话框内sdk模版列表
+          this.hidsdkTemplate = response.name_list   //对话框内sdk模版列表
           this.sdkTemplatelibrary = response.list
-          this.hidsdkTemplate = response.name_list
+          this.options = response.select_list
           this.listLoading = false
         })
       },//获取sdk模版
-      getSdkTemplate() {
+      change_pagename(name) {
+        this.dialog_secondary_visual = false
+        this.dialog_secondary_list = []
+        let visual;
+        let list = this.dialog_secondary_list;
+        for (let i = 0; i < this.sdk.form.domains.length; i++) {
+          let data = this.sdk.form.domains[i].param_name
+          if (data.split('-').length > 2 && data.split('-')[0] === name) {
+            visual = true
+            if (list.length === 0) {
+              list.push(data.split('-')[1])
+            } else {
+              let flag = true
+              for (let x = 0; x < list.length; x++) {
+                if (list[x].search(data.split('-')[1]) != -1) {
+                  flag = false
+                }
+              }
+              if (flag) {
+                list.push(data.split('-')[1])
+              }
+            }
+          }
+        }
+
+        this.dialog_secondary_visual = visual;
+        this.dialog_secondary_list = list;
+        this.filter_form_name = name  //联动对话框内标签页内容展示
+      },//根据点击的标签页名，渲染
+      findSdkTemplate() {
+        this.tag_name = ''
         this.sdk.form.domains = []
         for (let i = 0; i < this.checkedSdkTemplate.length; i++) {
           for (let j = 0; j < this.sdkTemplatelibrary.length; j++) {
@@ -679,38 +628,71 @@
             }
           }
         }
-        if (this.sdk.form.domains.length !== 0) {
-          this.filter_form_name = this.checkedSdkTemplate[0]
-        }
+        this.filter_form_name = this.page_name
+        this.change_pagename(this.page_name)
       },//sdk模版根据多选框变动
       createData() {
-        let tothis = this
-        for (let i = 0; i < this.sdk.form.domains.length; i++) {
-          if (this.sdk.form.domains[i].param_name === '' || this.sdk.form.domains[i].param === '' || this.sdk.form.domains[i].note === '') {
-            let names=this.sdk.form.domains[i].param_name.split('-')
-            let show_flag=false
-            if (names.length<3){
-              show_flag=true
-            } else {
-              let checked_falg=true
-              for (let j=0;j<this.dialog_secondary_checked.length;j++){
-                let checked=this.dialog_secondary_checked[j]
-                checked
-                if (checked===names[1]){
-                  checked_falg=false
-                  show_flag=true
+        //dia 选择器提交
+        let select = []
+        for (let i = 0; i < this.checkedSdkTemplate.length; i++) {
+          let checkedname = this.checkedSdkTemplate[i]
+          for (let j = 0; j < this.options.length; j++) {
+            let param_name = this.options[j].sdk_name
+            if (checkedname === param_name) {
+              let newele = {
+                param_name: this.options[j].sdk_name + '-' + this.options[j].param_name,
+                param: this.options[j].value,
+                sdk_type: '1',
+              }
+              if (select.length === 0) {
+                select.push(newele)
+              } else {
+                let flag = true
+                for (let x = 0; x < select.length; x++) {
+                  if (select[x].param_name === newele.param_name) {
+                    select[x].param_name = newele.param_name
+                    flag = false
+                  }
+                }
+                if (flag) {
+                  select.push(newele)
                 }
               }
-              if (checked_falg){
-                this.sdk.form.domains.splice(i)
+            }
+          }
+        }
+
+        this.sdk.form.select = []
+        this.sdk.form.select = this.sdk.form.select.concat(select)
+        //
+
+        let tothis = this
+        let dellist = []
+        for (let i = 0; i < this.sdk.form.domains.length; i++) {
+          if (this.sdk.form.domains[i].param_name === '' || this.sdk.form.domains[i].param === '') {
+            let names = this.sdk.form.domains[i].param_name.split('-')
+            let show_flag = false
+            if (names.length < 3) {
+              show_flag = true
+            } else {
+              let checked_falg = true
+              for (let j = 0; j < this.dialog_secondary_checked.length; j++) {
+                let checked = this.dialog_secondary_checked[j]
+                if (checked === names[1]) {
+                  checked_falg = false
+                  show_flag = true
+                }
+              }
+              if (checked_falg) {
+                dellist.push(i)
               }
             }
-            if (show_flag){
+            if (show_flag) {
               this.$notify({
                 title: '警告！',
-                dangerouslyUseHTMLString:true,
-                message: 'KEY表有参数没填！'+'' +
-                  ' <br> -->'+this.sdk.form.domains[i].param_name,
+                dangerouslyUseHTMLString: true,
+                message: 'KEY表有参数没填！' + '' +
+                  ' <br> -->' + this.sdk.form.domains[i].param_name,
                 type: 'error',
                 duration: 2000
               })
@@ -718,6 +700,20 @@
             }
           }
         }
+        let newlist = []
+        for (let j = 0; j < this.sdk.form.domains.length; j++) {
+          let flag = true
+          for (let i = 0; i < dellist.length; i++) {
+            if (dellist[i] === j) {
+              flag = false
+            }
+          }
+          if (flag) {
+            newlist.push(this.sdk.form.domains[j])
+          }
+        }
+        this.sdk.form.domains = newlist
+
         if (this.sdk.sdk_require === '') {
           this.sdk.sdk_require = '暂无'
         }
@@ -727,6 +723,8 @@
         if (this.sdk.sdk_config === '') {
           this.sdk.sdk_config = '暂无'
         }
+
+
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             let timestamp = (new Date(this.sdk.timevalue)).getTime()
@@ -742,6 +740,7 @@
                   type: 'success',
                   duration: 2000
                 })
+                this.handleFilter()
                 this.dialogFormVisible = false
               }).catch(rs => {
                 this.create_flag = true
@@ -798,50 +797,45 @@
         this.$nextTick(() => {
           this.$refs['dataForm'].clearValidate()
         })
-        this.getSdkTemplate()
-      }, //创建对话框
-      compareVersion(param1, param2) {
-        let arr1 = param1.split('.');
-        let arr2 = param2.split('.');
-        //将两个版本号拆成数字
-        let minL = Math.min(arr1.length, arr2.length);
-        let pos = 0;        //当前比较位
-        let diff = 0;        //当前为位比较是否相等
-        //逐个比较如果当前位相等则继续比较下一位
-        while (pos < minL) {
-          diff = parseInt(arr1[pos]) - parseInt(arr2[pos]);
-          if (diff != 0) {
-            break;
-          }
-          pos++;
-        }
-        return diff
-      },//比较版本号
+      }, //创建对话框展示
       handleUpdate(param) {
+        this.tag_name = ''
+        let paramter = param.paramter
+        for (let i = 0; i < paramter.length; i++) {
+          let sdk_name = paramter[i].mark
+          let param_name = paramter[i].param_name.split('-')[1]
+          if (paramter[i].sdk_type === '1') {
+            for (let j = 0; j < this.options.length; j++) {
+              if (sdk_name === this.options[j].sdk_name && param_name === this.options[j].param_name) {
+                this.options[j].value = paramter[i].param
+              }
+            }
+          }
+        }
+
         //对话框二级表单展示
-        console.log(param.paramter)
-        let checked=[]
-        for (let i=0;i<param.paramter.length;i++){
-          let names=param.paramter[i].param_name
-          let name=''
-          if (names.split('-').length>2) {
-             name=names.split('-')[1]
-            if (checked.length===0){
+        let checked = []
+        for (let i = 0; i < param.paramter.length; i++) {
+          let names = param.paramter[i].param_name
+          let name = ''
+          if (names.split('-').length > 2) {
+            name = names.split('-')[1]
+            if (checked.length === 0) {
               checked.push(name)
             } else {
-              let flag=true
-              for (let x=0;x<checked.length;x++){
-                if (checked[x]===name) {
-                  flag=false
+              let flag = true
+              for (let x = 0; x < checked.length; x++) {
+                if (checked[x] === name) {
+                  flag = false
                 }
               }
-              if (flag){
+              if (flag) {
                 checked.push(name)
               }
             }
           }
         }
-        this.dialog_secondary_checked=checked
+        this.dialog_secondary_checked = checked
         //结束
         this.handleCreate()
         this.sdk.id = param.id
@@ -857,7 +851,33 @@
         this.sdk.sdk_require = param.sdk_require
         this.sdk.note = param.note
         this.sdk.publish = '0'
-        this.sdk.form.domains = param.paramter
+        //this.sdk.form.domains = param.paramter
+        let marks_list = []
+        for (let i = 0; i < param.paramter.length; i++) {
+          if (marks_list.length === 0) {
+            marks_list.push(param.paramter[i].mark)
+          } else {
+            let flag = true
+            for (let j = 0; j < marks_list.length; j++) {
+              if (marks_list[j] === param.paramter[i].mark) {
+                flag = false
+              }
+            }
+            if (flag) {
+              marks_list.push(param.paramter[i].mark)
+            }
+          }
+
+        }
+        let list = []
+        for (let i = 0; i < marks_list.length; i++) {
+          for (let j = 0; j < this.sdkTemplatelibrary.length; j++) {
+            if (marks_list[i] === this.sdkTemplatelibrary[j].keymark) {
+              list = list.concat(this.sdkTemplatelibrary[j].keyform)
+            }
+          }
+        }
+        this.sdk.form.domains = list
         if (param.sdk_status === 1) {
           this.sdk.sdkstatus = '1'
         } else {
@@ -875,7 +895,6 @@
           }
           if (flag === false) {
             this.checkedSdkTemplate.push(name)
-            this.filter_form_name = name //添加默认的标签页名
           }
           for (let j = 0; j < this.sdkTemplatelibrary.length; j++) {
             if (name === this.sdkTemplatelibrary[j].keymark) {
@@ -887,44 +906,103 @@
             }
           }
         }
+        this.filter_form_name = this.page_name
+        this.change_pagename(this.page_name)
         this.dialogStatus = 'update'
         this.dialogFormVisible = true
       }, //更新对话框展示
       updateData() {
-        let tothis = this
-        for (let i = 0; i < this.sdk.form.domains.length; i++) {
-          if (this.sdk.form.domains[i].param_name === '' || this.sdk.form.domains[i].param === '' || this.sdk.form.domains[i].note === '') {
-            let names=this.sdk.form.domains[i].param_name.split('-')
-            let show_flag=false
-            if (names.length<3){
-              show_flag=true
-            } else {
-              let checked_falg=true
-              for (let j=0;j<this.dialog_secondary_checked.length;j++){
-                let checked=this.dialog_secondary_checked[j]
-                checked
-                if (checked===names[1]){
-                  checked_falg=false
-                  show_flag=true
+        //dia 选择器提交
+        let select = []
+        for (let i = 0; i < this.checkedSdkTemplate.length; i++) {
+          let checkedname = this.checkedSdkTemplate[i]
+          for (let j = 0; j < this.options.length; j++) {
+            let param_name = this.options[j].sdk_name
+            if (checkedname === param_name) {
+              let newele = {
+                param_name: this.options[j].sdk_name + '-' + this.options[j].param_name,
+                param: this.options[j].value,
+                sdk_type: '1',
+              }
+              if (select.length === 0) {
+                select.push(newele)
+              } else {
+                let flag = true
+                for (let x = 0; x < select.length; x++) {
+                  if (select[x].param_name === newele.param_name) {
+                    select[x].param_name = newele.param_name
+                    flag = false
+                  }
+                }
+                if (flag) {
+                  select.push(newele)
                 }
               }
-              if (checked_falg){
-                this.sdk.form.domains.splice(i)
+            }
+          }
+        }
+        this.sdk.form.select = []
+        this.sdk.form.select = this.sdk.form.select.concat(select)
+        //
+
+        let tothis = this
+        let del = []
+        for (let i = 0; i < this.sdk.form.domains.length; i++) {
+          let judge = this.sdk.form.domains[i].param_name === '' || this.sdk.form.domains[i].param === ''
+          let names = this.sdk.form.domains[i].param_name.split('-')
+          if (judge) {
+            let show_flag = false
+            if (names.length < 3) {
+              show_flag = true
+            } else {
+              let checked_falg = true
+              for (let j = 0; j < this.dialog_secondary_checked.length; j++) {
+                let checked = this.dialog_secondary_checked[j]
+                if (checked === names[1]) {
+                  checked_falg = false
+                  show_flag = true
+                }
               }
             }
-            if (show_flag){
+            if (show_flag) {
               this.$notify({
                 title: '警告！',
-                dangerouslyUseHTMLString:true,
-                message: 'KEY表有参数没填！'+'' +
-                  ' <br> -->'+this.sdk.form.domains[i].param_name,
+                dangerouslyUseHTMLString: true,
+                message: 'KEY表有参数没填！' + '' +
+                  ' <br> -->' + this.sdk.form.domains[i].param_name,
                 type: 'error',
                 duration: 2000
               })
               return
             }
           }
+          if (names.length > 2) {
+            let checked_falg = true
+            for (let j = 0; j < this.dialog_secondary_checked.length; j++) {
+              let checked = this.dialog_secondary_checked[j]
+              if (checked === names[1]) {
+                checked_falg = false
+              }
+            }
+            if (checked_falg) {
+              del.push(i)
+            }
+          }
         }
+        let newdomain = []
+        for (let i = 0; i < this.sdk.form.domains.length; i++) {
+          let newflag = true
+          for (let j = 0; j < del.length; j++) {
+            if (i === del[j]) {
+              newflag = false
+            }
+          }
+          if (newflag) {
+            newdomain.push(this.sdk.form.domains[i])
+          }
+        }
+        this.sdk.form.domains = newdomain
+
         if (this.sdk.sdk_require === '') {
           this.sdk.sdk_require = '暂无'
         }
@@ -951,6 +1029,7 @@
             type: 'success',
             duration: 2000
           })
+          this.handleFilter()
           this.update_flag = true
         }).catch(err => {
           tothis.$notify({
@@ -1006,12 +1085,8 @@
         }
         this.list = data3
         this.listLoading = false
-      }, //二次筛选
+      }, //table二次筛选  页面上方按钮
       handleFilter() {
-        if (this.timevalue === '' || this.timevalue[0] === 'undefined' || this.timevalue[1] === 'undefined') {
-          this.open3()
-          return
-        }
         this.hidtimevalue = this.timevalue
         this.listParam.start = this.timevalue[0]
         this.listParam.end = this.timevalue[1]
@@ -1021,18 +1096,37 @@
           this.list = response.data
           this.hidlist = response.data
           this.listLoading = false
+          console.log(this.list)
           this.getDatawithParam()
           this.initfilterlist()
         }).catch(function (rs) {
           tothis.listLoading = false
         })
-      },  //根据时间查询
-      open3() {
-        this.$message({
-          message: '记得选择查询范围~',
-          type: 'warning'
-        });
-      }, //查询范围提示
+      },  //查询数据
+      compareVersion(param1, param2) {
+        let arr1 = param1.split('.');
+        let arr2 = param2.split('.');
+        //将两个版本号拆成数字
+        let minL = Math.min(arr1.length, arr2.length);
+        let pos = 0;        //当前比较位
+        let diff = 0;        //当前为位比较是否相等
+        //逐个比较如果当前位相等则继续比较下一位
+        while (pos < minL) {
+          diff = parseInt(arr1[pos]) - parseInt(arr2[pos]);
+          if (diff != 0) {
+            break;
+          }
+          pos++;
+        }
+        if (diff === 0 && arr1.length > arr2.length) {
+          diff = 1
+        }
+        if (diff === 0 && arr1.length < arr2.length) {
+          diff = -1
+        }
+
+        return diff
+      },//比较版本号
       formatDate(date, fmt) {
         if (/(y+)/.test(fmt)) {
           fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
@@ -1055,112 +1149,92 @@
       checkPermission,
       padLeftZero(str) {
         return ('00' + str).substr(str.length);
-      } ,//日期转换
-      initfilterlist(){
+      },//日期转换
+      initfilterlist() {
         for (let i = 0; i < this.hidlist.length; i++) {
           if (this.channel_mark_list.length === 0) {
             this.channel_mark_list.push(this.hidlist[i].channel_mark)
           } else {
-            let channel_flag=true
+            let channel_flag = true
             for (let x = 0; x < this.channel_mark_list.length; x++) {
-              if (this.channel_mark_list[x]===this.hidlist[i].channel_mark){
-                channel_flag=false
+              if (this.channel_mark_list[x] === this.hidlist[i].channel_mark) {
+                channel_flag = false
               }
             }
-            if (channel_flag){
+            if (channel_flag) {
               this.channel_mark_list.push(this.hidlist[i].channel_mark)
             }
           }
           if (this.app_name_list.length === 0) {
             this.app_name_list.push(this.hidlist[i].app_name)
           } else {
-            let name_flag=true
+            let name_flag = true
             for (let y = 0; y < this.app_name_list.length; y++) {
-              if (this.app_name_list[y].search(this.hidlist[i].app_name)!=-1){
-                name_flag=false
+              if (this.app_name_list[y].search(this.hidlist[i].app_name) != -1) {
+                name_flag = false
               }
             }
-            if (name_flag){
+            if (name_flag) {
               this.app_name_list.push(this.hidlist[i].app_name)
             }
           }
-
         }
-      },
+      },//table查询条件初始化
+      expandrowhandler(row, expandedRows) {
+        let that = this
+        if (expandedRows.length) {
+          that.expands = []
+          if (row) {
+            that.expands.push(row.id)
+          }
+        } else {
+          that.expands = []
+        }
+        if (expandedRows.length < 1) {
+          return
+        }
+        let index = expandedRows.length - 1
+        this.getSpanArr(expandedRows[index].paramter)
+      },//展开行变化时触发
+      getSpanArr(data) {
+        this.spanArr.length = 0
+        for (let i = 0; i < data.length; i++) {
+          if (i === 0) {
+            this.spanArr.push(1);
+            this.pos = 0
+          } else {
+            // 判断当前元素与上一个元素是否相同
+            if (data[i].mark === data[i - 1].mark) {
+              this.spanArr[this.pos] += 1;
+              this.spanArr.push(0);
+            } else {
+              this.spanArr.push(1);
+              this.pos = i;
+            }
+          }
+        }
+      },//获取合并单元格判断数据
+      objectSpanMethod({row, column, rowIndex, columnIndex}) {
+        if (columnIndex === 0) {
+          const _row = this.spanArr[rowIndex];
+          const _col = _row > 0 ? 1 : 0;
+          return {
+            rowspan: _row,
+            colspan: _col
+
+          }
+        }
+      },//合并单元格
     }
   }
 
-  // validUpdate(param) {
-  //   if (param.sdk_status === 0) {
-  //     this.sdk.id = param.id
-  //     this.sdk.timevalue = param.date
-  //     this.sdk.app_name = param.app_name
-  //     this.sdk.package_name = param.package_name
-  //     this.sdk.channel_mark = param.channel_mark
-  //     this.sdk.version_online_version = param.version_online
-  //     this.sdk.version_update_version = param.version_update
-  //     this.sdk.versioncode_online_version = param.versioncode_online_version
-  //     this.sdk.versioncode_update_version = param.versioncode_update_version
-  //     this.sdk.sdk_config = param.sdk_config
-  //     this.sdk.sdk_require = param.sdk_require
-  //     this.sdk.note = param.note
-  //     this.sdk.form.domains = param.paramter
-  //     this.sdk.sdkstatus = '1'
-  //     this.updateData()
-  //   }
-  // },//可见按钮
-  // sdk模版样式
-  // {
-  //   keymark:'友盟统计',
-  //     keyform: [
-  //   {
-  //     key: 'default4',
-  //     param_name: '统计-友盟-appkey',
-  //     param: '',
-  //     note: '暂无'
-  //   }, {
-  //     key: 'default5',
-  //     param_name: '统计-talkingdate-appkey',
-  //     param: '',
-  //     note: '暂无'
-  //   }, {
-  //     key: 'default6',
-  //     param_name: '统计-热云-APPID',
-  //     param: '',
-  //     note: '暂无'
-  //   }
-  // ]
-  // }
-  // fetchName() {
-  //   if (!checkPermission(['admin', 'leader', 'operator'])) {
-  //     let data = {
-  //       username: this.name
-  //     }
-  //
-  //     let tothis = this
-  //     this.listLoading = true
-  //     getResourceName(data).then(response => {
-  //       this.names = response.data
-  //       this.listLoading = false
-  //     }).catch(function (rs) {
-  //       tothis.listLoading = false
-  //       console.error(rs)
-  //     })
-  //   } else {
-  //     let tothis = this
-  //     this.listLoading = true
-  //     getName().then(response => {
-  //       this.names = response.data
-  //       this.listLoading = false
-  //     }).catch(function (rs) {
-  //       tothis.listLoading = false
-  //       console.log(rs)
-  //     })
-  //
-  //   }
-  // },
 </script>
 <style>
+  .el-checkbox.is-bordered + .el-checkbox.is-bordered {
+    margin-left: 1px;
+    margin-bottom: 5px;
+  }
+
   #form-custom .el-form-item {
     margin-right: 250px;
   }
@@ -1185,7 +1259,8 @@
     width: 50%;
     border-bottom: #d3dce6 solid 1px;
   }
-  .el-tabs__nav-scroll{
+
+  .el-tabs__nav-scroll {
     width: 180px;
   }
 

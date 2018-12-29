@@ -113,11 +113,13 @@ export default {
           {
             name: name[0], itemStyle: {
               normal: {
-                color: '#FFD700',
+                color: '#33ADA0',
                 lineStyle: {
-                  color: '#FFD700',
+                  color: '#33ADA0',
                   width: 2 ,
-                  type:'dashed'
+                  type:'solid',
+                  shadowColor: '#33ADA0',
+                  shadowBlur:1,
                 }
               }
             },
@@ -130,12 +132,13 @@ export default {
           {
             name: name[1], itemStyle: {
               normal: {
-                color: '#22205A',
+                color: '#F4A254',
                 lineStyle: {
-                  color: '#22205A',
+                  color: '#F4A254',
                   width: 2 ,
-                  type:'dotted'
-
+                  type:'Dotted line',
+                  shadowColor: '#F4A254',
+                  shadowBlur:10,
                 }
               }
             },
@@ -148,9 +151,9 @@ export default {
           {
           name: name[2], itemStyle: {
             normal: {
-              color: '#FF005A',
+              color: '#33ADA0',
               lineStyle: {
-                color: '#FF005A',
+                color: '#33ADA0',
                 width: 2
               }
             }

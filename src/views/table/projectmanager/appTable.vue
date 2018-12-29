@@ -296,6 +296,7 @@
         });
       },
       handleFilter() {
+        this.listLoading=true
         let tothis=this;
         getApp().then(response => {
           this.hidlist = response.data
@@ -303,6 +304,7 @@
           this.listLoading = false
         }).catch(function (rs) {
           console.log(rs)
+          this.listLoading = false
         })
       },
       getDatawithName(){

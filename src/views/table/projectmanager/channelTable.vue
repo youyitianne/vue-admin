@@ -284,6 +284,7 @@
         }
       },
       handleFilter() {
+        this.listLoading = true
         let tothis=this
         getChannel().then(response => {
           this.list = response.data

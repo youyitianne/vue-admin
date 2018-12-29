@@ -10,20 +10,20 @@ Vue.use(Router)
 import Layout from '../views/layout/Layout'
 
 /**
-* hidden: true                   if `hidden:true` will not show in the sidebar(default is false)
-* alwaysShow: true               if set true, will always show the root menu, whatever its child routes length
-*                                if not set alwaysShow, only more than one route under the children
-*                                it will becomes nested mode, otherwise not show the root menu
-* redirect: noredirect           if `redirect:noredirect` will no redirect in the breadcrumb
-* name:'router-name'             the name is used by <keep-alive> (must set!!!)
-* meta : {
+ * hidden: true                   if `hidden:true` will not show in the sidebar(default is false)
+ * alwaysShow: true               if set true, will always show the root menu, whatever its child routes length
+ *                                if not set alwaysShow, only more than one route under the children
+ *                                it will becomes nested mode, otherwise not show the root menu
+ * redirect: noredirect           if `redirect:noredirect` will no redirect in the breadcrumb
+ * name:'router-name'             the name is used by <keep-alive> (must set!!!)
+ * meta : {
     title: 'title'               the name show in submenu and breadcrumb (recommend set)
     icon: 'svg-name'             the icon show in the sidebar,
   }
-**/
+ **/
 export const constantRouterMap = [
-  { path: '/login', component: () => import('@/views/login/index'), hidden: true },
-  { path: '/404', component: () => import('@/views/404'), hidden: true },
+  {path: '/login', component: () => import('@/views/login/index'), hidden: true},
+  {path: '/404', component: () => import('@/views/404'), hidden: true},
 
   {
     path: '/',
@@ -63,19 +63,20 @@ export const constantRouterMap = [
 ]
 
 export default new Router({
-   mode: 'history', //后端支持可开
-  scrollBehavior: () => ({ y: 0 }),
+  mode: 'history', //后端支持可开
+  scrollBehavior: () => ({y: 0}),
   routes: constantRouterMap
 })
 
 //异步挂载的路由
 //动态需要根据权限加载的路由表
 export const asyncRouterMap = [
+
   {
-    path:'/component',
-    component:Layout,
+    path: '/component',
+    component: Layout,
     redirect: '/component/dropzone',
-    name:'Component',
+    name: 'Component',
     meta: {
       title: '上传',
       icon: 'excel',
@@ -93,6 +94,30 @@ export const asyncRouterMap = [
       }]
   },
   {
+    path: '/statistics',
+    component: Layout,
+    redirect: '/statistic/cline',
+    name: 'Statistics',
+    meta: {
+      title: '统计',
+      icon: 'chart',
+      roles: ['operator']
+    },
+    children: [
+      {
+        path: 'cline',
+        component: () => import('@/views/complexChart/index'),
+        name: 'ComplexLineChart',
+        meta: {
+          title: '统计图表',
+          noCache: true,
+          icon: 'chart',
+          roles: ['operator', 'planner', 'developer', 'market', 'leader']
+        }
+      },
+    ]
+  },
+  {
     path: '/example',
     component: Layout,
     redirect: '/example/table',
@@ -100,21 +125,9 @@ export const asyncRouterMap = [
     meta: {
       title: '数据管理',
       icon: 'documentation',
-      roles: ['operator','planner','developer','market','leader']
+      roles: ['operator', 'planner', 'developer', 'market', 'leader']
     },
     children: [
-      {
-        path: 'cline',
-        hidden: true,
-        component: () => import('@/views/complexChart/index'),
-        name: 'ComplexLineChart',
-        meta: {
-          title: '统计图表',
-          noCache: true ,
-          icon: 'chart',
-          roles: ['operator','planner','developer','market','leader']
-        }
-      },
       {
         path: 'tree',
         name: 'Tree',
@@ -123,7 +136,7 @@ export const asyncRouterMap = [
         meta: {
           title: '树状图',
           icon: 'tree',
-          roles: ['operator','planner','developer','market','leader']
+          roles: ['operator', 'planner', 'developer', 'market', 'leader']
         }
       },
       {
@@ -133,9 +146,9 @@ export const asyncRouterMap = [
         hidden: true,
         meta: {
           title: '线形表',
-          noCache: true ,
+          noCache: true,
           icon: 'chart',
-          roles: ['operator','planner','developer','market','leader']
+          roles: ['operator', 'planner', 'developer', 'market', 'leader']
         }
       },
       {
@@ -145,7 +158,7 @@ export const asyncRouterMap = [
         meta: {
           title: '广告数据管理',
           icon: 'table',
-          roles: ['operator','planner','developer','market','leader']
+          roles: ['operator', 'planner', 'developer', 'market', 'leader']
         }
       },
       {
@@ -154,9 +167,9 @@ export const asyncRouterMap = [
         name: 'UserdataTable',
         meta: {
           title: '用户数据管理',
-          noCache: true ,
+          noCache: true,
           icon: 'table',
-          roles: ['operator','planner','developer','market','leader']
+          roles: ['operator', 'planner', 'developer', 'market', 'leader']
         }
       },
       {
@@ -165,9 +178,9 @@ export const asyncRouterMap = [
         name: 'YixinTable',
         meta: {
           title: '移信数据下载',
-          noCache: true ,
+          noCache: true,
           icon: 'table',
-          roles: ['operator','leader']
+          roles: ['operator', 'leader']
         }
       },
     ]
@@ -189,7 +202,7 @@ export const asyncRouterMap = [
         name: 'AppTable',
         meta: {
           title: '应用管理',
-          noCache: true ,
+          noCache: true,
           icon: 'table',
           roles: ['operator'],
         }
@@ -200,7 +213,7 @@ export const asyncRouterMap = [
         name: 'ChannelTable',
         meta: {
           title: '渠道管理',
-          noCache: true ,
+          noCache: true,
           icon: 'table',
           roles: ['operator'],
         }
@@ -211,8 +224,8 @@ export const asyncRouterMap = [
         name: 'AdTypeTable',
         meta: {
           title: '广告类型管理',
-          noCache: true ,
-          icon: 'table' ,
+          noCache: true,
+          icon: 'table',
           roles: ['operator'],
         }
       }
@@ -235,7 +248,7 @@ export const asyncRouterMap = [
         name: 'AccountTable',
         meta: {
           title: '用户管理',
-          noCache: true ,
+          noCache: true,
           icon: 'table',
           roles: ['admin']
         }
@@ -246,7 +259,7 @@ export const asyncRouterMap = [
         name: 'User_Role_Table',
         meta: {
           title: '角色管理',
-          noCache: true ,
+          noCache: true,
           icon: 'table',
           roles: ['admin']
         }
@@ -255,11 +268,11 @@ export const asyncRouterMap = [
         path: 'role_perms_Table',
         component: () => import('@/views/table/personalmanager/role_perms_Table'),
         name: 'Role_Perms_Table',
-        hidden:true,
+        hidden: true,
         meta: {
           title: '权限管理',
-          noCache: true ,
-          icon: 'table' ,
+          noCache: true,
+          icon: 'table',
           roles: ['admin']
         }
       },
@@ -269,17 +282,17 @@ export const asyncRouterMap = [
         name: 'ResourceTable',
         meta: {
           title: '资源管理',
-          icon: 'table' ,
+          icon: 'table',
           roles: ['leader']
         }
       }
     ]
   },
   {
-    path:'/sdkmanager',
-    component:Layout,
+    path: '/sdkmanager',
+    component: Layout,
     redirect: '/sdkmanager/sdklist',
-    name:'Component',
+    name: 'Component',
     meta: {
       title: 'SDK管理',
       icon: 'excel',
@@ -303,7 +316,7 @@ export const asyncRouterMap = [
           title: '项目配置表管理',
           //roles: ['operator'],
         }
-      },{
+      }, {
         path: 'projectconfiglist',
         component: () => import('@/views/table/sdkmanager/projectconfigtable_publish'),
         name: 'ProjectConfigList',
@@ -311,9 +324,9 @@ export const asyncRouterMap = [
           title: '项目配置表',
           //roles: ['operator'],
         }
-      }, ]
+      }]
   },
-  { path: '*', redirect: '/404'}
+  {path: '*', redirect: '/404'}
 ];
 
 //   path: '/nested',

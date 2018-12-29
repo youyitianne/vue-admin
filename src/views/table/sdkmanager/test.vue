@@ -15,6 +15,7 @@
         <el-option v-for="item in channel_mark_list" :key="item" :label="item" :value="item">
         </el-option>
       </el-select>
+      <!--<el-checkbox v-model="checked" border style="margin-left: 15px" @change="getDatawithParam">展示正常</el-checkbox>-->
       <el-checkbox v-model="checked" border style="margin-left: 15px" @change="getDatawithParam">展示最新配置表
       </el-checkbox>
     </div>
@@ -826,6 +827,22 @@
         getProjectConfigPublish().then(response => {
           this.list = response.data
           this.hidlist = response.data
+          // for (let i = 0; i < this.hidlist.length; i++) {
+          //   let data = this.hidlist[i].date.substring(0, this.hidlist[i].date.length - 4)
+          //   let date = this.formatDate(new Date(data), 'yyyy年MM月dd日 hh:mm:ss SSS')
+          //   this.hidlist[i].push(
+          //     {
+          //       date1:date
+          //     }
+          //   )
+          //   this.list[i].push(
+          //     {
+          //       date1:date
+          //     }
+          //   )
+          //   // this.hidlist[i].date = date
+          //   // this.list[i].date = date
+          // }
           this.listLoading = false
           this.getDatawithParam()
           this.initfilterlist()

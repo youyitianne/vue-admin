@@ -304,6 +304,7 @@
         });
       },
       handleFilter() {
+        this.listLoading=true
         let tothis=this
         getAdType().then(response => {
           this.list = response.data
