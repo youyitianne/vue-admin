@@ -7,6 +7,7 @@
       <el-input placeholder="根据账号查找" v-model="inputName" style="width: 200px" class="filter-item" clearable @blur="getDatawithName"/>
     </div>
     <el-table
+      height="850"
       stripe
       v-loading="listLoading"
       :data="list"

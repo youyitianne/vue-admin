@@ -16,6 +16,7 @@
 
     </div>
     <el-table
+      height="850"
       v-loading="listLoading"
       :data="list"
       element-loading-text="Loading"
@@ -78,7 +79,6 @@
 
 
 </template>
-
 <script>
   import {getuserdata} from '@/api/table/datamanager/userdata'
   import waves from '@/directive/waves'

@@ -21,3 +21,10 @@ export function getChannel() {
     method: 'get',
   })
 }
+
+export function getappdata(param) {
+  return request({
+    url: '/appdata/'+param.start+'/'+param.end,
+    method: 'get',
+  })
+}

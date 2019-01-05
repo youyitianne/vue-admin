@@ -19,10 +19,12 @@
         </el-option>
       </el-select>
       <!--<el-checkbox v-model="checked" border style="margin-left: 15px" @change="getDatawithParam">展示正常</el-checkbox>-->
-      <el-checkbox v-model="checked1" border style="margin-left: 15px" @change="getDatawithParam">显示删除状态配置表
-      </el-checkbox>
+      <!--<el-checkbox v-model="checked1" border style="margin-left: 15px" @change="getDatawithParam">显示删除状态配置表-->
+      <!--</el-checkbox>-->
     </div>
+    <!--<button @click="test">aasdasaaaaa</button>-->
     <el-table
+      height="850"
       v-loading="listLoading"
       :data="list"
       element-loading-text="Loading"
@@ -33,12 +35,9 @@
       border
       highlight-current-row
       @expand-change="expandrowhandler">
-      <el-table-column type="expand">
+      <el-table-column type="expand"  label="展开" width="100px">
         <template slot-scope="props">
           <el-form label-position="left" inline class="demo-table-expand">
-            <el-form-item label="时间:">
-              <span>{{ props.row.date1}}</span>
-            </el-form-item>
             <el-form-item label="游戏名:">
               <span>{{ props.row.app_name }}</span>
             </el-form-item>
@@ -59,19 +58,6 @@
             </el-form-item>
             <el-form-item label="内部版本_更新:">
               <span>{{ props.row.versioncode_update_version }}</span>
-            </el-form-item>
-            <el-form-item label="sdk配置:">
-              <span>{{ props.row.sdk_config }}</span>
-            </el-form-item>
-            <el-form-item label="状态:">
-              <span v-if="props.row.sdk_status===0"><el-button size="mini" type="danger">删除</el-button></span>
-              <span v-if="props.row.sdk_status===1"><el-button size="mini" type="success">正常</el-button></span>
-            </el-form-item>
-            <el-form-item label="渠道特别要求:">
-              <span>{{ props.row.sdk_require }}</span>
-            </el-form-item>
-            <el-form-item label="备注:">
-              <span>{{ props.row.note }}</span>
             </el-form-item>
           </el-form>
           <div>
@@ -105,7 +91,7 @@
           {{ ++scope1.$index }}
         </template>
       </el-table-column>
-      <el-table-column label="时间" prop="date1" width="200px">
+      <el-table-column label="包名" prop="package_name" width="400px">
       </el-table-column>
       <el-table-column label="应用名" prop="app_name">
       </el-table-column>
@@ -119,40 +105,33 @@
       </el-table-column>
       <el-table-column label="内部版本-更新" prop="versioncode_update_version">
       </el-table-column>
-      <el-table-column label="状态" align="center" width="130" class-name="small-padding fixed-width" prop="sdk_status"
-                       v-if="checkPermission(['operator', 'planner','admin','leader'])">
-        <template slot-scope="scope">
-          <el-button size="mini" type="success" v-if="scope.row.sdk_status===1">正常</el-button>
-          <el-button size="mini" type="danger" v-if=" scope.row.sdk_status===0">删除</el-button>
-        </template>
-      </el-table-column>
 
-      <el-table-column label="操作" align="center" width="450" class-name="small-padding fixed-width"
+      <el-table-column label="操作" align="center" width="250px" class-name="small-padding fixed-width"
                        v-if="checkPermission(['operator', 'planner','admin','leader'])">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleCreateByTemplate(scope.row)">{{ "创建新表" }}</el-button>
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ "编辑" }}</el-button>
-          <el-button type="success" size="mini" @click="publish(scope.row)">发布</el-button>
+          <!--<el-button type="success" size="mini" @click="publish(scope.row)">发布</el-button>-->
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="80%" :close-on-click-modal=false>
+    <el-dialog
+      :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="80%" :close-on-click-modal=false>
       <el-form ref="dataForm" :model="sdk" label-position="left" label-width="150px" :inline="true"
                style="margin-left:50px;" status-icon id="form-custom">
-        <el-form-item label="时间" class="filter-item" v-if="this.dialogStatus === 'create'">
+        <el-form-item label="时间" class="filter-item" v-if="this.dialogStatus === '1'">
           <el-date-picker v-model="sdk.timevalue" type="datetime" :disabled=true>
           </el-date-picker>
         </el-form-item>
         <div>
-          <el-form-item label="游戏名" :rules="[{ required: true, message: '游戏名不能为空'}]" prop="app_name">
+          <el-form-item label="游戏名" :rules="[{ required: true, message: '游戏名不能为空'}]" prop="app_name" v-if="this.dialogStatus === 'update'">
             <el-input v-model="sdk.app_name" placeholder="必填~" class="dia-input"/>
           </el-form-item>
         </div>
-        <el-form-item label="包名" :rules="[{ required: true, message: '包名不能为空'}]" prop="package_name">
-          <el-input v-model="sdk.package_name" placeholder="必填~" class="dia-input"/>
+        <el-form-item label="包名" :rules="[{ required: true, message: '包名不能为空'}]" prop="package_name" v-if="this.dialogStatus === 'update'" >
+          <el-input v-model="sdk.package_name" placeholder="必填~" class="dia-input" disabled/>
         </el-form-item>
-        <el-form-item label="渠道标记" :rules="[{ required: true, message: '渠道不能为空'}]" prop="channel_mark">
-          <el-select v-model="sdk.channel_mark">
+        <el-form-item label="渠道标记" :rules="[{ required: true, message: '渠道不能为空'}]" prop="channel_mark" v-if="this.dialogStatus === 'update'" >
+          <el-select v-model="sdk.channel_mark" disabled>
             <el-option
               v-for="item in channel_mark_list_dia"
               :key="item.name"
@@ -161,50 +140,49 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="外部版本-在线" class="filter-item" :rules="[{ required: true, message: '外部版本-在线不能为空'}]"
+        <el-form-item label="包名" :rules="[{ required: true, message: '包名不能为空'}]" prop="package_name" v-if="this.dialogStatus === 'create'" >
+          <el-input v-model="sdk.package_name" placeholder="必填~" class="dia-input"  />
+        </el-form-item>
+        <el-form-item label="渠道标记" :rules="[{ required: true, message: '渠道不能为空'}]" prop="channel_mark" v-if="this.dialogStatus === 'create'" >
+          <el-select v-model="sdk.channel_mark"   >
+            <el-option
+              v-for="item in channel_mark_list_dia"
+              :key="item.name"
+              :label="item.program_mark"
+              :value="item.program_mark">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="外部版本-在线" class="filter-item" :rules="[{ required: true, message: '外部版本-在线不能为空'}]" v-if="this.dialogStatus === 'update'"
                       prop="version_online_version">
-          <el-input v-model="sdk.version_online_version" placeholder="必填~" class="dia-input"/>
+          <el-input v-model="sdk.version_online_version" placeholder="必填~" class="dia-input" onkeyup="value=value.replace(/[^\d{1,}\.\d{1,}|\d{1,}]/g,'')" />
         </el-form-item>
-        <el-form-item label="外部版本-更新" :rules="[{ required: true, message: '外部版本-更新不能为空'}]"
+        <el-form-item label="外部版本-更新" :rules="[{ required: true, message: '外部版本-更新不能为空'}]"v-if="this.dialogStatus === 'update'"
                       prop="version_update_version">
-          <el-input v-model="sdk.version_update_version" placeholder="必填~" class="dia-input"/>
+          <el-input v-model="sdk.version_update_version" placeholder="必填~" class="dia-input"  onkeyup="value=value.replace(/[^\d{1,}\.\d{1,}|\d{1,}]/g,'')" />
         </el-form-item>
-        <el-form-item label="内部版本-在线" :rules="[{ required: true, message: '内部版本-在线不能为空'}]"
+        <el-form-item label="内部版本-在线" :rules="[{ required: true, message: '内部版本-在线不能为空'}]" v-if="this.dialogStatus === 'update'"
                       prop="versioncode_online_version">
           <el-input v-model="sdk.versioncode_online_version" placeholder="必填~" class="dia-input"/>
         </el-form-item>
-        <el-form-item label="内部版本_更新" :rules="[{ required: true, message: '内部版本_更新不能为空'}]"
+        <el-form-item label="内部版本_更新" :rules="[{ required: true, message: '内部版本_更新不能为空'}]" v-if="this.dialogStatus === 'update'"
                       prop="versioncode_update_version">
           <el-input v-model="sdk.versioncode_update_version" placeholder="必填~" class="dia-input"/>
         </el-form-item>
-        <el-form-item label="sdk配置" class="filter-item">
-          <el-input v-model="sdk.sdk_config" placeholder="" class="dia-input"/>
-        </el-form-item>
-        <el-form-item label="状态">
-          <el-switch v-model="sdk.sdkstatus" active-color="#13ce66" inactive-color="#ff4949"
-                     active-value="1" inactive-value="0"
-                     active-text="正常" inactive-text="删除">
-          </el-switch>
-        </el-form-item>
-        <el-form-item label="渠道特别要求">
-          <el-input type="textarea" v-model="sdk.sdk_require" class="dia-input" maxlength="150" :autosize="{maxRows: 5}"
-                    placeholder=""/>
-        </el-form-item>
         <br/>
         <!--筛选输入框-->
-        <el-input placeholder="SDK模版筛选" v-model="sdk_template_name"
-                  style="width: 200px;margin-bottom: 10px" class="filter-item" clearable
+        <el-input placeholder="SDK模版筛选" v-model="sdk_template_name" v-if="this.dialogStatus === 'update'"
+                  style="width: 200px;margin-bottom: 10px" class="filter-item" clearable @keyup.native="getchannelmarklist"
                   @change="getchannelmarklist"/>
         <!--多选框 sdk模版控制-->
-        <el-checkbox-group v-model="checkedSdkTemplate" style="border-bottom: 15px" size="mini">
-          <el-checkbox v-for="name in sdkTemplate" :label="name" :key="name" @change="findSdkTemplate" border>
-            <div class="grid-content bg-purple-light" style="width: 107px;margin-bottom: 15px">{{name}}</div>
+        <el-checkbox-group v-model="checkedSdkTemplate" style="border-bottom: 15px" size="mini"  v-if="this.dialogStatus === 'update'">
+          <el-checkbox v-for="name in sdkTemplate" :label="name.mark" :key="name.mark" @change="findSdkTemplate" :value="name.name" border>
+            <div class="grid-content bg-purple-light" style="width: 107px;margin-bottom: 15px">{{name.mark}}</div>
           </el-checkbox>
         </el-checkbox-group>
-
         <br/>
         <!--标签页-->
-        <el-tabs tab-position="left" style="width: 95%;background-color: #f4f4f5;height: 500px;padding: 1px" id="test1"
+        <el-tabs tab-position="left" style="width: 95%;background-color: #f4f4f5;height: 500px;padding: 1px" id="test1" v-if="this.dialogStatus === 'update'"
                  @tab-click="findtabname" type="border-card">
           <el-tab-pane v-for="name in checkedSdkTemplate" :label="name" :key="name"
                        style="font-size: 14px;font-family: Microsoft YaHei;width: 100%">
@@ -233,13 +211,14 @@
                   </el-select>
                 </div>
               </template>
+
               <!--标签页内表单-->
               <el-form-item v-for="(domain, index) in sdk.form.domains" :key="domain.key+index"
                             v-if="form_item_filter(domain)" style="margin-right: 1px"
-                             v-model="page_name">
+                            v-model="page_name">
                 <div>
                   <span style="margin-right: 20px;font-size: 14px;font-family: Microsoft YaHei">
-                    {{domain.param_name}}：
+                    {{domain.param_name1}}：
                   </span>
                   <el-input v-model="domain.param" style="width: 300px;margin-right: 25px" placeholder="必填"/>
                 </div>
@@ -249,8 +228,9 @@
         </el-tabs>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">{{ '取消'}}</el-button>
+        <!--<el-button @click="dialogFormVisible = false">{{ '取消'}}</el-button>-->
         <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">{{ '确认' }}</el-button>
+        <el-button type="success" @click="test()" v-if="dialogStatus==='update'">发布</el-button>
       </div>
     </el-dialog>
   </div>
@@ -283,6 +263,7 @@
     },
     data() {
       return {
+        rowvalue:'',
         tag_name: '',
         options: [],
         value: [],
@@ -292,7 +273,7 @@
         dialog_secondary_visual: false,
         app_name_list: [],
         spanArr: [],
-        filter_form_name: '无',
+        filter_form_name: '暂无',
         update_flag: true,
         create_flag: true,
         sdk_template_name: '',
@@ -350,6 +331,8 @@
           create: '创建'
         },
         sdk: {
+          second_checked:[],
+          checked:[],
           id: '',
           timevalue: '',
           app_name: '',
@@ -379,7 +362,6 @@
       }
     },
     created() {
-      //this.fetchName()
       this.initchannel()  //获取渠道
       this.initTemplate()   //获取sdk模版
       this.initDate()   //初始化日期查询数据
@@ -392,35 +374,81 @@
         return false
       },
       test() {
-
+       this.publish(this.rowvalue)
       },
       findtabname(tab, event) {
         this.tag_name = tab.label
         this.change_pagename(tab.label)
       },//获取对话框内标签页 名触发事件
       publish(param) {
+        console.log(111111)
         let tothis = this
-        this.sdk.id = param.id
-        this.sdk.timevalue = param.date
-        this.sdk.app_name = param.app_name
-        this.sdk.package_name = param.package_name
-        this.sdk.channel_mark = param.channel_mark
-        this.sdk.version_online_version = param.version_online
-        this.sdk.version_update_version = param.version_update
-        this.sdk.versioncode_online_version = param.versioncode_online_version
-        this.sdk.versioncode_update_version = param.versioncode_update_version
-        this.sdk.sdk_config = param.sdk_config
-        this.sdk.sdk_require = param.sdk_require
-        this.sdk.note = param.note
-        this.sdk.form.domains = param.paramter
+        // this.sdk.id = param.id
+        // this.sdk.timevalue = param.date
+        // this.sdk.app_name = param.app_name
+        // this.sdk.package_name = param.package_name
+        // this.sdk.channel_mark = param.channel_mark
+        // this.sdk.version_online_version = param.version_online
+        // this.sdk.version_update_version = param.version_update
+        // this.sdk.versioncode_online_version = param.versioncode_online_version
+        // this.sdk.versioncode_update_version = param.versioncode_update_version
+        // this.sdk.sdk_config = param.sdk_config
+        // this.sdk.sdk_require = param.sdk_require
+        // this.sdk.note = param.note
+        // this.sdk.checked = param.checked.split(',')
+        //未勾选的去掉  start
+        // this.sdk.form.domains = param.paramter
+        let newdomains = []
+        for (let i = 0; i < this.checkedSdkTemplate.length; i++) {
+          for (let j = 0; j < this.sdk.form.domains.length; j++) {
+            if (this.sdk.form.domains[j].param_name.split('-')[0] === this.checkedSdkTemplate[i]) {
+              newdomains.push(this.sdk.form.domains[j])
+            }
+          }
+        }
+
+        // //二级未勾选的去掉
+        // let second_newdomains=[]
+        // for (let i = 0; i < newdomains.length; i++) {
+        //   if(newdomains[i].param_name.split('-').length===3){
+        //     for (let j=0;j<param.second_checked.length;j++){
+        //       if (param.second_checked[j]===newdomains[i].param_name[1]){
+        //         second_newdomains.push(newdomains[i])
+        //       }
+        //     }
+        //   }else {
+        //     second_newdomains.push(newdomains[i])
+        //   }
+        // }
+        // this.sdk.form.domains = second_newdomains
+      console.log(newdomains)
+
+        //二级未勾选的去掉
+        let second_newdomains=[]
+        for (let i = 0; i < newdomains.length; i++) {
+          if(newdomains[i].param_name.split('-').length===3){
+            for (let j=0;j<this.dialog_secondary_checked.length;j++){
+              if (this.dialog_secondary_checked[j]===newdomains[i].param_name.split('-')[1]){
+                second_newdomains.push(newdomains[i])
+              }
+            }
+          }else {
+            second_newdomains.push(newdomains[i])
+          }
+        }
+        this.sdk.form.domains = second_newdomains
+        //end
+        console.log(second_newdomains)
+
         this.sdk.sdkstatus = '1'
         this.sdk.publish = '1'
+        this.sdk.form.select=[]
+
         getProjectConfigPublish().then(response => {
           this.publishlist = response.data
           if (!this.valideSdkForm()) {
             return
           }
-          ;
           let timestamp = (new Date()).getTime()
           this.sdk.timevalue = timestamp
           createProjectConfig(this.sdk).then(response => {
@@ -453,28 +481,41 @@
         })
       },//发布按钮
       valideSdkForm() {
-        for (let i = 0; i < this.publishlist.length; i++) {
-          if (isNaN(parseInt(this.sdk.versioncode_online_version)) || isNaN(parseInt(this.sdk.versioncode_update_version))) {
+          let num=new RegExp('^[0-9]*$')
+          if (!num.test(this.sdk.versioncode_online_version)&&!num.test(this.sdk.versioncode_update_version)) {
             this.$notify({
               title: '警告！',
-              message: '内部版本号格式错误,请及时修改！',
+              dangerouslyUseHTMLString: true,
+              message: '内部版本号格式错误,请及时修改！<br>必须为正整数。',
               type: 'warning',
               duration: 2000
             })
             return false
           }
-
           let arr2 = this.sdk.version_update_version.split('.');//外版本号
-          if (arr2.length < 3) {
+          let arr3 = this.sdk.version_online_version.split('.');//外版本号
+          let arr2test=false
+          let arr3test=false
+          for (let i=0;i<arr2.length;i++){
+            if (!num.test(arr2[i])){
+              arr2test=true
+            }
+          }
+          for (let i=0;i<arr3.length;i++){
+            if (!num.test(arr3[i])){
+              arr3test=true
+            }
+          }
+          if (arr2.length < 3||arr3.length<3||arr2test||arr3test) {
             this.$notify({
               title: '警告！',
-              message: '外部版本号格式不正确,请及时修改！',
+              dangerouslyUseHTMLString: true,
+              message: '外部版本号格式不正确,请及时修改！<br>例如:1.0.0',
               type: 'warning',
               duration: 2000
             })
             return false
           }
-
           if (parseInt(this.sdk.versioncode_update_version) <= parseInt(this.sdk.versioncode_online_version)) {
             this.$notify({
               title: '警告！',
@@ -484,24 +525,23 @@
             })
             return false
           }
-
+          let diff = this.compareVersion(this.sdk.version_online_version, this.sdk.version_update_version)
+          if (diff >= 0) {
+            this.$notify({
+              title: '警告！',
+              message: '外版本号更新必须大于在线,请及时修改！',
+              type: 'warning',
+              duration: 2000
+            })
+            return false
+          }
+        for (let i = 0; i < this.publishlist.length; i++) {
           if (this.publishlist[i].channel_mark === this.sdk.channel_mark && this.publishlist[i].package_name === this.sdk.package_name) {
-            let diff = this.compareVersion(this.publishlist[i].version_update, this.sdk.version_update_version)
-            if (diff >= 0) {
-              let out_code = this.publishlist[i].version_update
-              this.$notify({
-                title: '警告！',
-                message: '最高外版本号为' + out_code + ',请及时修改！',
-                type: 'warning',
-                duration: 2000
-              })
-              return false
-            }
-
             if (parseInt(this.publishlist[i].versioncode_update_version) >= parseInt(this.sdk.versioncode_update_version)) {//内版本号
               this.$notify({
                 title: '警告！',
-                message: '目前最大的内部版本号为：' + this.publishlist[i].versioncode_update_version + ',请及时修改！',
+                dangerouslyUseHTMLString: true,
+                message: '最大的内部版本号为：' + this.publishlist[i].versioncode_update_version + ',<br>请及时修改！',
                 type: 'warning',
                 duration: 2000
               })
@@ -509,7 +549,6 @@
             }
           }
         }
-
         return true
       },  //发布验证
       form_item_filter(domain) {
@@ -547,23 +586,13 @@
             list.push(this.hidsdkTemplate[i])
           }
         }
-
-
         for (let i = 0; i < this.hidsdkTemplate.length; i++) {
-          if (this.hidsdkTemplate[i].search(this.sdk_template_name) != -1) {
+          if (this.hidsdkTemplate[i].name.search(this.sdk_template_name) != -1) {
             list.push(this.hidsdkTemplate[i])
           }
         }
         this.sdkTemplate = list
       },//根据对话框内搜索框改变sdk多选框
-      handleCreateByTemplate(param) {
-        this.dialog_secondary_checked = []
-        this.handleCreate()
-        this.handleUpdate(param)
-        const date = new Date();
-        this.sdk.timevalue = date
-        this.dialogStatus = 'create'
-      },//以为模版创建
       initchannel() {
         getChannel().then(response => {
           this.channel_mark_list_dia = response.data
@@ -700,6 +729,7 @@
             }
           }
         }
+
         let newlist = []
         for (let j = 0; j < this.sdk.form.domains.length; j++) {
           let flag = true
@@ -724,6 +754,21 @@
           this.sdk.sdk_config = '暂无'
         }
 
+        if (this.sdk.app_name === '') {
+          this.sdk.app_name = '暂无'
+        }
+        if (this.sdk.version_online_version === '') {
+          this.sdk.version_online_version = '暂无'
+        }
+        if (this.sdk.version_update_version === '') {
+          this.sdk.version_update_version = '暂无'
+        }
+        if (this.sdk.versioncode_online_version === '') {
+          this.sdk.versioncode_online_version = '暂无'
+        }
+        if (this.sdk.versioncode_update_version === '') {
+          this.sdk.versioncode_update_version = '暂无'
+        }
 
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
@@ -732,16 +777,26 @@
             if (this.create_flag) {
               this.create_flag = false
               createProjectConfig(this.sdk).then(response => {
-                this.create_flag = true
-                this.initDate()
-                this.$notify({
-                  title: '成功',
-                  message: '添加成功',
-                  type: 'success',
-                  duration: 2000
-                })
-                this.handleFilter()
-                this.dialogFormVisible = false
+                if (response.data==='成功'){
+                  this.create_flag = true
+                  this.initDate()
+                  this.$notify({
+                    title: '成功',
+                    message: '添加成功',
+                    type: 'success',
+                    duration: 2000
+                  })
+                  this.handleFilter()
+                  this.dialogFormVisible = false
+                } else {
+                  this.create_flag = true
+                  this.$notify({
+                    title: '失败',
+                    message: '表单已存在',
+                    type: 'error',
+                    duration: 2000
+                  })
+                }
               }).catch(rs => {
                 this.create_flag = true
                 tothis.$notify({
@@ -767,6 +822,8 @@
           }
         }
         this.sdk = {
+          second_checked:[],
+          checked:[],
           id: '',
           timevalue: '',
           app_name: '',
@@ -799,6 +856,7 @@
         })
       }, //创建对话框展示
       handleUpdate(param) {
+        this.resetTemp()
         this.tag_name = ''
         let paramter = param.paramter
         for (let i = 0; i < paramter.length; i++) {
@@ -840,13 +898,13 @@
         this.handleCreate()
         this.sdk.id = param.id
         this.sdk.timevalue = param.date
-        this.sdk.app_name = param.app_name
-        this.sdk.package_name = param.package_name
         this.sdk.channel_mark = param.channel_mark
-        this.sdk.version_online_version = param.version_online
-        this.sdk.version_update_version = param.version_update
-        this.sdk.versioncode_online_version = param.versioncode_online_version
-        this.sdk.versioncode_update_version = param.versioncode_update_version
+        this.sdk.package_name = param.package_name
+        this.sdk.app_name = param.app_name==='暂无'?'':param.app_name
+        this.sdk.version_online_version = param.version_online==='暂无'?'':param.version_online
+        this.sdk.version_update_version = param.version_update==='暂无'?'':param.version_update
+        this.sdk.versioncode_online_version = param.versioncode_online_version==='暂无'?'':param.versioncode_online_version
+        this.sdk.versioncode_update_version = param.versioncode_update_version==='暂无'?'':param.versioncode_update_version
         this.sdk.sdk_config = param.sdk_config
         this.sdk.sdk_require = param.sdk_require
         this.sdk.note = param.note
@@ -908,42 +966,91 @@
         }
         this.filter_form_name = this.page_name
         this.change_pagename(this.page_name)
+        //展示时sdk模版多选框等于checked start
+        let checked1=param.checked.split(',')
+        let newchecked1=[]
+        for (let i=0;i<checked1.length;i++){
+          if (checked1[i]!=='暂无'){
+            newchecked1.push(checked1[i])
+          }
+        }
+        this.checkedSdkTemplate=newchecked1
+
+        let checked2=param.second_checked.split(',')
+        let newchecked2=[]
+        for (let i=0;i<checked2.length;i++){
+          if (checked2[i]!=='暂无'){
+            newchecked2.push(checked2[i])
+          }
+        }
+        this.dialog_secondary_checked=newchecked2
+
+        //end
+
+        this.rowvalue=param
+
         this.dialogStatus = 'update'
         this.dialogFormVisible = true
       }, //更新对话框展示
       updateData() {
-        //dia 选择器提交
-        let select = []
-        for (let i = 0; i < this.checkedSdkTemplate.length; i++) {
-          let checkedname = this.checkedSdkTemplate[i]
-          for (let j = 0; j < this.options.length; j++) {
-            let param_name = this.options[j].sdk_name
-            if (checkedname === param_name) {
-              let newele = {
-                param_name: this.options[j].sdk_name + '-' + this.options[j].param_name,
-                param: this.options[j].value,
-                sdk_type: '1',
-              }
-              if (select.length === 0) {
-                select.push(newele)
-              } else {
-                let flag = true
-                for (let x = 0; x < select.length; x++) {
-                  if (select[x].param_name === newele.param_name) {
-                    select[x].param_name = newele.param_name
-                    flag = false
-                  }
-                }
-                if (flag) {
-                  select.push(newele)
-                }
-              }
+        // //dia 选择器提交
+        // let select = []
+        // for (let i = 0; i < this.checkedSdkTemplate.length; i++) {
+        //   let checkedname = this.checkedSdkTemplate[i]
+        //   for (let j = 0; j < this.options.length; j++) {
+        //     let param_name = this.options[j].sdk_name
+        //     if (checkedname === param_name) {
+        //       let newele = {
+        //         param_name: this.options[j].sdk_name + '-' + this.options[j].param_name,
+        //         param: this.options[j].value,
+        //         sdk_type: '1',
+        //       }
+        //       if (select.length === 0) {
+        //         select.push(newele)
+        //       } else {
+        //         let flag = true
+        //         for (let x = 0; x < select.length; x++) {
+        //           if (select[x].param_name === newele.param_name) {
+        //             select[x].param_name = newele.param_name
+        //             flag = false
+        //           }
+        //         }
+        //         if (flag) {
+        //           select.push(newele)
+        //         }
+        //       }
+        //     }
+        //   }
+        // }
+        // this.sdk.form.select = []
+        // this.sdk.form.select = this.sdk.form.select.concat(select)
+        // //
+
+        //未勾选的去掉  start
+        let newdomains1 = []
+        for (let i = 0; i < this.sdk.checked.length; i++) {
+          for (let j = 0; j < this.sdk.form.domains.length; j++) {
+            if (this.sdk.form.domains[j].param_name.split('-')[0] === this.sdk.checked[i]) {
+              newdomains1.push(this.sdk.form.domains[j])
             }
           }
         }
-        this.sdk.form.select = []
-        this.sdk.form.select = this.sdk.form.select.concat(select)
-        //
+
+        //二级未勾选的去掉
+        let second_newdomains=[]
+        for (let i = 0; i < newdomains1.length; i++) {
+          if(newdomains1[i].param_name.split('-').length===3){
+            for (let j=0;j<this.sdk.second_checked.length;j++){
+              if (this.sdk.second_checked[j]===newdomains1[i].param_name[1]){
+                second_newdomains.push(newdomains1[i])
+              }
+            }
+          }else {
+            second_newdomains.push(newdomains1[i])
+          }
+        }
+        this.sdk.form.domains = second_newdomains
+        //end
 
         let tothis = this
         let del = []
@@ -976,6 +1083,7 @@
               return
             }
           }
+
           if (names.length > 2) {
             let checked_falg = true
             for (let j = 0; j < this.dialog_secondary_checked.length; j++) {
@@ -1012,33 +1120,87 @@
         if (this.sdk.sdk_config === '') {
           this.sdk.sdk_config = '暂无'
         }
+        //把所有有值的一起提交
+        let newdomains=[]
+        for (let i=0;i<this.sdkTemplatelibrary.length;i++){
+          for (let j=0;j<this.sdkTemplatelibrary[i].keyform.length;j++){
+            if (this.sdkTemplatelibrary[i].keyform[j].param!==''){
+              newdomains.push(this.sdkTemplatelibrary[i].keyform[j])
+            }
+          }
+        }
+        this.sdk.form.domains=newdomains
+        //把二级表单的checked一起保存
+        //保留checkedSdkTemplate
+        this.sdk.checked=this.checkedSdkTemplate
+        this.sdk.second_checked=this.dialog_secondary_checked
+        //选择器提交
+        let select = []
+        for (let j = 0; j < this.options.length; j++) {
+          let param_name = this.options[j].sdk_name
+          let newele = {
+            param_name: this.options[j].sdk_name + '-' + this.options[j].param_name,
+            param: this.options[j].value,
+            sdk_type: '1',
+          }
+          if (select.length === 0) {
+            select.push(newele)
+          } else {
+            let flag = true
+            for (let x = 0; x < select.length; x++) {
+              if (select[x].param_name === newele.param_name) {
+                select[x].param_name = newele.param_name
+                flag = false
+              }
+            }
+            if (flag) {
+              select.push(newele)
+            }
+          }
+        }
+        this.sdk.form.select = []
+        this.sdk.form.select = select
+
+        getProjectConfigPublish().then(response => {
+          this.publishlist = response.data
+          if (!this.valideSdkForm()) {
+            return
+          }
+
         if (!this.update_flag) {
           return
         }
         this.update_flag = false
-        updateProjectConfig(this.sdk).then(response => {
-          this.listLoading = true
-          if (this.hidtimevalue != '') {
-            this.timevalue = this.hidtimevalue
-            this.handleFilter();
+
+        this.$refs['dataForm'].validate((valid) => {
+          if (valid) {
+            updateProjectConfig(this.sdk).then(response => {
+              this.listLoading = true
+              if (this.hidtimevalue != '') {
+                this.timevalue = this.hidtimevalue
+                this.handleFilter();
+              }
+              this.dialogFormVisible = false
+              this.$notify({
+                title: '成功',
+                message: '更新成功',
+                type: 'success',
+                duration: 2000
+              })
+              this.handleFilter()
+              this.update_flag = true
+            }).catch(err => {
+              tothis.$notify({
+                title: '失败',
+                message: '请稍后重试',
+                type: 'error',
+                duration: 2000
+              })
+            })
           }
-          this.dialogFormVisible = false
-          this.$notify({
-            title: '成功',
-            message: '更新成功',
-            type: 'success',
-            duration: 2000
-          })
-          this.handleFilter()
           this.update_flag = true
-        }).catch(err => {
-          tothis.$notify({
-            title: '失败',
-            message: '请稍后重试',
-            type: 'error',
-            duration: 2000
-          })
-          this.update_flag = true
+        })
+
         })
       }, //更新方法
       getDatawithParam() {
@@ -1096,7 +1258,6 @@
           this.list = response.data
           this.hidlist = response.data
           this.listLoading = false
-          console.log(this.list)
           this.getDatawithParam()
           this.initfilterlist()
         }).catch(function (rs) {
@@ -1151,6 +1312,8 @@
         return ('00' + str).substr(str.length);
       },//日期转换
       initfilterlist() {
+        this.channel_mark_list=[]
+        this.app_name_list=[]
         for (let i = 0; i < this.hidlist.length; i++) {
           if (this.channel_mark_list.length === 0) {
             this.channel_mark_list.push(this.hidlist[i].channel_mark)

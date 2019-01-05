@@ -2,6 +2,7 @@
   <div class="app-container">
     <el-input placeholder="根据账号查找" v-model="inputName" style="width: 200px;margin-bottom: 15px" class="filter-item" clearable @blur="getDatawithName"/>
     <el-table
+      height="850"
       v-loading="listLoading"
       :data="list"
       element-loading-text="Loading"

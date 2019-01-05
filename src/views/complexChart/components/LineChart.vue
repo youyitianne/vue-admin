@@ -66,9 +66,7 @@ export default {
     if (this.autoResize) {
       window.removeEventListener('resize', this.__resizeHandler)
     }
-
     this.sidebarElm && this.sidebarElm.removeEventListener('transitionend', this.sidebarResizeHandler)
-
     this.chart.dispose()
     this.chart = null
   },

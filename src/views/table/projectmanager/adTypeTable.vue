@@ -7,6 +7,7 @@
 
     </div>
     <el-table
+      height="850"
       v-loading="listLoading"
       :data="list"
       element-loading-text="Loading"

@@ -6,13 +6,15 @@
           <svg-icon icon-class="peoples" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
-          <div style="margin-left: 140px;margin-bottom: -37px">
-            对比新增用户：{{statistical_data.contrast_newuser}}<br><br>
-            同比:<span style="color: hotpink" v-if="statistical_data.newuser_change<0"> ↘ &nbsp;{{statistical_data.newuser_change}}%</span><span style="color: limegreen" v-if="statistical_data.newuser_change>0">↗ &nbsp;{{statistical_data.newuser_change}}%</span>
-          </div>
           <div class="card-panel-text">新增用户</div>
-          <count-to :start-val="0" :end-val="this.statistical_data.newuser" :duration="2600" class="card-panel-num"/>
+          <count-to :start-val="0" :end-val="this.statistical_data.newuser" :duration="10" class="card-panel-num"/>
         </div>
+        <div style="margin-top: 20px;margin-left: 50px;font-size: 14px;font-weight: bolder">
+            对比新增用户：{{statistical_data.contrast_newuser}}<br><br>
+            同比:<span style="color: hotpink" v-if="statistical_data.newuser_change<0">
+          ↘ &nbsp;{{statistical_data.newuser_change}}%</span><span style="color: limegreen" v-if="statistical_data.newuser_change>0">
+          ↗ &nbsp;{{statistical_data.newuser_change}}%</span>
+          </div>
       </div>
     </el-col>
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
@@ -21,12 +23,14 @@
           <svg-icon icon-class="peoples" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
-          <div style="margin-left: 140px;margin-bottom: -37px">
-            对比活跃用户：{{statistical_data.contrast_activeuser}}<br><br>
-            同比:<span style="color: hotpink" v-if="statistical_data.activeuser_change<0"> ↘ &nbsp;{{statistical_data.activeuser_change}}%</span><span style="color: limegreen" v-if="statistical_data.activeuser_change>0"> ↗ &nbsp;{{statistical_data.activeuser_change}}%</span>
-          </div>
           <div class="card-panel-text">活跃用户</div>
-          <count-to :start-val="0" :end-val="this.statistical_data.activeuser" :duration="3000" class="card-panel-num"/>
+          <count-to :start-val="0" :end-val="this.statistical_data.activeuser" :duration="10" class="card-panel-num"/>
+        </div>
+        <div style="margin-top: 20px;margin-left: 50px;font-size: 14px;font-weight: bolder">
+          对比活跃用户：{{statistical_data.contrast_activeuser}}<br><br>
+          同比:<span style="color: hotpink" v-if="statistical_data.activeuser_change<0">
+          ↘ &nbsp;{{statistical_data.activeuser_change}}%</span><span style="color: limegreen" v-if="statistical_data.activeuser_change>0">
+          ↗ &nbsp;{{statistical_data.activeuser_change}}%</span>
         </div>
       </div>
     </el-col>
@@ -36,12 +40,14 @@
           <svg-icon icon-class="documentation" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
-          <div style="margin-left: 140px;margin-bottom: -37px">
-            对比总展次：{{statistical_data.contrast_showtimes}}<br><br>
-            同比:<span style="color: hotpink" v-if="statistical_data.showtimes_change<0"> ↘ &nbsp;{{statistical_data.showtimes_change}}%</span><span style="color: limegreen" v-if="statistical_data.showtimes_change>0"> ↗ &nbsp;{{statistical_data.showtimes_change}}%</span>
-          </div>
           <div class="card-panel-text">总展次</div>
-          <count-to :start-val="0" :end-val="this.statistical_data.showtimes" :duration="3200" class="card-panel-num"/>
+          <count-to :start-val="0" :end-val="this.statistical_data.showtimes" :duration="10" class="card-panel-num"/>
+        </div>
+        <div style="margin-top: 20px;margin-left: 50px;font-size: 14px;font-weight: bolder">
+          对比总展次：{{statistical_data.contrast_showtimes}}<br><br>
+          同比:<span style="color: hotpink" v-if="statistical_data.showtimes_change<0">
+            ↘ &nbsp;{{statistical_data.showtimes_change}}%</span><span style="color: limegreen" v-if="statistical_data.showtimes_change>0">
+            ↗ &nbsp;{{statistical_data.showtimes_change}}%</span>
         </div>
       </div>
     </el-col>
@@ -51,12 +57,84 @@
           <svg-icon icon-class="money" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
-          <div style="margin-left: 140px;margin-bottom: -37px">
-            对比总流水：{{statistical_data.contrast_earned}}<br><br>
-            同比:<span style="color: hotpink" v-if="statistical_data.earned_change<0"> ↘ &nbsp;{{statistical_data.earned_change}}%</span><span style="color: limegreen" v-if="statistical_data.earned_change>0"> ↗ &nbsp;{{statistical_data.earned_change}}%</span>
-          </div>
           <div class="card-panel-text">总流水</div>
-          <count-to :start-val="0" :end-val="this.statistical_data.earned" :duration="3600" class="card-panel-num"/>
+          <count-to :start-val="0" :end-val="this.statistical_data.earned" :duration="10" class="card-panel-num"/>
+        </div>
+        <div style="margin-top: 20px;margin-left: 50px;font-size: 14px;font-weight: bolder">
+          对比总流水：{{statistical_data.contrast_earned}}<br><br>
+          同比:<span style="color: hotpink" v-if="statistical_data.earned_change<0">
+            ↘ &nbsp;{{statistical_data.earned_change}}%</span><span style="color: limegreen" v-if="statistical_data.earned_change>0">
+            ↗ &nbsp;{{statistical_data.earned_change}}%</span>
+        </div>
+      </div>
+    </el-col><br>
+
+
+    <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
+      <div class="card-panel" @click="handleSetLineChartData('shoppings')">
+        <div class="card-panel-icon-wrapper icon-money">
+          <svg-icon icon-class="banner" class-name="card-panel-icon" />
+        </div>
+        <div class="card-panel-description">
+          <div class="card-panel-text">横幅总展次</div>
+          <count-to :start-val="0" :end-val="this.statistical_data.banner" :duration="10" class="card-panel-num"/>
+        </div>
+        <div style="margin-top: 20px;margin-left: 50px;font-size: 14px;font-weight: bolder">
+          对比横幅总展次：{{statistical_data.contrast_banner}}<br><br>
+          同比:<span style="color: hotpink" v-if="statistical_data.banner_change<0">
+            ↘ &nbsp;{{statistical_data.banner_change}}%</span><span style="color: limegreen" v-if="statistical_data.banner_change>0">
+            ↗ &nbsp;{{statistical_data.banner_change}}%</span>
+        </div>
+      </div>
+    </el-col>
+    <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
+      <div class="card-panel" @click="handleSetLineChartData('shoppings')">
+        <div class="card-panel-icon-wrapper icon-money">
+          <svg-icon icon-class="video" class-name="card-panel-icon" />
+        </div>
+        <div class="card-panel-description">
+          <div class="card-panel-text">视频总展次</div>
+          <count-to :start-val="0" :end-val="this.statistical_data.video" :duration="10" class="card-panel-num"/>
+        </div>
+        <div style="margin-top: 20px;margin-left: 50px;font-size: 14px;font-weight: bolder">
+          对比视频总展次：{{statistical_data.contrast_video}}<br><br>
+          同比:<span style="color: hotpink" v-if="statistical_data.video_change<0">
+            ↘ &nbsp;{{statistical_data.video_change}}%</span><span style="color: limegreen" v-if="statistical_data.video_change>0">
+            ↗ &nbsp;{{statistical_data.video_change}}%</span>
+        </div>
+      </div>
+    </el-col>
+    <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
+      <div class="card-panel" @click="handleSetLineChartData('shoppings')">
+        <div class="card-panel-icon-wrapper icon-money">
+          <svg-icon icon-class="inline" class-name="card-panel-icon" />
+        </div>
+        <div class="card-panel-description">
+          <div class="card-panel-text">插屏总展次</div>
+          <count-to :start-val="0" :end-val="this.statistical_data.inline" :duration="10" class="card-panel-num"/>
+        </div>
+        <div style="margin-top: 20px;margin-left: 50px;font-size: 14px;font-weight: bolder">
+          对比插屏总展次：{{statistical_data.contrast_inline}}<br><br>
+          同比:<span style="color: hotpink" v-if="statistical_data.inline_change<0">
+            ↘ &nbsp;{{statistical_data.inline_change}}%</span><span style="color: limegreen" v-if="statistical_data.inline_change>0">
+            ↗ &nbsp;{{statistical_data.inline_change}}%</span>
+        </div>
+      </div>
+    </el-col>
+    <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
+      <div class="card-panel" @click="handleSetLineChartData('shoppings')">
+        <div class="card-panel-icon-wrapper icon-money">
+          <svg-icon icon-class="splash" class-name="card-panel-icon" />
+        </div>
+        <div class="card-panel-description">
+          <div class="card-panel-text">开屏总展次</div>
+          <count-to :start-val="0" :end-val="this.statistical_data.splash" :duration="10" class="card-panel-num"/>
+        </div>
+        <div style="margin-top: 20px;margin-left: 50px;font-size: 14px;font-weight: bolder">
+          对比开屏展次：{{statistical_data.contrast_splash}}<br><br>
+          同比:<span style="color: hotpink" v-if="statistical_data.splash_change<0">
+            ↘ &nbsp;{{statistical_data.splash_change}}%</span><span style="color: limegreen" v-if="statistical_data.splash_change>0">
+            ↗ &nbsp;{{statistical_data.splash_change}}%</span>
         </div>
       </div>
     </el-col>
@@ -81,13 +159,7 @@ export default {
   ,
   data(){
     return{
-      big:50,
-        small:-50,
-        newuser:800000,
-        newUser:800,
-        activeUser:700,
-        earned:9999,
-        paidUser:998,
+
     }
   },
   mounted(){

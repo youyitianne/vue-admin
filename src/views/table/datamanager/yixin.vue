@@ -16,6 +16,7 @@
       <el-button v-waves :loading="downloadLoading" type="primary" icon="el-icon-download"  @click="handleDownload" >{{'下载'}}</el-button>
     </div>
     <el-table
+      height="850"
       v-loading="listLoading"
       :data="list"
       element-loading-text="Loading"

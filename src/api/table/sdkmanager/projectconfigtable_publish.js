@@ -37,3 +37,18 @@ export function getChannel() {
     method: 'get',
   })
 }
+
+export function delProjectConfigPublish(param) {
+  return request({
+    url: '/channel',
+    method: 'get',
+  })
+}
+
+export function updateProjectConfig(param) {
+  return request({
+    url: '/api/publish_delete',
+    method: 'post',
+    data:param
+  })
+}

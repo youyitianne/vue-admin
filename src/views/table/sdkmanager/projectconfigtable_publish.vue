@@ -19,6 +19,7 @@
       </el-checkbox>
     </div>
     <el-table
+      height="850"
       v-loading="listLoading"
       :data="list"
       element-loading-text="Loading"
@@ -29,7 +30,7 @@
       border
       highlight-current-row
       @expand-change="expandrowhandler">
-      <el-table-column type="expand">
+      <el-table-column type="expand" label="展开" width="100px">
         <template slot-scope="props">
           <el-form label-position="left" inline class="demo-table-expand">
             <el-form-item label="时间:">
@@ -56,15 +57,15 @@
             <el-form-item label="内部版本_更新:">
               <span>{{ props.row.versioncode_update_version }}</span>
             </el-form-item>
-            <el-form-item label="sdk配置:">
-              <span>{{ props.row.sdk_config }}</span>
-            </el-form-item>
-            <el-form-item label="渠道特别要求:">
-              <span>{{ props.row.sdk_require }}</span>
-            </el-form-item>
-            <el-form-item label="备注:">
-              <span>{{ props.row.note }}</span>
-            </el-form-item>
+            <!--<el-form-item label="sdk配置:">-->
+              <!--<span>{{ props.row.sdk_config }}</span>-->
+            <!--</el-form-item>-->
+            <!--<el-form-item label="渠道特别要求:">-->
+              <!--<span>{{ props.row.sdk_require }}</span>-->
+            <!--</el-form-item>-->
+            <!--<el-form-item label="备注:">-->
+              <!--<span>{{ props.row.note }}</span>-->
+            <!--</el-form-item>-->
           </el-form>
           <div>
             <el-table
@@ -92,7 +93,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="序号" width="60">
+      <el-table-column label="序号" align="center" width="60">
         <template slot-scope="scope1">
           {{ ++scope1.$index }}
         </template>
@@ -109,10 +110,10 @@
       </el-table-column>
       <el-table-column label="内部版本-更新" prop="versioncode_update_version">
       </el-table-column>
-      <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width"
-                       v-if="checkPermission(['operator', 'planner','admin','leader'])&&checked===true">
+      <el-table-column label="操作" align="center" width="150px" class-name="small-padding fixed-width"
+                       v-if="checkPermission(['operator', 'planner','admin','leader'])">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ "编辑" }}</el-button>
+          <el-button type="danger" size="mini" @click="handleDelete(scope.row)">{{ "删除" }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -175,7 +176,7 @@
                   @change="getchannelmarklist"/>
         <!--多选框 sdk模版控制-->
         <el-checkbox-group v-model="checkedSdkTemplate" style="border-bottom: 15px" size="mini">
-          <el-checkbox v-for="name in sdkTemplate" :label="name" :key="name" @change="findSdkTemplate" border>
+          <el-checkbox v-for="name in sdkTemplate" :label="name.mark" :key="name.mark" :value="name.name" @change="findSdkTemplate" border>
             <div class="grid-content bg-purple-light" style="width: 107px;margin-bottom: 15px">{{name}}</div>
           </el-checkbox>
         </el-checkbox-group>
@@ -241,13 +242,13 @@
   import {
     createProjectConfig,
     getProjectConfig,
-    updateProjectConfig,
+
     getSdkTemplate,
     getChannel
   } from '@/api/table/sdkmanager/projectconfigtable'
   import {getName, getResourceName} from '@/api/table/sdkmanager/projectconfigtable'
 
-  import {getProjectConfigPublish} from '@/api/table/sdkmanager/projectconfigtable_publish'
+  import {updateProjectConfig,getProjectConfigPublish} from '@/api/table/sdkmanager/projectconfigtable_publish'
 
   export default {
     filters: {
@@ -364,6 +365,26 @@
       this.initDate()   //初始化日期查询数据
     },
     methods: {
+      handleDelete(data){
+        let tothis=this
+        this.$confirm('是否确定删除?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          updateProjectConfig(data).then(response=>{
+            this.handleFilter();
+          }).catch(rs=>{
+            tothis.$notify({
+              title: '失败',
+              message: '请稍后重试',
+              type: 'error',
+              duration: 2000
+            })
+          })
+        })
+
+      },
       test1(name) {
         if (name === this.tag_name) {
           return true
@@ -484,7 +505,7 @@
         this.sdk.form.domains = []
         for (let i = 0; i < this.checkedSdkTemplate.length; i++) {
           for (let j = 0; j < this.sdkTemplatelibrary.length; j++) {
-            if (this.sdkTemplatelibrary[j].keymark === this.checkedSdkTemplate[i]) {
+            if (this.sdkTemplatelibrary[j].name.keymark === this.checkedSdkTemplate[i]) {
               if (this.sdk.form.domains.length === 0) {
                 this.sdk.form.domains = this.sdkTemplatelibrary[j].keyform
               } else {
@@ -881,6 +902,8 @@
         return ('00' + str).substr(str.length);
       },//日期转换
       initfilterlist() {
+        this.channel_mark_list=[]
+        this.app_name_list=[]
         for (let i = 0; i < this.hidlist.length; i++) {
           if (this.channel_mark_list.length === 0) {
             this.channel_mark_list.push(this.hidlist[i].channel_mark)

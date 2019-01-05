@@ -10,6 +10,7 @@
 
     </div>
     <el-table
+      height="850"
       stripe
       v-loading="listLoading"
       :data="list"

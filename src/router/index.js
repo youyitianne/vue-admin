@@ -313,7 +313,7 @@ export const asyncRouterMap = [
         component: () => import('@/views/table/sdkmanager/projectconfigtable'),
         name: 'ProjectConfigManager',
         meta: {
-          title: '项目配置表管理',
+          title: '配置表管理',
           //roles: ['operator'],
         }
       }, {
@@ -321,7 +321,7 @@ export const asyncRouterMap = [
         component: () => import('@/views/table/sdkmanager/projectconfigtable_publish'),
         name: 'ProjectConfigList',
         meta: {
-          title: '项目配置表',
+          title: '配置表发布记录',
           //roles: ['operator'],
         }
       }]

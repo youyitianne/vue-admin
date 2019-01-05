@@ -15,6 +15,7 @@
       <el-button v-model="checked1" border style="" @click="dialogMessageVisible=true" type="info">SDK模版添加说明</el-button>
     </div>
     <el-table
+      height="850"
       v-loading="listLoading"
       :data="list"
       element-loading-text="Loading"
@@ -185,7 +186,7 @@
     },
     data() {
       return {
-        dialogMessageVisible:true,
+        dialogMessageVisible:false,
         options: [{
           value: '0',
           label: '输入框'
