@@ -90,15 +90,15 @@
               <el-button size="mini" round @click="restore1()"><svg-icon icon-class="restore"
                                                                          class-name="card-panel-icon"/>&nbsp;还原</el-button>
           </span>
-          应用：
-          <el-select v-model="secondary_game" style="margin-right: 20px" size="mini" @change="paramchange()" filterable >
-            <el-option key="全部" label="全部" value="全部">
-            </el-option>
-            <el-option v-for="item in app_name_list" :key="item" :label="item" :value="item">
+          项目：
+          <el-select v-model="secondary_game" style="margin-right: 20px" size="mini" @change="paramchange()" value-key="project_name">
+            <!--<el-option key="全部" label="全部" value="全部"></el-option>-->
+            <el-option v-for="item in app_name_list" :key="item.project_name" :label="item.project_name" :value="item">
             </el-option>
           </el-select>
           渠道：
-          <el-select v-model="secondary_channel.program_mark" style="margin-top: -10px;margin-right: 20px" size="mini" filterable
+          <el-select v-model="secondary_channel.program_mark" style="margin-top: -10px;margin-right: 20px" size="mini"
+                     filterable
                      @change="paramchange()">
             <el-option key="全部" label="全部" value="全部">
             </el-option>
@@ -118,7 +118,7 @@
         </div>
       </div>
     </div>
-    <div v-if="panel_view" >
+    <div v-if="panel_view">
       <panel-group
         @handleSetLineChartData="handleSetLineChartData"
         style="margin-bottom: -45px" v-bind:statistical_data="statistical_data"/>
@@ -446,9 +446,9 @@
         </el-table-column>
         <el-table-column
           v-if="this.query_way==='日'"
-                         width="100px"
-                         prop="mau"
-                         label="MAU">
+          width="100px"
+          prop="mau"
+          label="MAU">
         </el-table-column>
         <el-table-column
           width="100px"
@@ -587,7 +587,7 @@
   import PanelGroup from './components/PanelGroup'
   import LineChart from './components/LineChart'
   import {gettest} from '@/api/lineMarker'
-  import {getResourceName, getName, getChannel, getappdata} from '@/api/complexChart/index'
+  import {getResourceName, getName, getChannel, getappdata,getProject} from '@/api/complexChart/index'
   import checkPermission from '@/utils/permission' // 权限判断函数
   import formatDate from '@/utils/timetransform'
 
@@ -609,7 +609,7 @@
         chartline: true,
         secondary_platform: '全部',
         platform_list: [],
-        totaltabledata:[],
+        totaltabledata: [],
         tableData: [],
         listLoading: true,
         original_list: [],
@@ -656,7 +656,10 @@
           name: '',
         },
         app_name_list: [],
-        secondary_game: '全部',
+        secondary_game:{
+          project_name:'全部',
+          applist:[]
+        },
         original_time: [],
         contrast_time: [],
         list1: {
@@ -822,7 +825,7 @@
           this.panel_view = true
         }
       },
-      downloadhandler()   {
+      downloadhandler() {
         import('@/vendor/Export2Excel').then(excel => {
           const tHeader = ['日期', 'DAU', 'MAU', '总收益',
             'DAUARPU', 'DNU', 'MNU', '总展次',
@@ -852,12 +855,14 @@
           this.chartline = true
           this.arpu_chartline = false
         }
-
       },//折线图隐藏按钮
       restore1() {
         this.secondary_platform = '全部'
         this.secondary_channel.program_mark = '全部'
-        this.secondary_game = '全部'
+        this.secondary_game = {
+          project_name:'全部',
+          applist:[]
+        }
         this.analysisdata()
       },//重置按钮
       fetchdata() {
@@ -893,7 +898,7 @@
             end: this.contrast_time[1].split('-')[0],
           }
         }
-        //this.listLoading=false
+        //this.listLoading = false
         getappdata(listParam).then(response => {
           this.original_list = response.data
           this.original_list_app = response.data1
@@ -912,8 +917,10 @@
           tothis.listLoading = false
           console.error(rs)
         })
-
       },//根据时间查找数据
+
+
+
       analysisdata() {
         this.resetchart()
         let times
@@ -961,19 +968,40 @@
         let video_earned_list = []
         let inline_earned_list = []
         let splash_earned_list = []
-
         for (let j = 0; j < times.length; j++) {
-          //原始数据
+          let contrast_dau = 0
+          let contrast_dnu = 0
+          let contrast_showtimes = 0
+          let contrast_earned = 0
+          let orginal_banner = 0
+          let orginal_video = 0
+          let orginal_inline = 0
+          let orginal_splash = 0
+          let banner_earned = 0
+          let video_earned = 0
+          let inline_earned = 0
+          let splash_earned = 0
+          let contrast_banner = 0
+          let contrast_video = 0
+          let contrast_inline = 0
+          let contrast_splash = 0
           let original_dau = 0
           let original_dnu = 0
+          //原始数据
           for (let i = 0; i < this.original_list.length; i++) {
             let channel = false
             if (this.secondary_channel.program_mark === '全部' || this.secondary_channel.program_mark === this.original_list[i].channel) {
               channel = true
             }
             let game = false
-            if (this.secondary_game === '全部' || this.secondary_game === this.original_list[i].app_name) {
+            if (this.secondary_game.project_name === '全部') {
               game = true
+            } else {
+              for (let n = 0; n < this.secondary_game.applist.length; n++) {
+                if (this.secondary_game.applist[n].app_name === this.original_list[i].app_name) {
+                  game = true
+                }
+              }
             }
             if (times[j] === this.original_list[i].date && game && channel) {
               original_dau = original_dau + this.original_list[i].dau
@@ -986,17 +1014,20 @@
           this.list2.firstData.push(original_dau)
 
           //对比数据
-          let contrast_dau = 0
-          let contrast_dnu = 0
-
           for (let i = 0; i < this.contrast_list.length; i++) {
             let channel = false
             if (this.secondary_channel.program_mark === '全部' || this.secondary_channel.program_mark === this.contrast_list[i].channel) {
               channel = true
             }
             let game = false
-            if (this.secondary_game === '全部' || this.secondary_game === this.contrast_list[i].app_name) {
+            if (this.secondary_game.project_name === '全部') {
               game = true
+            } else {
+              for (let n = 0; n < this.secondary_game.applist.length; n++) {
+                if (this.secondary_game.applist[n].app_name === this.contrast_list[i].app_name) {
+                  game = true
+                }
+              }
             }
             if (times1[j] === this.contrast_list[i].date && game && channel) {
               contrast_dau = contrast_dau + this.contrast_list[i].dau
@@ -1008,23 +1039,23 @@
           this.list1.secondData.push(contrast_dnu)
           this.list2.secondData.push(contrast_dau)
 
-        this.statistical_data.newuser = original_sumdnu
-        this.statistical_data.contrast_newuser = contrast_sumdnu
-        this.statistical_data.newuser_change = ((original_sumdnu - contrast_sumdnu) / contrast_sumdnu * 100).toFixed(2)
-        this.statistical_data.activeuser = original_sumdau
-        this.statistical_data.contrast_activeuser = contrast_sumdau
-        this.statistical_data.activeuser_change = ((original_sumdau - contrast_sumdau) / contrast_sumdau * 100).toFixed(2)
-        /**
-         newuser: 1,
-         contrast_newuser: 2,
-         newuser_change: 50,
-         activeuser: 3,
-         contrast_activeuser: 4,
-         activeuser_change: 60,
-         * */
+          this.statistical_data.newuser = original_sumdnu
+          this.statistical_data.contrast_newuser = contrast_sumdnu
+          this.statistical_data.newuser_change = ((original_sumdnu - contrast_sumdnu) / contrast_sumdnu * 100).toFixed(2)
+          this.statistical_data.activeuser = original_sumdau
+          this.statistical_data.contrast_activeuser = contrast_sumdau
+          this.statistical_data.activeuser_change = ((original_sumdau - contrast_sumdau) / contrast_sumdau * 100).toFixed(2)
+          /**
+           newuser: 1,
+           contrast_newuser: 2,
+           newuser_change: 50,
+           activeuser: 3,
+           contrast_activeuser: 4,
+           activeuser_change: 60,
+           * */
 
 
-          //原始数据
+            //原始数据
           let orginal_showtimes = 0
           let orginal_earned = 0
           for (let i = 0; i < this.original_list_app.length; i++) {
@@ -1033,11 +1064,15 @@
               channel = true
             }
             let game = false
-            if (this.secondary_game === '全部' || this.secondary_game === this.original_list_app[i].app_name) {
+            if (this.secondary_game.project_name === '全部') {
               game = true
+            } else {
+              for (let n = 0; n < this.secondary_game.applist.length; n++) {
+                if (this.secondary_game.applist[n].app_name === this.original_list_app[i].app_name) {
+                  game = true
+                }
+              }
             }
-
-
             let platform = false
 
             if (this.secondary_platform === '其他') {
@@ -1063,16 +1098,21 @@
 
           //对比数据
 
-          let contrast_showtimes = 0
-          let contrast_earned = 0
+
           for (let i = 0; i < this.contrast_list_app.length; i++) {
             let channel = false
             if (this.secondary_channel.program_mark === '全部' || this.secondary_channel.program_mark === this.contrast_list_app[i].channel) {
               channel = true
             }
             let game = false
-            if (this.secondary_game === '全部' || this.secondary_game === this.contrast_list_app[i].app_name) {
+            if (this.secondary_game.project_name === '全部') {
               game = true
+            } else {
+              for (let n = 0; n < this.secondary_game.applist.length; n++) {
+                if (this.secondary_game.applist[n].app_name === this.contrast_list_app[i].app_name) {
+                  game = true
+                }
+              }
             }
             let platform = false
             if (this.secondary_platform === '其他') {
@@ -1094,33 +1134,21 @@
           this.list3.secondData.push(contrast_showtimes)
           this.list4.secondData.push(parseInt(contrast_earned))
 
-        this.statistical_data.showtimes =  parseInt(original_sumdau)===0?0:(parseInt(original_sumearned)/original_sumdau).toFixed(4)
-        this.statistical_data.contrast_showtimes =  parseInt(contrast_sumdau)===0?0:(parseInt(contrast_sumearned)/contrast_sumdau).toFixed(4)
-        this.statistical_data.showtimes_change =  parseInt(original_sumdau)===0||parseInt(contrast_sumdau)===0?0:((parseInt(original_sumearned)/original_sumdau - parseInt(contrast_sumearned)/contrast_sumdau) / (parseInt(contrast_sumearned)/contrast_sumdau) * 100).toFixed(2)
-        this.statistical_data.earned = parseInt(original_sumearned)
-        this.statistical_data.contrast_earned = parseInt(contrast_sumearned)
-        this.statistical_data.earned_change = ((original_sumearned - contrast_sumearned) / contrast_sumearned * 100).toFixed(2)
-        /**
-         showtimes: 5,
-         contrast_showtimes: 6,
-         showtimes_change: -50,
-         earned: 7,
-         contrast_earned: 8,
-         earned_change: -90,
-         */
+          this.statistical_data.showtimes = parseInt(original_sumdau) === 0 ? 0 : (parseInt(original_sumearned) / original_sumdau).toFixed(4)
+          this.statistical_data.contrast_showtimes = parseInt(contrast_sumdau) === 0 ? 0 : (parseInt(contrast_sumearned) / contrast_sumdau).toFixed(4)
+          this.statistical_data.showtimes_change = parseInt(original_sumdau) === 0 || parseInt(contrast_sumdau) === 0 ? 0 : ((parseInt(original_sumearned) / original_sumdau - parseInt(contrast_sumearned) / contrast_sumdau) / (parseInt(contrast_sumearned) / contrast_sumdau) * 100).toFixed(2)
+          this.statistical_data.earned = parseInt(original_sumearned)
+          this.statistical_data.contrast_earned = parseInt(contrast_sumearned)
+          this.statistical_data.earned_change = ((original_sumearned - contrast_sumearned) / contrast_sumearned * 100).toFixed(2)
+          /**
+           showtimes: 5,
+           contrast_showtimes: 6,
+           showtimes_change: -50,
+           earned: 7,
+           contrast_earned: 8,
+           earned_change: -90,
+           */
           //各类型
-          let orginal_banner = 0
-          let orginal_video = 0
-          let orginal_inline = 0
-          let orginal_splash = 0
-          let banner_earned = 0
-          let video_earned = 0
-          let inline_earned = 0
-          let splash_earned = 0
-          let contrast_banner = 0
-          let contrast_video = 0
-          let contrast_inline = 0
-          let contrast_splash = 0
 
           //原始数据
           for (let i = 0; i < this.original_list_app.length; i++) {
@@ -1129,8 +1157,14 @@
               channel = true
             }
             let game = false
-            if (this.secondary_game === '全部' || this.secondary_game === this.original_list_app[i].app_name) {
+            if (this.secondary_game.project_name === '全部') {
               game = true
+            } else {
+              for (let n = 0; n < this.secondary_game.applist.length; n++) {
+                if (this.secondary_game.applist[n].app_name === this.original_list_app[i].app_name) {
+                  game = true
+                }
+              }
             }
             let platform = false
             if (this.secondary_platform === '其他') {
@@ -1178,13 +1212,12 @@
           this.list_video.firstData.push(orginal_video)
           this.list_inline.firstData.push(orginal_inline)
           this.list_splash.firstData.push(orginal_splash)
-          this.list_banner_pershow.firstData.push(this.list2.firstData[j]===0?0:(orginal_banner/this.list2.firstData[j]).toFixed(2))
-          this.list_video_pershow.firstData.push(this.list2.firstData[j]===0?0:(orginal_video/this.list2.firstData[j]).toFixed(2))
-          this.list_inline_pershow.firstData.push(this.list2.firstData[j]===0?0:(orginal_inline/this.list2.firstData[j]).toFixed(2))
-          this.list_splash_pershow.firstData.push(this.list2.firstData[j]===0?0:(orginal_splash/this.list2.firstData[j]).toFixed(2))
+          this.list_banner_pershow.firstData.push(this.list2.firstData[j] === 0 ? 0 : (orginal_banner / this.list2.firstData[j]).toFixed(2))
+          this.list_video_pershow.firstData.push(this.list2.firstData[j] === 0 ? 0 : (orginal_video / this.list2.firstData[j]).toFixed(2))
+          this.list_inline_pershow.firstData.push(this.list2.firstData[j] === 0 ? 0 : (orginal_inline / this.list2.firstData[j]).toFixed(2))
+          this.list_splash_pershow.firstData.push(this.list2.firstData[j] === 0 ? 0 : (orginal_splash / this.list2.firstData[j]).toFixed(2))
 
           //对比数据
-
           for (let i = 0; i < this.contrast_list_app.length; i++) {
 
             let channel = false
@@ -1192,10 +1225,15 @@
               channel = true
             }
             let game = false
-            if (this.secondary_game === '全部' || this.secondary_game === this.contrast_list_app[i].app_name) {
+            if (this.secondary_game.project_name === '全部') {
               game = true
+            } else {
+              for (let n = 0; n < this.secondary_game.applist.length; n++) {
+                if (this.secondary_game.applist[n].app_name === this.contrast_list_app[i].app_name) {
+                  game = true
+                }
+              }
             }
-
             let platform = false
             if (this.secondary_platform === '其他') {
               if ('广点通' !== this.contrast_list_app[i].platform) {
@@ -1234,23 +1272,23 @@
           this.list_video.secondData.push(contrast_video)
           this.list_inline.secondData.push(contrast_inline)
           this.list_splash.secondData.push(contrast_splash)
-          this.list_banner_pershow.secondData.push(this.list2.secondData[j]===0?0:(contrast_banner/this.list2.secondData[j]).toFixed(2))
-          this.list_video_pershow.secondData.push(this.list2.secondData[j]===0?0:(contrast_video/this.list2.secondData[j]).toFixed(2))
-          this.list_inline_pershow.secondData.push(this.list2.secondData[j]===0?0:(contrast_inline/this.list2.secondData[j]).toFixed(2))
-          this.list_splash_pershow.secondData.push(this.list2.secondData[j]===0?0:(contrast_splash/this.list2.secondData[j]).toFixed(2))
+          this.list_banner_pershow.secondData.push(this.list2.secondData[j] === 0 ? 0 : (contrast_banner / this.list2.secondData[j]).toFixed(2))
+          this.list_video_pershow.secondData.push(this.list2.secondData[j] === 0 ? 0 : (contrast_video / this.list2.secondData[j]).toFixed(2))
+          this.list_inline_pershow.secondData.push(this.list2.secondData[j] === 0 ? 0 : (contrast_inline / this.list2.secondData[j]).toFixed(2))
+          this.list_splash_pershow.secondData.push(this.list2.secondData[j] === 0 ? 0 : (contrast_splash / this.list2.secondData[j]).toFixed(2))
         }
-        this.statistical_data.banner = parseInt(original_sumdau)===0?0:(original_sumbanner/original_sumdau).toFixed(2)
-        this.statistical_data.contrast_banner =  parseInt(contrast_sumdau)===0?0:(contrast_sumbanner/contrast_sumdau).toFixed(2)
-        this.statistical_data.banner_change =  parseInt(original_sumdau)===0||parseInt(contrast_sumdau)===0?0:((original_sumbanner/original_sumdau - contrast_sumbanner/contrast_sumdau) / (contrast_sumbanner/contrast_sumdau) * 100).toFixed(2)
-        this.statistical_data.video =  parseInt(original_sumdau)===0?0:(original_sumvideo/original_sumdau).toFixed(2)
-        this.statistical_data.contrast_video =  parseInt(contrast_sumdau)===0?0:(contrast_sumvideo/contrast_sumdau).toFixed(2)
-        this.statistical_data.video_change =  parseInt(original_sumdau)===0||parseInt(contrast_sumdau)===0?0:((original_sumvideo/original_sumdau - contrast_sumvideo/contrast_sumdau) / (contrast_sumvideo/contrast_sumdau) * 100).toFixed(2)
-        this.statistical_data.inline =  parseInt(original_sumdau)===0?0:(original_suminline/original_sumdau).toFixed(2)
-        this.statistical_data.contrast_inline =  parseInt(contrast_sumdau)===0?0:(contrast_suminline/contrast_sumdau).toFixed(2)
-        this.statistical_data.inline_change =  parseInt(original_sumdau)===0||parseInt(contrast_sumdau)===0?0:((original_suminline/original_sumdau - contrast_suminline/contrast_sumdau) / (contrast_suminline/contrast_sumdau) * 100).toFixed(2)
-        this.statistical_data.splash =  parseInt(original_sumdau)===0?0:(original_sumsplash/original_sumdau).toFixed(2)
-        this.statistical_data.contrast_splash =  parseInt(contrast_sumdau)===0?0:(contrast_sumsplash/contrast_sumdau).toFixed(2)
-        this.statistical_data.splash_change =  parseInt(original_sumdau)===0||parseInt(contrast_sumdau)===0?0:((original_sumsplash/original_sumdau - contrast_sumsplash/contrast_sumdau) / (contrast_sumsplash/contrast_sumdau) * 100).toFixed(2)
+        this.statistical_data.banner = parseInt(original_sumdau) === 0 ? 0 : (original_sumbanner / original_sumdau).toFixed(2)
+        this.statistical_data.contrast_banner = parseInt(contrast_sumdau) === 0 ? 0 : (contrast_sumbanner / contrast_sumdau).toFixed(2)
+        this.statistical_data.banner_change = parseInt(original_sumdau) === 0 || parseInt(contrast_sumdau) === 0 ? 0 : ((original_sumbanner / original_sumdau - contrast_sumbanner / contrast_sumdau) / (contrast_sumbanner / contrast_sumdau) * 100).toFixed(2)
+        this.statistical_data.video = parseInt(original_sumdau) === 0 ? 0 : (original_sumvideo / original_sumdau).toFixed(2)
+        this.statistical_data.contrast_video = parseInt(contrast_sumdau) === 0 ? 0 : (contrast_sumvideo / contrast_sumdau).toFixed(2)
+        this.statistical_data.video_change = parseInt(original_sumdau) === 0 || parseInt(contrast_sumdau) === 0 ? 0 : ((original_sumvideo / original_sumdau - contrast_sumvideo / contrast_sumdau) / (contrast_sumvideo / contrast_sumdau) * 100).toFixed(2)
+        this.statistical_data.inline = parseInt(original_sumdau) === 0 ? 0 : (original_suminline / original_sumdau).toFixed(2)
+        this.statistical_data.contrast_inline = parseInt(contrast_sumdau) === 0 ? 0 : (contrast_suminline / contrast_sumdau).toFixed(2)
+        this.statistical_data.inline_change = parseInt(original_sumdau) === 0 || parseInt(contrast_sumdau) === 0 ? 0 : ((original_suminline / original_sumdau - contrast_suminline / contrast_sumdau) / (contrast_suminline / contrast_sumdau) * 100).toFixed(2)
+        this.statistical_data.splash = parseInt(original_sumdau) === 0 ? 0 : (original_sumsplash / original_sumdau).toFixed(2)
+        this.statistical_data.contrast_splash = parseInt(contrast_sumdau) === 0 ? 0 : (contrast_sumsplash / contrast_sumdau).toFixed(2)
+        this.statistical_data.splash_change = parseInt(original_sumdau) === 0 || parseInt(contrast_sumdau) === 0 ? 0 : ((original_sumsplash / original_sumdau - contrast_sumsplash / contrast_sumdau) / (contrast_sumsplash / contrast_sumdau) * 100).toFixed(2)
         /**
          //横幅
          banner: 1,
@@ -1317,10 +1355,10 @@
             video: this.list_video.firstData[i],
             splash: this.list_splash.firstData[i],
             inline: this.list_inline.firstData[i],
-            banner_pershow: (this.list2.firstData[i] === 0 ? 0 : this.list_banner.firstData[i]/this.list2.firstData[i]).toFixed(2),
-            video_pershow: (this.list2.firstData[i] === 0 ? 0 : this.list_video.firstData[i]/this.list2.firstData[i]).toFixed(2),
-            splash_pershow: (this.list2.firstData[i] === 0 ? 0 : this.list_splash.firstData[i]/this.list2.firstData[i]).toFixed(2),
-            inline_pershow: (this.list2.firstData[i] === 0 ? 0 : this.list_inline.firstData[i]/this.list2.firstData[i]).toFixed(2),
+            banner_pershow: (this.list2.firstData[i] === 0 ? 0 : this.list_banner.firstData[i] / this.list2.firstData[i]).toFixed(2),
+            video_pershow: (this.list2.firstData[i] === 0 ? 0 : this.list_video.firstData[i] / this.list2.firstData[i]).toFixed(2),
+            splash_pershow: (this.list2.firstData[i] === 0 ? 0 : this.list_splash.firstData[i] / this.list2.firstData[i]).toFixed(2),
+            inline_pershow: (this.list2.firstData[i] === 0 ? 0 : this.list_inline.firstData[i] / this.list2.firstData[i]).toFixed(2),
             ecpm_all: this.list3.firstData[i] === 0 ? 0 : (this.list4.firstData[i] / this.list3.firstData[i] * 1000).toFixed(3),
             banner_earned: banner_earned_list[i].toFixed(2),
             banner_ecpm: this.list_banner.firstData[i] === 0 ? 0 : (banner_earned_list[i].toFixed(2) / this.list_banner.firstData[i] * 1000).toFixed(3),
@@ -1334,12 +1372,31 @@
           this.totaltabledata.push(one)
         }
 
-        this.tableData=this.totaltabledata.slice(0,10)
-        this.total_page=this.totaltabledata.length
+        this.tableData = this.totaltabledata.slice(0, 10)
+        this.total_page = this.totaltabledata.length
         this.listLoading = false
 
       },//数据整合
-      paramchange() {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      paramchange()   {
         this.listLoading = true
         this.analysisdata()
       },//根据游戏渠道变动
@@ -1421,25 +1478,69 @@
         }
       },//重置线性表内数据
       fetchName() {
-        if (!checkPermission(['admin', 'leader', 'operator'])) {
-          let data = {
-            username: this.name
-          }
-          let tothis = this
-          getResourceName(data).then(response => {
-            this.app_name_list = response.data
-          }).catch(function (rs) {
-            console.error(rs)
+        this.listLoading=true
+        getProject().then(response => {
+          this.app_name_list.push( {
+            project_name: '全部',
+            applist: []
           })
-        } else {
-          let tothis = this
-          getName().then(response => {
-            this.app_name_list = response.data
-          }).catch(function (rs) {
-            tothis.listLoading = false
-            console.error(rs)
-          })
-        }
+          let list=response.data
+          this.app_name_list=this.app_name_list.concat(list)
+        }).catch(function (rs) {
+          console.log(rs)
+          this.listLoading = false
+        })
+
+        // this.app_name_list = [
+        //   {
+        //     name: '全部',
+        //     applist: []
+        //   },{
+        //     name: '拥挤城市',
+        //     applist: ['拥挤城市', '拥挤战争']
+        //   },{
+        //     name: '保护气球',
+        //     applist: ['保护气球']
+        //   }
+        // ]
+
+        // if (!checkPermission(['admin', 'leader', 'operator'])) {
+        //   let data = {
+        //     username: this.name
+        //   }
+        //   let tothis = this
+        //   this.app_name_list = [
+        //     {
+        //       name: '全部',
+        //       applist: []
+        //     }, {
+        //       name: '拥挤城市',
+        //       applist: ['拥挤城市', '拥挤战争']
+        //     }
+        //   ]
+        //   // getResourceName(data).then(response => {
+        //   //   this.app_name_list = response.data
+        //   // }).catch(function (rs) {
+        //   //   console.error(rs)
+        //   // })
+        // } else {
+        //   let tothis = this
+        //   this.app_name_list = [
+        //     {
+        //       name: '全部',
+        //       applist: []
+        //     },{
+        //       name: '拥挤城市',
+        //       applist: ['拥挤城市', '拥挤战争']
+        //     }
+        //   ]
+        //   // getName().then(response => {
+        //   //   this.app_name_list = response.data
+        //   // }).catch(function (rs) {
+        //   //   tothis.listLoading = false
+        //   //   console.error(rs)
+        //   // })
+        // }
       },//初始化游戏名
       initchannel() {
         getChannel().then(response => {

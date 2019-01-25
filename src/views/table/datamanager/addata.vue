@@ -52,9 +52,16 @@
         :picker-options="pickerOptions0">>
       </el-date-picker>
 
-      <el-select v-model="chooseNamed" :placeholder="'选择游戏'" style="width: 140px" class="filter-item" filterable>
-        <el-option v-for="item in names" :key="item" :label="item" :value="item"/>
+      <!--<el-select v-model="chooseNamed" :placeholder="'选择游戏'" style="width: 140px" class="filter-item" filterable>-->
+        <!--<el-option v-for="item in names" :key="item" :label="item" :value="item"/>-->
+      <!--</el-select>-->
+
+      <el-select v-model="secondary_project" style="margin-right: 20px" @change="" value-key="project_name"
+                 :placeholder="'选择项目'" filterable>
+        <el-option v-for="item in app_name_list" :key="item.project_name" :label="item.project_name" :value="item">
+        </el-option>
       </el-select>
+
 
       <el-button v-waves :loading="downloadLoading" type="primary" icon="el-icon-download" @click="handleDownloadAll">
         {{'下载总表'}}
@@ -76,9 +83,12 @@
       </el-date-picker>
       <!--value-format="yyyy-MM-dd"-->
 
-      <el-select v-if="false" v-model="aupu_chooseNamed" :placeholder="'选择游戏'" style="width: 140px" class="filter-item" filterable>
-        <el-option v-for="item in names" :key="item" :label="item" :value="item"/>
+      <el-select v-model="aupu_chooseNamed" style="margin-right: 20px" @change="" value-key="project_name"
+                 :placeholder="'选择项目'" filterable>
+        <el-option v-for="item in app_name_list" :key="item.project_name" :label="item.project_name" :value="item">
+        </el-option>
       </el-select>
+
 
       <el-button v-waves :loading="downloadLoading" type="primary" icon="el-icon-download"
                  @click="arpu_handleDownloadAll">
@@ -204,12 +214,14 @@
 
 <script>
   import {
+    getProject,
     getList,
     getListdata,
     getdownload,
     getResourceName,
     getName,
-    getarpufile
+    getarpufile,
+    getarpufile1
   } from '@/api/table/datamanager/select'
   import waves from '@/directive/waves'
   import {parseTime} from '@/utils'
@@ -237,13 +249,15 @@
     },
     data() {
       return {
+        app_name_list: [],
+        secondary_project: '选择项目',
         data2: [
           {
             label: 'oppo',
             children: [{
               id: '6+9',
               label: '统计'
-            },{
+            }, {
               id: '10+29',
               label: '广点通'
             }, {
@@ -261,7 +275,7 @@
             children: [{
               id: '105+108',
               label: '统计'
-            },{
+            }, {
               id: '109+128',
               label: '广点通'
             }, {
@@ -279,7 +293,7 @@
             children: [{
               id: '204+207',
               label: '统计'
-            },{
+            }, {
               id: '208+227',
               label: '广点通'
             }, {
@@ -297,7 +311,7 @@
             children: [{
               id: '303+306',
               label: '统计'
-            },{
+            }, {
               id: '307+326',
               label: '广点通'
             }, {
@@ -315,7 +329,7 @@
             children: [{
               id: '402+405',
               label: '统计'
-            },{
+            }, {
               id: '406+425',
               label: '广点通'
             }, {
@@ -333,7 +347,7 @@
             children: [{
               id: '501+504',
               label: '统计'
-            },{
+            }, {
               id: '505+524',
               label: '广点通'
             }, {
@@ -351,7 +365,7 @@
             children: [{
               id: '600+603',
               label: '统计'
-            },{
+            }, {
               id: '604+623',
               label: '广点通'
             }, {
@@ -369,7 +383,7 @@
             children: [{
               id: '699+702',
               label: '统计'
-            },{
+            }, {
               id: '703+722',
               label: '广点通'
             }, {
@@ -387,7 +401,7 @@
             children: [{
               id: '798+801',
               label: '统计'
-            },{
+            }, {
               id: '802+821',
               label: '广点通'
             }, {
@@ -405,7 +419,7 @@
             children: [{
               id: '897+900',
               label: '统计'
-            },{
+            }, {
               id: '901+920',
               label: '广点通'
             }, {
@@ -423,7 +437,7 @@
             children: [{
               id: '996+999',
               label: '统计'
-            },{
+            }, {
               id: '1000+1019',
               label: '广点通'
             }, {
@@ -441,7 +455,7 @@
             children: [{
               id: '1095+1098',
               label: '统计'
-            },{
+            }, {
               id: '1099+1118',
               label: '广点通'
             }, {
@@ -459,7 +473,7 @@
             children: [{
               id: '1194+1197',
               label: '统计'
-            },{
+            }, {
               id: '1198+1217',
               label: '广点通'
             }, {
@@ -477,7 +491,7 @@
             children: [{
               id: '1293+1296',
               label: '统计'
-            },{
+            }, {
               id: '1297+1316',
               label: '广点通'
             }, {
@@ -495,7 +509,7 @@
             children: [{
               id: '1392+1395',
               label: '统计'
-            },{
+            }, {
               id: '1396+1415',
               label: '广点通'
             }, {
@@ -513,7 +527,7 @@
             children: [{
               id: '1491+1494',
               label: '统计'
-            },{
+            }, {
               id: '1495+1514',
               label: '广点通'
             }, {
@@ -531,7 +545,7 @@
             children: [{
               id: '1590+1593',
               label: '统计'
-            },{
+            }, {
               id: '1594+1613',
               label: '广点通'
             }, {
@@ -549,7 +563,7 @@
             children: [{
               id: '1689+1692',
               label: '统计'
-            },{
+            }, {
               id: '1693+1712',
               label: '广点通'
             }, {
@@ -597,7 +611,7 @@
         layout: '',
         chooseName: '选择游戏',
         chooseNamed: '选择游戏',
-        aupu_chooseNamed: '选择游戏',
+        aupu_chooseNamed: '选择项目',
         select_value: '',
         download_value: '',
         arpu_download_value: '',
@@ -605,7 +619,8 @@
           start: undefined,
           end: undefined,
           name: undefined,
-          list:[]
+          namelist: '',
+          list: []
         },
         aupu_downloadParam: {
           start: undefined,
@@ -635,24 +650,34 @@
     },
     created() {
       this.fetchName()
-    }
-    ,
+      this.fetchProject()
+    },
     methods:
       {
-        getnumlist(){
-          this.hackReset=false
-          this.downloadLoading = true
-          let tothis=this
-          let checked=this.$refs.tree.getCheckedKeys();
-          let list=[]
-          for (let i=0;i<checked.length;i++){
-            if (typeof(checked[i])==='undefined'){
+        fetchProject() {
+          this.listLoading = true
+          getProject().then(response => {
+            this.app_name_list = response.data
+          }).catch(function (rs) {
+            console.log(rs)
+            this.listLoading = false
+          })
+        },//获取项目名
+        getnumlist() {
+           this.hackReset = false
+           this.downloadLoading = true
+          let tothis = this
+          let checked = this.$refs.tree.getCheckedKeys();
+          let list = []
+          for (let i = 0; i < checked.length; i++) {
+            if (typeof(checked[i]) === 'undefined') {
               continue
             }
-            let numlist=this.getNum(parseInt(checked[i].split('+')[0]),parseInt(checked[i].split('+')[1]))
-            list=list.concat(numlist)
+            let numlist = this.getNum(parseInt(checked[i].split('+')[0]), parseInt(checked[i].split('+')[1]))
+            list = list.concat(numlist)
           }
-          this.downloadParam.list=list
+          this.downloadParam.list = list
+
           getdownload(this.downloadParam).then(data => {
             if (!data) {
               return
@@ -661,7 +686,7 @@
             let link = document.createElement('a')
             link.style.display = 'none'
             link.href = url
-            link.setAttribute('download', this.downloadParam.start + '_' + this.downloadParam.end + '_' + this.downloadParam.name + '.xls')
+            link.setAttribute('download', this.downloadParam.start + '_' + this.downloadParam.end + '_' + this.downloadParam.name.project_name + '.xls')
             document.body.appendChild(link)
             link.click()
             this.downloadLoading = false
@@ -669,25 +694,23 @@
             tothis.downloadLoading = false
             tothis.$notify({
               title: '下载失败',
-              message: '权限不足',
+              message: '刷新试试',
               type: 'error',
               duration: 2000
             })
           })
+        }, //总表下载方法
 
-
-        },
-
-        getNum(num1,num2){
-          let list=[]
+        getNum(num1, num2) {
+          let list = []
           list.push(num1)
-          for (let i=num1+1;i<=num2;i++){
+          for (let i = num1 + 1; i <= num2; i++) {
             list.push(i)
           }
           return list
-        },
+        },//获得两个数字间的所有数字
 
-        chooseyixin(){
+        chooseyixin() {
           this.$refs.tree.setCheckedKeys([
             '80+104',
             '179+203',
@@ -733,25 +756,12 @@
             '1194+1197',
             '1293+1296',
             '1392+1395']);
-        },
-        rechoose(){
+        },//总表下载对话框 模版一
+        rechoose() {
           this.$refs.tree.setCheckedKeys([])
-          },
+        },//总表下载对话框 还原
 
-        open3() {
-          this.$message({
-            message: '请选择查询范围~',
-            type: 'warning'
-          });
-        }
-        ,
-        open4() {
-          this.$message({
-            message: '没有信息可以打印~',
-            type: 'warning'
-          });
-        }
-        ,
+
         fetchName() {
           if (!checkPermission(['admin', 'leader', 'operator'])) {
             let data = {
@@ -759,7 +769,7 @@
             }
             let tothis = this
             this.listLoading = true
-            getResourceName(data).then(response =>{
+            getResourceName(data).then(response => {
               this.names = response.data
               this.listLoading = false
             }).catch(function (rs) {
@@ -777,9 +787,9 @@
               console.log(rs)
             })
           }
-        }
+        }//获取应用名
         ,
-        handleFilter() {   // 查找数据
+        handleFilter() {
           this.downloadLoading = true
           let tothis = this
           this.listParam.name = this.chooseName
@@ -792,6 +802,7 @@
           this.listParam.end = this.select_value[1]
           this.listLoading = true
           getListdata(this.listParam).then(response => {
+            console.log()
             this.list = response.data
             this.hidlist = response.data
             this.listLoading = false
@@ -800,7 +811,7 @@
             tothis.listLoading = false
             tothis.downloadLoading = false
           })
-        }
+        } // 表格查找数据
         ,
         getDatawithName() {
           if (this.hidlist === []) {
@@ -857,14 +868,18 @@
 
           this.list = data3
           this.listLoading = false
-        }
+        }//表格数据筛选
         ,
-        handleDownloadAll() {    //下载总表
+        handleDownloadAll() {
           let tothis = this
+          if (this.download_value === null) {
+            this.open3()
+            return
+          }
           this.downloadParam.start = this.download_value[0]
           this.downloadParam.end = this.download_value[1]
-          this.downloadParam.name = this.chooseNamed
-          if (this.downloadParam.name === '选择游戏') {
+          this.downloadParam.name = this.secondary_project
+          if (this.downloadParam.name === '选择项目') {
             this.open3()
             return
           }
@@ -876,13 +891,29 @@
             this.open3()
             return
           }
-          this.hackReset=true
-        }
+          this.hackReset = true
+        }//总表下载对话框
         ,
         arpu_handleDownloadAll() {    //下载收益表
           let tothis = this
-          let time=6*24*60*60*1000
-          if (this.arpu_download_value[1]-this.arpu_download_value[0]>time){
+          let time = 6 * 24 * 60 * 60 * 1000
+          if (this.aupu_downloadParam===null) {
+            this.open3()
+            return
+          }
+          if (this.aupu_downloadParam.name === '选择项目') {
+            this.open3()
+            return
+          }
+          if (this.arpu_download_value[0] === undefined) {
+            this.open3()
+            return
+          }
+          if (this.arpu_download_value[1] === undefined) {
+            this.open3()
+            return
+          }
+          if (this.arpu_download_value[1] - this.arpu_download_value[0] > time) {
             tothis.$notify({
               title: '',
               message: '时间范围最多选择7天',
@@ -891,25 +922,12 @@
             })
             return
           }
-          this.aupu_downloadParam.start =this.formatDate(new Date(this.arpu_download_value[0]),'yyyy-MM-dd')
-          this.aupu_downloadParam.end = this.formatDate(new Date(this.arpu_download_value[1]),'yyyy-MM-dd')
-          //this.aupu_downloadParam.name = this.aupu_chooseNamed
-          this.aupu_downloadParam.name='全部'  //收益表为下载所有
-
-          if (this.aupu_downloadParam.name === '选择游戏') {
-            this.open3()
-            return
-          }
-          if (this.aupu_downloadParam.start === undefined) {
-            this.open3()
-            return
-          }
-          if (this.aupu_downloadParam.end === undefined) {
-            this.open3()
-            return
-          }
+          this.aupu_downloadParam.start = this.formatDate(new Date(this.arpu_download_value[0]), 'yyyy-MM-dd')
+          this.aupu_downloadParam.end = this.formatDate(new Date(this.arpu_download_value[1]), 'yyyy-MM-dd')
+          this.aupu_downloadParam.name = this.aupu_chooseNamed
+          //this.aupu_downloadParam.name = '全部'  //收益表为下载所有
           this.downloadLoading = true
-          getarpufile(this.aupu_downloadParam).then(data => {
+          getarpufile1(this.aupu_downloadParam).then(data => {
             if (!data) {
               return
             }
@@ -917,7 +935,7 @@
             let link = document.createElement('a')
             link.style.display = 'none'
             link.href = url
-            link.setAttribute('download', this.aupu_downloadParam.start + '_' + this.aupu_downloadParam.end + '_' + this.aupu_downloadParam.name + '_arpu.xls')
+            link.setAttribute('download', this.aupu_downloadParam.start + '_' + this.aupu_downloadParam.end  +this.aupu_downloadParam.name.project_name +'_arpu.xls')
             document.body.appendChild(link)
             link.click()
             this.downloadLoading = false
@@ -926,12 +944,12 @@
             tothis.downloadLoading = false
             tothis.$notify({
               title: '下载失败',
-              message: '权限不足',
+              message: '刷新试试',
               type: 'error',
               duration: 2000
             })
           })
-        }
+        }//收益表下载方法
         ,
         handleDownload() {   //下载请求
           this.downloadLoading = true
@@ -956,7 +974,8 @@
         /**
          * 获取指定日期(字符串类型)到当前时间的天数
          * @param {Object} sDate1 格式:2018-01-04
-         */secondart_date_change() {
+         */
+        secondart_date_change() {
           if (this.select_value === null) {
             return
           }
@@ -1009,6 +1028,20 @@
             }
           }
           return fmt;
+        }
+        ,
+        open3() {
+          this.$message({
+            message: '请选择查询范围~',
+            type: 'warning'
+          });
+        }
+        ,
+        open4() {
+          this.$message({
+            message: '没有信息可以打印~',
+            type: 'warning'
+          });
         }
         ,
         padLeftZero(str) {

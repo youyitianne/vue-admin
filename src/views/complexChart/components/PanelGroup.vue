@@ -11,9 +11,10 @@
         </div>
         <div style="margin-top: 20px;margin-left: 50px;font-size: 14px;font-weight: bolder">
             对比新增用户：{{statistical_data.contrast_newuser}}<br><br>
-            同比:<span style="color: hotpink" v-if="statistical_data.newuser_change<0">
-          ↘ &nbsp;{{statistical_data.newuser_change}}%</span><span style="color: limegreen" v-if="statistical_data.newuser_change>0">
-          ↗ &nbsp;{{statistical_data.newuser_change}}%</span>
+            同比:
+          <span style="color: limegreen" v-if="statistical_data.newuser_change<0">↘ &nbsp;{{statistical_data.newuser_change}}%</span>
+          <span style="color:  hotpink" v-if="statistical_data.newuser_change>0">↗ &nbsp;{{statistical_data.newuser_change}}%</span>
+          <span style="color: grey" v-if="statistical_data.newuser_change==0"> &nbsp;≈&nbsp;0&nbsp;%</span>
           </div>
       </div>
     </el-col>
@@ -28,9 +29,10 @@
         </div>
         <div style="margin-top: 20px;margin-left: 50px;font-size: 14px;font-weight: bolder">
           对比活跃用户：{{statistical_data.contrast_activeuser}}<br><br>
-          同比:<span style="color: hotpink" v-if="statistical_data.activeuser_change<0">
-          ↘ &nbsp;{{statistical_data.activeuser_change}}%</span><span style="color: limegreen" v-if="statistical_data.activeuser_change>0">
-          ↗ &nbsp;{{statistical_data.activeuser_change}}%</span>
+          同比:
+          <span style="color:  limegreen" v-if="statistical_data.activeuser_change<0">↘ &nbsp;{{statistical_data.activeuser_change}}%</span>
+          <span style="color: hotpink" v-if="statistical_data.activeuser_change>0">↗ &nbsp;{{statistical_data.activeuser_change}}%</span>
+          <span style="color: grey" v-if="statistical_data.activeuser_change==0"> &nbsp;≈&nbsp;0&nbsp;%</span>
         </div>
       </div>
     </el-col>
@@ -40,14 +42,16 @@
           <svg-icon icon-class="documentation" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
-          <div class="card-panel-text">总展次</div>
-          <count-to :start-val="0" :end-val="this.statistical_data.showtimes" :duration="10" class="card-panel-num"/>
+          <div class="card-panel-text">总ARPU</div>
+          <span style="font-size: 20px;font-weight: bold">{{statistical_data.showtimes}}</span>
+          <!--<count-to :start-val="0" :end-val="this.statistical_data.showtimes" :duration="10" class="card-panel-num"/>-->
         </div>
         <div style="margin-top: 20px;margin-left: 50px;font-size: 14px;font-weight: bolder">
-          对比总展次：{{statistical_data.contrast_showtimes}}<br><br>
-          同比:<span style="color: hotpink" v-if="statistical_data.showtimes_change<0">
-            ↘ &nbsp;{{statistical_data.showtimes_change}}%</span><span style="color: limegreen" v-if="statistical_data.showtimes_change>0">
-            ↗ &nbsp;{{statistical_data.showtimes_change}}%</span>
+          对比总ARPU：{{statistical_data.contrast_showtimes}}<br><br>
+          同比:
+          <span style="color:  limegreen" v-if="statistical_data.showtimes_change<0">↘ &nbsp;{{statistical_data.showtimes_change}}%</span>
+          <span style="color: hotpink" v-if="statistical_data.showtimes_change>0">↗ &nbsp;{{statistical_data.showtimes_change}}%</span>
+          <span style="color: grey" v-if="statistical_data.showtimes_change==0"> &nbsp;≈&nbsp;0&nbsp;%</span>
         </div>
       </div>
     </el-col>
@@ -62,9 +66,10 @@
         </div>
         <div style="margin-top: 20px;margin-left: 50px;font-size: 14px;font-weight: bolder">
           对比总流水：{{statistical_data.contrast_earned}}<br><br>
-          同比:<span style="color: hotpink" v-if="statistical_data.earned_change<0">
-            ↘ &nbsp;{{statistical_data.earned_change}}%</span><span style="color: limegreen" v-if="statistical_data.earned_change>0">
-            ↗ &nbsp;{{statistical_data.earned_change}}%</span>
+          同比:
+          <span style="color:  limegreen" v-if="statistical_data.earned_change<0">↘ &nbsp;{{statistical_data.earned_change}}%</span>
+          <span style="color: hotpink" v-if="statistical_data.earned_change>0">↗ &nbsp;{{statistical_data.earned_change}}%</span>
+          <span style="color: grey" v-if="statistical_data.earned_change==0"> &nbsp;≈&nbsp;0&nbsp;%</span>
         </div>
       </div>
     </el-col><br>
@@ -76,14 +81,15 @@
           <svg-icon icon-class="banner" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
-          <div class="card-panel-text">横幅总展次</div>
-          <count-to :start-val="0" :end-val="this.statistical_data.banner" :duration="10" class="card-panel-num"/>
+          <div class="card-panel-text">横幅人均展次</div>
+          <span style="font-size: 20px;font-weight: bold">{{statistical_data.banner}}</span>
+          <!--<count-to :start-val="0" :end-val="this.statistical_data.banner" :duration="10" class="card-panel-num"/>-->
         </div>
         <div style="margin-top: 20px;margin-left: 50px;font-size: 14px;font-weight: bolder">
-          对比横幅总展次：{{statistical_data.contrast_banner}}<br><br>
-          同比:<span style="color: hotpink" v-if="statistical_data.banner_change<0">
-            ↘ &nbsp;{{statistical_data.banner_change}}%</span><span style="color: limegreen" v-if="statistical_data.banner_change>0">
-            ↗ &nbsp;{{statistical_data.banner_change}}%</span>
+          对比横幅人均展次：{{statistical_data.contrast_banner}}<br><br>
+          同比:<span style="color:  limegreen" v-if="statistical_data.banner_change<0">↘ &nbsp;{{statistical_data.banner_change}}%</span>
+          <span style="color: hotpink" v-if="statistical_data.banner_change>0">↗ &nbsp;{{statistical_data.banner_change}}%</span>
+          <span style="color: grey" v-if="statistical_data.banner_change==0"> &nbsp;≈&nbsp;0&nbsp;%</span>
         </div>
       </div>
     </el-col>
@@ -93,14 +99,16 @@
           <svg-icon icon-class="video" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
-          <div class="card-panel-text">视频总展次</div>
-          <count-to :start-val="0" :end-val="this.statistical_data.video" :duration="10" class="card-panel-num"/>
+          <div class="card-panel-text">视频人均展次</div>
+          <span style="font-size: 20px;font-weight: bold"> {{statistical_data.video}}</span>
+          <!--<count-to :start-val="0" :end-val="this.statistical_data.video" :duration="10" class="card-panel-num"/>-->
         </div>
         <div style="margin-top: 20px;margin-left: 50px;font-size: 14px;font-weight: bolder">
-          对比视频总展次：{{statistical_data.contrast_video}}<br><br>
-          同比:<span style="color: hotpink" v-if="statistical_data.video_change<0">
-            ↘ &nbsp;{{statistical_data.video_change}}%</span><span style="color: limegreen" v-if="statistical_data.video_change>0">
-            ↗ &nbsp;{{statistical_data.video_change}}%</span>
+          对比视频人均展次：{{statistical_data.contrast_video}}<br><br>
+          同比:
+          <span style="color:  limegreen" v-if="statistical_data.video_change<0">↘ &nbsp;{{statistical_data.video_change}}%</span>
+          <span style="color: hotpink" v-if="statistical_data.video_change>0">↗ &nbsp;{{statistical_data.video_change}}%</span>
+          <span style="color: grey" v-if="statistical_data.video_change==0"> &nbsp;≈&nbsp;0&nbsp;%</span>
         </div>
       </div>
     </el-col>
@@ -110,14 +118,16 @@
           <svg-icon icon-class="inline" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
-          <div class="card-panel-text">插屏总展次</div>
-          <count-to :start-val="0" :end-val="this.statistical_data.inline" :duration="10" class="card-panel-num"/>
+          <div class="card-panel-text">插屏人均展次</div>
+          <span style="font-size: 20px;font-weight: bold">{{statistical_data.inline}}</span>
+          <!--<count-to :start-val="0" :end-val="this.statistical_data.inline" :duration="10" class="card-panel-num"/>-->
         </div>
         <div style="margin-top: 20px;margin-left: 50px;font-size: 14px;font-weight: bolder">
-          对比插屏总展次：{{statistical_data.contrast_inline}}<br><br>
-          同比:<span style="color: hotpink" v-if="statistical_data.inline_change<0">
-            ↘ &nbsp;{{statistical_data.inline_change}}%</span><span style="color: limegreen" v-if="statistical_data.inline_change>0">
-            ↗ &nbsp;{{statistical_data.inline_change}}%</span>
+          对比插屏人均展次：{{statistical_data.contrast_inline}}<br><br>
+          同比:
+          <span style="color:  limegreen" v-if="statistical_data.inline_change<0">↘ &nbsp;{{statistical_data.inline_change}}%</span>
+          <span style="color: hotpink" v-if="statistical_data.inline_change>0">↗ &nbsp;{{statistical_data.inline_change}}%</span>
+          <span style="color: grey" v-if="statistical_data.inline_change==0"> &nbsp;≈&nbsp;0&nbsp;%</span>
         </div>
       </div>
     </el-col>
@@ -127,14 +137,16 @@
           <svg-icon icon-class="splash" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
-          <div class="card-panel-text">开屏总展次</div>
-          <count-to :start-val="0" :end-val="this.statistical_data.splash" :duration="10" class="card-panel-num"/>
+          <div class="card-panel-text">开屏人均展次</div>
+          <span style="font-size: 20px;font-weight: bold">  {{statistical_data.splash}}</span>
+          <!--<count-to :start-val="0" :end-val="this.statistical_data.splash" :duration="10" class="card-panel-num"/>-->
         </div>
         <div style="margin-top: 20px;margin-left: 50px;font-size: 14px;font-weight: bolder">
-          对比开屏展次：{{statistical_data.contrast_splash}}<br><br>
-          同比:<span style="color: hotpink" v-if="statistical_data.splash_change<0">
-            ↘ &nbsp;{{statistical_data.splash_change}}%</span><span style="color: limegreen" v-if="statistical_data.splash_change>0">
-            ↗ &nbsp;{{statistical_data.splash_change}}%</span>
+          对比开屏人均展次：{{statistical_data.contrast_splash}}<br><br>
+          同比:
+          <span style="color:  limegreen" v-if="statistical_data.splash_change<0">↘ &nbsp;{{statistical_data.splash_change}}%</span>
+          <span style="color: hotpink" v-if="statistical_data.splash_change>0">↗ &nbsp;{{statistical_data.splash_change}}%</span>
+          <span style="color: grey" v-if="statistical_data.splash_change==0"> &nbsp;≈&nbsp;0&nbsp;%</span>
         </div>
       </div>
     </el-col>
@@ -220,10 +232,11 @@ export default {
     }
     .card-panel-icon-wrapper {
       float: left;
-      margin: 14px 0 0 14px;
+      margin: 14px 25px 0 14px;
       padding: 16px;
       transition: all 0.38s ease-out;
       border-radius: 6px;
+
     }
     .card-panel-icon {
       float: left;

@@ -22,16 +22,9 @@ export function getChannel() {
   })
 }
 
-export function getappdata(param) {
+export function getdata(param) {
   return request({
-    url: '/appdata/'+param.start+'/'+param.end,
-    method: 'get',
-  })
-}
-
-export function getProject() {
-  return request({
-    url: '/project',
+    url: '/paydata/'+param.start+'/'+param.end,
     method: 'get',
   })
 }

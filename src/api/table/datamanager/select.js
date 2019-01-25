@@ -23,8 +23,9 @@ export function getListdata(param) {
 
   export function getdownload(param) {
     return request({
-      url: '/file/'+param.start+'_'+param.end+'_'+param.name,
-      method: 'get',
+      url: '/file',
+      method: 'post',
+      data:param,
       responseType: "blob"
     })
 
@@ -35,5 +36,31 @@ export function getResourceName(param) {
     url: '/api/getresourcelist',
     method: 'post',
     params:param
+  })
+}
+
+export function getarpufile(param) {
+  return request({
+    url: '/arpufile/'+param.start+'_'+param.end+'_'+param.name,
+    method: 'get',
+    responseType: "blob",
+    params:param
+  })
+}
+
+export function getProject() {
+  return request({
+    url: '/project',
+    method: 'get',
+  })
+}
+
+export function getarpufile1(param) {
+  return request({
+    url: '/arpufile/'+param.start+'_'+param.end,
+    method: 'post',
+    responseType: "blob",
+    params:param,
+    data:param
   })
 }

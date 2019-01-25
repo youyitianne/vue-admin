@@ -48,7 +48,7 @@ export default {
     },
     maxFilesize: {
       type: Number,
-      default: 2
+      default: 5
     },
     maxFiles: {
       type: Number,
@@ -109,10 +109,12 @@ export default {
         ' <div class="dz-image" style="width:' + this.thumbnailWidth + 'px;height:' + this.thumbnailHeight + 'px" ><img style="width:' + this.thumbnailWidth + 'px;height:' +
         this.thumbnailHeight + 'px" data-dz-thumbnail /></div> ' +
         ' <div class="dz-details"><div class="dz-size"><span data-dz-size>超过最大上传文件尺寸</span></div> ' +
-        '<div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress>正在上传</span></div> ' +
+        ' <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress>正在上传</span></div> ' +
         ' <div class="dz-error-message"><span data-dz-errormessage>发生错误</span></div> ' +
         ' <div class="dz-success-mark"> <i class="material-icons">成功</i> ' +
-        '</div>  <div class="dz-error-mark"><i class="material-icons">失败</i></div></div>',
+        ' <div class="dz-error-mark"><i class="material-icons">失败</i></div>'+
+        ' <div class="dz-filename"><span data-dz-name=""></span></div>',
+
       init() {
         const val = vm.defaultImg
         if (!val) return

@@ -26,10 +26,10 @@
         <template slot-scope="props">
           <el-form label-position="left" inline class="demo-table-expand">
             <el-form-item label="sdk名称:">
-              <span>{{ props.row.sdk_name }}</span>
-            </el-form-item>
-            <el-form-item label="sdk标记:">
               <span>{{ props.row.sdk_mark }}</span>
+            </el-form-item>
+            <el-form-item label="sdk搜索标记:">
+              <span>{{ props.row.sdk_name }}</span>
             </el-form-item>
             <el-form-item label="版本:">
               <span>{{ props.row.sdk_version }}</span>
@@ -62,9 +62,9 @@
           {{ ++scope1.$index }}
         </template>
       </el-table-column>
-      <el-table-column label="SDK名称" prop="sdk_name">
+      <el-table-column label="SDK名称" prop="sdk_mark">
       </el-table-column>
-      <el-table-column label="SDK标记" prop="sdk_mark">
+      <el-table-column label="SDK搜索标记" prop="sdk_name">
       </el-table-column>
       <el-table-column label="版本" prop="sdk_version">
       </el-table-column>

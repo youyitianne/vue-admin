@@ -37,6 +37,7 @@
         <!--<span style="margin-right:20px;">username: admin</span>-->
         <!--<span> password: admin</span>-->
       <!--</div>-->
+      <div style="font-size: 10px;color: lightslategrey;margin-top: -15px;margin-left: 15px">若忘记密码请联系管理员.</div>
     </el-form>
   </div>
 </template>
@@ -99,7 +100,7 @@ export default {
           this.loading = true
           this.$store.dispatch('Login', this.loginForm).then(() => {
             this.loading = false
-            this.$router.push({ path: '/example/table' })
+            this.$router.push({ path: '/dashboard' })
             //this.$router.push({ path: this.redirect || '/example/table' })
           }).catch(err => {
             console.log(err)

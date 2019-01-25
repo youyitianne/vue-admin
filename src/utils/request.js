@@ -6,7 +6,7 @@ import { getToken } from '@/utils/auth'
 // 创建axios实例
 const service = axios.create({
   baseURL: process.env.BASE_API, // api 的 base_url
-  timeout: 5000 // 请求超时时间
+  timeout: 15000 // 请求超时时间
 })
 
 
@@ -33,12 +33,15 @@ service.interceptors.response.use(
      * code为非20000是抛错 可结合自己业务进行修改
      */
     const res = response.data
+
     if (res.msg=='Unauthorized'||res.status==status){
-      Message({
-        message:'权限不足',
-        type: 'error',
-        duration: 5 * 1000
-      })
+      console.error(res)
+      console.error('--------》权限不足')
+      // Message({
+      //   message:'权限不足',
+      //   type: 'error',
+      //   duration: 5 * 1000
+      // })
     }
     if (res.code === 50020) {           //登录失败 自定义
       return Promise.reject('登录失败，请检查帐号密码是否正确')
@@ -51,6 +54,7 @@ service.interceptors.response.use(
       })
       return
     }
+
     if (res.code !== 20000) {     //下载文件跳过 自定义
       if (response.statusText=="wenjian"){
         return response.data
@@ -72,7 +76,13 @@ service.interceptors.response.use(
           })
         })
       }
-      //下载文件根据datatype辨认 跳过拦截
+      // console.log('++++++++++')
+      // console.log(response.headers)
+      // console.log(response)
+      // console.log('+++++++')
+      // //下载文件根据datatype辨认 跳过拦截
+      // return response.data  //test
+
       if (response.data.type==='application/octet-stream'){
         return response.data
       }

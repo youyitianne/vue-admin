@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div class="filter-container" style="margin: 15px;margin-top: -5px">
-      <el-button class="filter-item" style="margin-left: 10px;margin-right: 20px" type="primary" icon="el-icon-edit"
+      <el-button class="filter-item" style="margin-left: 10px;margin-right: 20px" type="primary" icon="el-icon-edit" v-if="checkPermission(['operator','admin','leader'])"
                  @click="handleCreate">添加配置表
       </el-button>
       <span style="margin-left: 15px;margin-right: 5px">游戏:</span>
@@ -106,10 +106,10 @@
       <el-table-column label="内部版本-更新" prop="versioncode_update_version">
       </el-table-column>
 
-      <el-table-column label="操作" align="center" width="250px" class-name="small-padding fixed-width"
-                       v-if="checkPermission(['operator', 'planner','admin','leader'])">
+      <el-table-column label="操作" align="center" width="150px" class-name="small-padding fixed-width"
+                       v-if="checkPermission(['operator','admin','leader'])">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ "编辑" }}</el-button>
+          <el-button type="primary" size="mini" @click="handleUpdate(scope.row)" >{{ "编辑" }}</el-button>
           <!--<el-button type="success" size="mini" @click="publish(scope.row)">发布</el-button>-->
         </template>
       </el-table-column>
@@ -197,12 +197,11 @@
                                     style="margin-left: 0px">{{name}}
                 </el-checkbox-button>
               </el-checkbox-group>
-
               <template v-for="option in options">
                 <div style="font-size: 16px;font-family: Microsoft YaHei;margin-top: 8px;margin-bottom: 8px"
                      v-if="test1(option.sdk_name)">
                   {{option.param_name}}:
-                  <el-select v-model="option.value" @change="test(option.param_name,option.value)">
+                  <el-select v-model="option.value">
                     <el-option
                       v-for="item in option.param"
                       :key="item.value"
@@ -381,7 +380,6 @@
         this.change_pagename(tab.label)
       },//获取对话框内标签页 名触发事件
       publish(param) {
-        console.log(111111)
         let tothis = this
         // this.sdk.id = param.id
         // this.sdk.timevalue = param.date
@@ -421,7 +419,6 @@
         //   }
         // }
         // this.sdk.form.domains = second_newdomains
-      console.log(newdomains)
 
         //二级未勾选的去掉
         let second_newdomains=[]
@@ -438,11 +435,44 @@
         }
         this.sdk.form.domains = second_newdomains
         //end
-        console.log(second_newdomains)
+
+        //选择器提交
+        let select = []
+        for (let i = 0; i < this.checkedSdkTemplate.length; i++) {
+          for (let j = 0; j < this.options.length; j++) {
+            if (this.options[j].sdk_name===this.checkedSdkTemplate[i]){
+            let param_name = this.options[j].sdk_name
+            let newele = {
+              param_name: this.options[j].sdk_name + '-' + this.options[j].param_name,
+              param: this.options[j].value,
+              sdk_type: '1',
+            }
+            if (select.length === 0) {
+              select.push(newele)
+            } else {
+              let flag = true
+              for (let x = 0; x < select.length; x++) {
+                if (select[x].param_name === newele.param_name) {
+                  select[x].param_name = newele.param_name
+                  flag = false
+                }
+              }
+              if (flag) {
+                select.push(newele)
+              }
+            }
+            }
+          }
+        }
+        this.sdk.form.select = []
+        this.sdk.form.select = select
 
         this.sdk.sdkstatus = '1'
         this.sdk.publish = '1'
-        this.sdk.form.select=[]
+
+        console.log(this.sdk.form.domains)
+        console.log(this.sdk.form.select)
+        console.log('----------------------')
 
         getProjectConfigPublish().then(response => {
           this.publishlist = response.data
@@ -460,6 +490,7 @@
               type: 'success',
               duration: 2000
             })
+            this.dialogFormVisible=false
             this.handleFilter()
           }).catch(rs => {
             this.create_flag = true
@@ -870,7 +901,6 @@
             }
           }
         }
-
         //对话框二级表单展示
         let checked = []
         for (let i = 0; i < param.paramter.length; i++) {
@@ -984,11 +1014,8 @@
           }
         }
         this.dialog_secondary_checked=newchecked2
-
         //end
-
         this.rowvalue=param
-
         this.dialogStatus = 'update'
         this.dialogFormVisible = true
       }, //更新对话框展示
@@ -1180,7 +1207,7 @@
                 this.timevalue = this.hidtimevalue
                 this.handleFilter();
               }
-              this.dialogFormVisible = false
+              // this.dialogFormVisible = false
               this.$notify({
                 title: '成功',
                 message: '更新成功',
@@ -1255,6 +1282,8 @@
         let tothis = this
         this.listLoading = true
         getProjectConfig(this.listParam).then(response => {
+          console.log(response.data)
+          console.log('+++++++++++++++++++')
           this.list = response.data
           this.hidlist = response.data
           this.listLoading = false
