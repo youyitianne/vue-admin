@@ -24,7 +24,7 @@ export function updateApp(param) {
       name:param.name,
       system:param.system,
       icon:param.icon,
-      introduce:param.introduce,
+      project:param.project,
     }
   })
 }
@@ -33,6 +33,13 @@ export function deleteApp(param) {
   return request({
     url: '/app/'+param.id,
     method: 'delete',
+  })
+}
+
+export function getProject() {
+  return request({
+    url: '/project',
+    method: 'get',
   })
 }
 

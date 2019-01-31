@@ -35,3 +35,10 @@ export function getProject() {
     method: 'get',
   })
 }
+
+export function getProjectList() {
+  return request({
+    url: '/projectList',
+    method: 'get',
+  })
+}

@@ -78,7 +78,7 @@
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ "编辑" }}</el-button>
-          <!--<el-button size="mini" type="success" @click="validUpdate(scope.row)">正常</el-button>-->
+          <!--<el-button size="mini" type="success" @click="validUpdate(scope.row)">还原</el-button>-->
           <el-button size="mini" type="danger" @click="invalidUpdate(scope.row)">删除</el-button>
         </template>
       </el-table-column>
@@ -86,16 +86,16 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="60%" :close-on-click-modal=false >
       <el-form ref="dataForm" :model="sdk" label-position="left" label-width="100px" :inline="true"
                style="margin-left:50px;" status-icon>
-        <el-form-item label="名称" :rules="[{ required: true, message: '名称不能为空'}]" prop="name" style="margin-right: 100px">
-          <el-input v-model="sdk.name" placeholder="必填~" class="dia-input"/>
-        </el-form-item>
-        <el-form-item label="版本" :rules="[{ required: true, message: '版本不能为空'}]" prop="version">
-          <el-input v-model="sdk.version" placeholder="必填~" class="dia-input"/>
-        </el-form-item><br>
-        <el-form-item label="标记" class="filter-item" :rules="[{ required: true, message: '标记不能为空'}]" prop="mark" style="margin-right: 100px" v-if="this.dialogStatus === 'create'">
+        <el-form-item label="SDK名称" class="filter-item" :rules="[{ required: true, message: '标记不能为空'}]" prop="mark" style="margin-right: 80px">
           <el-input v-model="sdk.mark" placeholder="必填~" class="dia-input"/>
         </el-form-item>
-        <el-form-item label="状态">
+        <el-form-item label="SDK搜索标记" :rules="[{ required: true, message: '名称不能为空'}]" prop="name"label-width="120px">
+          <el-input v-model="sdk.name" placeholder="必填~" class="dia-input"/>
+        </el-form-item>
+        <el-form-item label="版本" :rules="[{ required: true, message: '版本不能为空'}]" prop="version"  style="margin-right: 83px" >
+          <el-input v-model="sdk.version" placeholder="必填~" class="dia-input"/>
+        </el-form-item>
+        <el-form-item label="状态:">
           <el-switch v-model="sdk.sdkstatus" active-color="#13ce66" inactive-color="#ff4949"
                      active-value="1" inactive-value="0"
                      active-text="正常" inactive-text="删除">
@@ -267,17 +267,24 @@
         }
       },//有效按钮
       invalidUpdate(param) {
-        if (param.sdk_status === '1') {
-          this.sdk.id = param.id
-          this.sdk.form.domains = param.paramter
-          this.sdk.name = param.sdk_name
-          this.sdk.mark = param.sdk_mark
-          this.sdk.sdkstatus = param.sdk_status
-          this.sdk.version = param.sdk_version
-          this.sdk.sdkstatus = '0'
-          this.updatemethod()
-          this.listdata()
-        }
+        let tothis = this
+        this.$confirm('是否确定删除?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          if (param.sdk_status === '1') {
+            this.sdk.id = param.id
+            this.sdk.form.domains = param.paramter
+            this.sdk.name = param.sdk_name
+            this.sdk.mark = param.sdk_mark
+            this.sdk.sdkstatus = param.sdk_status
+            this.sdk.version = param.sdk_version
+            this.sdk.sdkstatus = '0'
+            this.updatemethod()
+            this.listdata()
+          }
+        })
       },//无效按钮
       listdata() {
         let tothis = this

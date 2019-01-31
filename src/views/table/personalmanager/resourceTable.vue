@@ -65,7 +65,7 @@
   </div>
 </template>
 <script>
-  import {getRole, getapplist, getResource, createResource} from '@/api/table/personalmanager/resourceTable'
+  import {getRole, getapplist, getResource, createResource,getProject} from '@/api/table/personalmanager/resourceTable'
   import waves from '@/directive/waves'
   import {parseTime} from '@/utils'
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
@@ -111,12 +111,27 @@
     methods: {
       initTree() {
         let tothis = this
-        getapplist().then(rs => {
-          this.data2 = rs.data;
+        getProject().then(rs => {
+          let projects=rs.data
+          let projectlist=[]
+          for (let i=0;i<projects.length;i++){
+            let project={
+              id:projects[i].id,
+              label: projects[i].project_name
+            }
+            projectlist.push(project)
+          }
+          this.data2 = projectlist
         }).catch(function (rs) {
-            console.log(rs)
+          tothis.$notify({
+            title: '失败',
+            message: '请稍后重试',
+            type: 'error',
+            duration: 2000
+          })
+            console.error(rs)
         })
-      },
+      },//获取项目列表初始化树形图
       updateResource() {
         let tothis = this;
         let namelist = this.$refs.tree.getCheckedNodes();
@@ -156,8 +171,9 @@
           })
           this.update_flag=true
         })
-      },
+      },//更新资源
       handleResource(row) {
+        let tothis=this
         this.resourcelist = row
         this.app = Object.assign({}, row) // copy obj
         getResource(row).then(rs => {
@@ -167,28 +183,54 @@
           this.checkedlist = rs.data
           this.resourceFormVisible = true
         }).catch(function (rs) {
-          console.log(rs)
+          tothis.$notify({
+            title: '失败',
+            message: '请稍后重试',
+            type: 'error',
+            duration: 2000
+          })
+          console.error(rs)
         })
-      },
+      },//获取资源
       handleFilter() {
         let tothis = this
         getRole().then(response => {
           let accountName = store.getters && store.getters.name
           let data = response.data
+          let uselesslist=this.getUselessName(data)
           let newlist = [];
           if (!checkPermission(['admin'])) {
             if (checkPermission(['operator', 'planner', 'developer', 'market'])) {
               let role = this.check();
               for (let i = 0; i < data.length; i++) {
                 if (data[i].role == role && data[i].username != accountName) {
-                  newlist.push(data[i])
+                  //
+                  let flag=true
+                  for (let j=0;j<uselesslist.length;j++){
+                    if (data[i].username===uselesslist[j]){
+                      flag=false
+                    }
+                  }
+                  if (flag){
+                    newlist.push(data[i])
+                  }
                 }
               }
             }
           } else {
             for (let i = 0; i < data.length; i++) {
               if (data[i].username != accountName&&data[i].role != 'leader') {
-                newlist.push(data[i])
+                //去掉不需要设置权限的人
+                let flag=true
+                for (let j=0;j<uselesslist.length;j++){
+                  if (data[i].username===uselesslist[j]){
+                    flag=false
+                  }
+                }
+                if (flag){
+                  newlist.push(data[i])
+                }
+
               }
             }
           }
@@ -197,9 +239,15 @@
           tothis.listLoading = false
         }).catch(function (rs) {
           console.log(rs)
+          tothis.$notify({
+            title: '失败',
+            message: '请稍后重试',
+            type: 'error',
+            duration: 2000
+          })
           tothis.listLoading = false
         })
-      },
+      },//获取table
       getDatawithName(){
         this.listLoading=true
         let param=this.inputName
@@ -220,6 +268,15 @@
       formatJson(filterVal, jsonData) {
         return jsonData.map(v => filterVal.map(j => v[j]))
       },
+      getUselessName(data){
+        let list=[]
+        for (let i=0;i<data.length;i++){
+          if (data[i].role==='leader'||data[i].role==='admin') {
+            list.push(data[i].username)
+          }
+        }
+        return list
+      },
       check() {
         let name = "未知";
         let names = ['operator', 'planner', 'developer', 'market'];
@@ -230,6 +287,9 @@
         }
         return name
       }
+
+
+
     }
   }
 </script>

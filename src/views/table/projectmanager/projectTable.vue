@@ -1,11 +1,12 @@
 <template>
   <div class="app-container">
-    <div class="filter-container" style="margin: 15px;margin-top: -5px" v-if="checkPermission(['operator', 'planner','admin','leader','market'])">
+    <div class="filter-container" style="margin: 15px;margin-top: -5px"
+         v-if="checkPermission(['operator', 'planner','admin','leader','market'])">
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit"
                  @click="handleCreate">{{addButton}}
       </el-button>
-      <!--<el-input placeholder="根据项目名查找" v-model="inputName" style="width: 200px" class="filter-item" clearable-->
-                <!--@blur="getDatawithName"/>-->
+      <el-input placeholder="根据项目名查找" v-model="inputName" style="width: 200px" class="filter-item" clearable
+                @blur="getDatawithName"/>
     </div>
     <el-table
       height="850"
@@ -40,6 +41,9 @@
             <el-form-item label="备注:">
               <span>{{ props.row.note }}</span>
             </el-form-item>
+            <!--<el-form-item label="应用:" style="width: 50%">-->
+              <!--<span>{{ props.row.names }}</span>-->
+            <!--</el-form-item>-->
             <div style="padding-top: 15px">
               <el-table
                 stripe
@@ -47,8 +51,8 @@
                 :data="props.row.applist"
                 style="width: 100%;margin-bottom: 30px">
                 <el-table-column
-                  prop="app_name"
-                  label="应用名"
+                  prop="package_name"
+                  label="包名"
                   style="width: 15%">
                 </el-table-column>
                 <el-table-column
@@ -60,7 +64,12 @@
                   label="链接"
                   style="width: 25%">
                   <template slot-scope="scope2">
-                    <el-button @click="linkhandler(scope2.row)">查看key表</el-button>
+                    <span>
+                      <el-button @click="link_Check(scope2.row)" type="info">查看key表</el-button>
+                    </span>
+                    <span v-if="checkPermission(['operator','leader','admin'])">
+                    <el-button @click="link_Edit(scope2.row)" type="success">编辑key表</el-button>
+                    </span>
                   </template>
                 </el-table-column>
               </el-table>
@@ -85,25 +94,26 @@
       </el-table-column>
       <el-table-column label="备注" prop="note">
       </el-table-column>
-      <el-table-column label="操作" align="center" width="150px" class-name="small-padding fixed-width"  v-if="checkPermission(['operator', 'planner','admin','leader','market'])">
+      <el-table-column label="操作" align="center" width="150px" class-name="small-padding fixed-width"
+                       v-if="checkPermission(['operator', 'planner','admin','leader','market'])">
         <template slot-scope="scope">
-          <el-button type="success" size="mini" @click="updateHandler(scope.row)">{{ "编辑" }}</el-button>
-          <div v-if="checkPermission(['admin'])">
-          <el-button type="danger" size="mini" @click="handleDelete(scope.row)" >{{ "删除" }}</el-button>
+          <div v-if="checkPermission(['admin','leader','operator'])">
+            <el-button type="success" size="mini" @click="updateHandler(scope.row)">{{ "编辑" }}</el-button>
+            <el-button type="danger" size="mini" @click="handleDelete(scope.row)">{{ "删除" }}</el-button>
           </div>
         </template>
       </el-table-column>
     </el-table>
-
-    <el-dialog
-      :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="60%">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="50%">
       <el-form ref="dataForm" :model="project" label-position="left" label-width="90px"
                style="width: 400px; margin-left:50px;">
-        <el-form-item label="项目名" :rules="{required: true, message: '项目名不能为空', trigger: 'blur'}"  v-if="dialogStatus==='update'"
+        <el-form-item label="项目名" :rules="{required: true, message: '项目名不能为空', trigger: 'blur'}"
+                      v-if="dialogStatus==='update'"
                       prop="project_name">
           <el-input v-model="project.project_name" placeholder="请输入项目名~" disabled/>
         </el-form-item>
-        <el-form-item label="项目名" :rules="{required: true, message: '项目名不能为空', trigger: 'blur'}" v-if="dialogStatus==='create'"
+        <el-form-item label="项目名" :rules="{required: true, message: '项目名不能为空', trigger: 'blur'}"
+                      v-if="dialogStatus==='create'"
                       prop="project_name">
           <el-input v-model="project.project_name" placeholder="请输入项目名~"/>
         </el-form-item>
@@ -122,36 +132,50 @@
         <el-form-item label="备注" :rules="{required: true, message: '备注不能为空', trigger: 'blur'}" prop="note">
           <el-input v-model="project.note"/>
         </el-form-item>
-        <el-button @click="addDomain">新增应用</el-button>
-        <el-form-item
-          style="margin-top: 15px;width: 400px"
-          v-for="(domain, index) in project.applist"
-          :label="'应用名'"
-          :key="domain.key">
-          <div style="width: 600px">
-            <el-select v-model="domain.app_name" placeholder="请选择" style="width: 150px">
+        <el-button @click="innerVisible = true" type="primary">添加应用</el-button>
+        <el-dialog
+          style="margin-top: 100px"
+          width="40%"
+          title="添加应用"
+          :visible.sync="innerVisible"
+          append-to-body>
+          <div style="width: 800px;font-weight: bold">
+            <div style="margin-bottom: 20px">
+            从已有配置表中添加：
+            <el-select v-model="project_value" placeholder="请选择配置表" style="width: 450px" filterable value-key="name">
               <el-option
-                v-for="item in app_name_list"
-                :key="item"
-                :label="item"
+                v-for="item in project_list"
+                :key="item.key"
+                :label="item.name"
                 :value="item">
               </el-option>
             </el-select>
+            <!--<el-button @click="addDomain" type="success">确认添加</el-button>-->
+            </div>
+            <span>
+            <el-button @click="link_Edit"> 未发现关联配置表？&nbsp&nbsp&nbsp点击前往添加配置表</el-button>
+            </span>
+          </div>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click="innerVisible = false">{{ '取消'}}</el-button>
+            <el-button type="primary" @click="addDomain">{{ '确认' }}</el-button>
+          </div>
+        </el-dialog>
+        <el-form-item
+          style="margin-top: 15px;width: 400px"
+          v-for="(domain, index) in project.applist"
+          :key="domain.key">
+          <div style="width: 1300px;margin-left: -100px">
             <span style="font-weight: bolder">渠道：</span>
-            <el-select v-model="domain.channel" placeholder="请选择" style="width: 150px">
-              <el-option
-                v-for="item in channel_list"
-                :key="item.name"
-                :label="item.name"
-                :value="item.name">
-              </el-option>
-            </el-select>
+            <el-input v-model="domain.channel" placeholder="请填写" style="width: 200px" disabled/>
+            <span style="font-weight: bolder">包名：</span>
+            <el-input v-model="domain.package_name" placeholder="请填写" style="width: 400px" disabled/>
             <el-button @click.prevent="removeDomain(domain)">删除</el-button>
           </div>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">{{ '取消'}}</el-button>
+        <el-button @click="closedialog()">{{ '取消'}}</el-button>
         <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">{{ '确认' }}</el-button>
       </div>
     </el-dialog>
@@ -160,10 +184,12 @@
 
 <script>
   import checkPermission from '@/utils/permission' // 权限判断函数
-  import {getName, getChannel,getProject,createProject,updateProject,deleteProject} from '@/api/table/projectmanager/projectTable'
+  import {getName, getChannel, getProject, createProject, getProjectConfigPublish, getProjectConfig,
+    updateProject, deleteProject, getResourceName} from '@/api/table/projectmanager/projectTable'
   import waves from '@/directive/waves'
   import {parseTime} from '@/utils'
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
+  import store from '@/store'
 
   export default {
     components: {Pagination},
@@ -180,6 +206,9 @@
     },
     data() {
       return {
+        innerVisible:false,
+        project_value: {},
+        project_list: [],
         channel_list: [],
         app_name_list: [],
         expands: [],
@@ -219,7 +248,9 @@
           note: undefined,
           applist: [{
             app_name: '',
-            channel: ''
+            channel: '',
+            package_name: '无',
+            project: {}
           }],
         },
         textMap: {
@@ -237,10 +268,118 @@
       this.handleFilter();
       this.fetchname();
       this.fetchchannel();
+      this.initProjectList();
     },
     methods: {
+      link_Edit(val) {
+        let routeData = this.$router.resolve({
+          name: 'ProjectConfigManager',
+          query: {package_name: val.package_name, channel: val.channel}
+        });
+        window.open(routeData.href, '_blank');
+      },//编辑sdk链接
+      addDomain() {
+        if (typeof (this.project_value.app_name) === "undefined") {
+          this.$message({
+            message: '请选择对应的配置表',
+            type: 'warning'
+          });
+          return
+        }
+        let app_info = {
+          app_name: this.project_value.app_name,
+          channel: this.project_value.channel_mark,
+          key: Date.now(),
+          package_name: this.project_value.package_name,
+          project: {}
+        }
+        let list = this.project.applist
+        let flag = true
+        for (let i = 0; i < list.length; i++) {
+          if (list[i].package_name === this.project_value.package_name &&
+            list[i].channel === this.project_value.channel_mark) {
+            flag = false
+          }
+        }
+        if (flag) {
+          this.project.applist.push(app_info);
+          this.innerVisible=false
+        } else {
+          this.$message({
+            message: '请不要重复添加',
+            type: 'warning'
+          });
+          return
+        }
+      },//添加应用
+      test() {
+        let list = this.project.applist
+        for (let i = 0; i < list.length; i++) {
+          if (typeof (list[i].project.app_name) !== "undefined") {
+            list[i].app_name = list[i].project.app_name
+            list[i].channel = list[i].project.channel_mark
+            list[i].package_name = list[i].project.package_name
+          }
+        }
+      },
+      initProjectList() {
+        let name = {
+          start: '1',
+          end: '2'
+        }
+        getProjectConfig(name).then(response => {
+          let data1 = response.data
+          let data2 = []
+          for (let i = 0; i < data1.length; i++) {
+            let flag = true
+            for (let j = 0; j < data2.length; j++) {
+              if (data1[i].channel_mark === data2[j].channel_mark &&
+                data1[i].package_name === data2[j].package_name) {
+                flag = false
+              }
+            }
+            if (flag) {
+              data1[i]['name'] = data1[i].channel_mark + '_' + data1[i].app_name + '_' + data1[i].package_name
+              data2.push(data1[i])
+            }
+          }
+          this.project_list = data2
+        })
+      },//初始化配置表list
+      uichange(list) {
+        for (let i = 0; i < list.length; i++) {
+          let json = list[i]
+          let names = ''
+          let newapplist = []
+          for (let j = json.applist.length - 1; j >= 0; j--) {
+            if (names.search(json.applist[j].app_name) == -1) {
+              if (names.length !== 0) {
+                names = names + ',' + json.applist[j].app_name
+              } else {
+                names = json.applist[j].app_name
+              }
+
+            }
+            let flag = true
+            for (let x = 0; x < newapplist.length; x++) {
+              if (json.applist[j].channel === newapplist[x].channel) {
+                flag = false
+              }
+            }
+            if (flag) {
+              newapplist.push(json.applist[j])
+            }
+          }
+          json['applist1'] = newapplist
+          json['names'] = names
+        }
+      },//ui数据改变
+      closedialog() {
+        this.handleFilter();
+        this.dialogFormVisible = false
+      },//关闭对话框
       fetchchannel() {
-        if (!this.checkPermission(['operator', 'planner','admin','leader'])){
+        if (!this.checkPermission(['operator', 'planner', 'admin', 'leader'])) {
           return
         }
         let tothis = this
@@ -279,15 +418,11 @@
           this.project.applist.splice(index, 1)
         }
       },//删除应用
-      addDomain() {
-        this.project.applist.push({
-          app_name: '',
-          channel: '',
-          key: Date.now()
+      link_Check(val) {
+        let routeData = this.$router.resolve({
+          name: 'ProjectConfigList',
+          query: {package_name: val.package_name, channel: val.channel}
         });
-      },//添加应用
-      linkhandler(val) {
-        let routeData = this.$router.resolve({name: 'ProjectConfigList', query: {app_name: val.app_name,channel:val.channel}});
         window.open(routeData.href, '_blank');
       },//跳转方法
       expandrowhandler(row, expandedRows) {
@@ -306,34 +441,35 @@
         let index = expandedRows.length - 1
       },//展开行变化时触发
       createData() {
-        let tothis=this
+        let tothis = this
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            let flag=true
-            let list=this.project.applist
-            for (let i=0;i<list.length;i++){
-              if (list[i].app_name==''){
-                flag=false
+            let flag = true
+            let list = this.project.applist
+            for (let i = 0; i < list.length; i++) {
+              if (list[i].app_name == '') {
+                flag = false
                 tothis.$notify({
                   title: '警告',
-                  message: '第'+(i+1)+'个应用的应用名未选择！',
+                  message: '第' + (i + 1) + '个应用的应用名未选择！',
                   type: 'warning'
                 });
                 return
               }
-             if (list[i].channel==''){
-               flag=false
-               tothis.$notify({
-                 title: '警告',
-                 message: '第'+(i+1)+'个应用的渠道未选择！',
-                 type: 'warning'
-               });
-               return
-             }
+              if (list[i].channel == '') {
+                flag = false
+                tothis.$notify({
+                  title: '警告',
+                  message: '第' + (i + 1) + '个应用的渠道未选择！',
+                  type: 'warning'
+                });
+                return
+              }
             }
-            if (flag){
+            if (flag) {
               createProject(this.project).then(response => {
-                if (response.data==='ok') {
+                if (response.data === 'ok') {
+                  this.handleFilter();
                   this.dialogFormVisible = false
                   this.$notify({
                     title: '成功',
@@ -341,7 +477,8 @@
                     type: 'success',
                     duration: 2000
                   })
-                }else if (response.data==='repeat'){
+                } else if (response.data === 'repeat') {
+                  this.handleFilter();
                   this.$notify({
                     title: '注意',
                     message: '项目名重复请修改！',
@@ -361,41 +498,41 @@
 
             }
           } else {
-            console.log('error submit!!');
+            console.error('error submit!!');
             return false;
           }
         });
       },//创建方法
       updateData() {
-        let tothis=this
+        let tothis = this
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            let flag=true
-            let list=this.project.applist
-            for (let i=0;i<list.length;i++){
-              if (list[i].app_name==''){
-                flag=false
+            let flag = true
+            let list = this.project.applist
+            for (let i = 0; i < list.length; i++) {
+              if (list[i].app_name == '') {
+                flag = false
                 tothis.$notify({
                   title: '警告',
-                  message: '第'+(i+1)+'个应用的应用名未选择！',
+                  message: '第' + (i + 1) + '个应用的应用名未选择！',
                   type: 'warning'
                 });
                 return
               }
-              if (list[i].channel==''){
-                flag=false
+              if (list[i].channel == '') {
+                flag = false
                 tothis.$notify({
                   title: '警告',
-                  message: '第'+(i+1)+'个应用的渠道未选择！',
+                  message: '第' + (i + 1) + '个应用的渠道未选择！',
                   type: 'warning'
                 });
                 return
               }
             }
-            if (flag){
+            if (flag) {
               updateProject(this.project).then(() => {
                 this.handleFilter();
-                this.dialogFormVisible=false
+                this.dialogFormVisible = false
                 this.$notify({
                   title: '成功',
                   message: '更新成功',
@@ -444,22 +581,48 @@
       },//删除方法
       handleFilter() {
         this.listLoading = true
-        getProject().then(response => {
-          this.hidlist = response.data
-          this.list = response.data
-          this.listLoading = false
+        let accountName = store.getters && store.getters.name
+        let name = {
+          username: accountName
+        }
+        getResourceName(name).then(response => {
+          let projectlist = response.data
+          getProject().then(response => {
+            if (this.checkPermission(['leader']) || this.checkPermission(['admin'])|| this.checkPermission(['operator'])) {
+              this.uichange(response.data)
+              this.hidlist = response.data
+              this.list = response.data
+            } else {
+              let newlist = []
+              let todolist = response.data
+              for (let i = 0; i < todolist.length; i++) {
+                for (let j = 0; j < projectlist.length; j++) {
+                  if (todolist[i].project_name === projectlist[j]) {
+                    newlist.push(todolist[i])
+                    break
+                  }
+                }
+              }
+              this.hidlist = newlist
+              this.list = newlist
+            }
+            this.listLoading = false
+          }).catch(function (rs) {
+            console.error(rs)
+            this.listLoading = false
+          })
         }).catch(function (rs) {
-          console.log(rs)
+          console.error(rs)
           this.listLoading = false
         })
       },//查询方法
-      updateHandler(val){
-        this.dialogStatus='update'
-        this.dialogFormVisible=true
+      updateHandler(val) {
+        this.dialogStatus = 'update'
+        this.dialogFormVisible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].clearValidate()
         })
-        this.project=val
+        this.project = val
       },//更新对话框展示
       handleCreate() {
         this.resetTemp()
@@ -477,10 +640,7 @@
           compete_good: '暂无',
           version_plan: '暂无',
           note: '暂无',
-          applist: [{
-            app_name: '',
-            channel: ''
-          }],
+          applist: [],
         }
       },//重置对话框内容
       getDatawithName() {
@@ -493,7 +653,7 @@
         }
         let data = []
         for (let i = 0; i < this.hidlist.length; i++) {
-          if (this.hidlist[i].name.search(param) != -1) {
+          if (this.hidlist[i].project_name.search(param) != -1) {
             data.push(this.hidlist[i])
           }
         }

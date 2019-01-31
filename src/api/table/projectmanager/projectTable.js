@@ -39,10 +39,31 @@ export function updateProject(param) {
 }
 
 export function deleteProject(param) {
-  console.log(param)
   return request({
     url: '/project/'+param.id,
     method: 'delete',
     data:param
+  })
+}
+
+export function getResourceName(param) {
+  return request({
+    url: '/api/getresourcelist',
+    method: 'post',
+    params:param
+  })
+}
+
+export function getProjectConfigPublish() {
+  return request({
+    url: '/api/projectconfig_publish',
+    method: 'get',
+  })
+}
+
+export function getProjectConfig(param) {
+  return request({
+    url: '/api/projectconfig/'+param.start+'/'+param.end,
+    method: 'get',
   })
 }

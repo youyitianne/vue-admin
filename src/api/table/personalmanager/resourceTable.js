@@ -31,3 +31,11 @@ export function createResource(param) {
     params:param
   })
 }
+
+export function getProject() {
+  return request({
+    url: '/project',
+    method: 'get',
+  })
+}
+

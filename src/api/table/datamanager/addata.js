@@ -64,3 +64,10 @@ export function getarpufile1(param) {
     data:param
   })
 }
+
+export function getProjectList() {
+  return request({
+    url: '/projectList',
+    method: 'get',
+  })
+}

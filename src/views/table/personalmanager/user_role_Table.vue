@@ -555,8 +555,25 @@
       handleFilter() {
         let tothis = this
         getRole().then(response => {
-          this.list = response.data
-          this.hidlist= response.data
+          let todolist=response.data
+          let newlist=[]
+          for (let i=0;i<todolist.length;i++){
+            if (newlist.length===0){
+              newlist.push(todolist[i])
+            } else {
+              let flag=true
+              for (let j=0;j<newlist.length;j++){
+                if (todolist[i].username===newlist[j].username){
+                  flag=false
+                }
+              }
+              if (flag){
+                newlist.push(todolist[i])
+              }
+            }
+          }
+          this.list = newlist
+          this.hidlist= newlist
           this.listLoading = false
         }).catch(function (rs) {
           console.log(rs)

@@ -59,3 +59,11 @@ export function getProjectConfigPublish() {
     method: 'get',
   })
 }
+
+
+export function getProject() {
+  return request({
+    url: '/project',
+    method: 'get',
+  })
+}

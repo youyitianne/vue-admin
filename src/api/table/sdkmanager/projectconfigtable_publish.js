@@ -52,3 +52,10 @@ export function updateProjectConfig(param) {
     data:param
   })
 }
+
+export function getProject() {
+  return request({
+    url: '/project',
+    method: 'get',
+  })
+}

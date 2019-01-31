@@ -140,6 +140,17 @@ export const asyncRouterMap = [
     },
     children: [
       {
+        path: 'appTable',
+        component: () => import('@/views/table/projectmanager/appTable'),
+        name: 'AppTable',
+        meta: {
+          title: '应用名管理',
+          noCache: true,
+          icon: 'table',
+          roles: ['operator'],
+        }
+      },
+      {
         path: 'table',
         name: 'Table',
         component: () => import('@/views/table/datamanager/addata'),
@@ -189,23 +200,13 @@ export const asyncRouterMap = [
         component: () => import('@/views/table/projectmanager/projectTable'),
         name: 'ProjectTable',
         meta: {
-          title: '项目管理',
+          title: '所有项目',
           noCache: true,
           icon: 'table',
           roles: ['operator','developer','market'],
         }
       },
-      {
-        path: 'appTable',
-        component: () => import('@/views/table/projectmanager/appTable'),
-        name: 'AppTable',
-        meta: {
-          title: '应用管理',
-          noCache: true,
-          icon: 'table',
-          roles: ['operator'],
-        }
-      },
+
       {
         path: 'channelTable',
         component: () => import('@/views/table/projectmanager/channelTable'),

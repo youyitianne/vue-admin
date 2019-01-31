@@ -91,7 +91,7 @@
                                                                          class-name="card-panel-icon"/>&nbsp;还原</el-button>
           </span>
           项目：
-          <el-select v-model="secondary_game" style="margin-right: 20px" size="mini" @change="paramchange()" value-key="project_name">
+          <el-select v-model="secondary_game" style="margin-right: 20px" size="mini" @change="paramchange()" value-key="project_name" filterable>
             <!--<el-option key="全部" label="全部" value="全部"></el-option>-->
             <el-option v-for="item in app_name_list" :key="item.project_name" :label="item.project_name" :value="item">
             </el-option>
@@ -587,7 +587,7 @@
   import PanelGroup from './components/PanelGroup'
   import LineChart from './components/LineChart'
   import {gettest} from '@/api/lineMarker'
-  import {getResourceName, getName, getChannel, getappdata,getProject} from '@/api/complexChart/index'
+  import {getResourceName, getName, getChannel, getappdata,getProjectList} from '@/api/complexChart/user_ad_addata_line_chart'
   import checkPermission from '@/utils/permission' // 权限判断函数
   import formatDate from '@/utils/timetransform'
 
@@ -918,9 +918,6 @@
           console.error(rs)
         })
       },//根据时间查找数据
-
-
-
       analysisdata() {
         this.resetchart()
         let times
@@ -997,11 +994,17 @@
             if (this.secondary_game.project_name === '全部') {
               game = true
             } else {
+              //根据项目下的项目名判断
+              // if (this.secondary_game.project_name===== this.original_list[i].app_name) {
+              //   game=true
+              // }
+              //根据项目下的应用名判断
               for (let n = 0; n < this.secondary_game.applist.length; n++) {
                 if (this.secondary_game.applist[n].app_name === this.original_list[i].app_name) {
                   game = true
                 }
               }
+
             }
             if (times[j] === this.original_list[i].date && game && channel) {
               original_dau = original_dau + this.original_list[i].dau
@@ -1023,11 +1026,18 @@
             if (this.secondary_game.project_name === '全部') {
               game = true
             } else {
+              //根据项目下的项目名判断
+              // if (this.secondary_game.project_name===== this.contrast_list[i].app_name) {
+              //   game=true
+              // }
+              //根据项目下的应用名判断
               for (let n = 0; n < this.secondary_game.applist.length; n++) {
                 if (this.secondary_game.applist[n].app_name === this.contrast_list[i].app_name) {
                   game = true
                 }
               }
+
+
             }
             if (times1[j] === this.contrast_list[i].date && game && channel) {
               contrast_dau = contrast_dau + this.contrast_list[i].dau
@@ -1377,25 +1387,6 @@
         this.listLoading = false
 
       },//数据整合
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       paramchange()   {
         this.listLoading = true
         this.analysisdata()
@@ -1479,68 +1470,18 @@
       },//重置线性表内数据
       fetchName() {
         this.listLoading=true
-        getProject().then(response => {
+        getProjectList().then(response => {
           this.app_name_list.push( {
             project_name: '全部',
             applist: []
           })
           let list=response.data
+          console.log(list)
           this.app_name_list=this.app_name_list.concat(list)
         }).catch(function (rs) {
           console.log(rs)
           this.listLoading = false
         })
-
-        // this.app_name_list = [
-        //   {
-        //     name: '全部',
-        //     applist: []
-        //   },{
-        //     name: '拥挤城市',
-        //     applist: ['拥挤城市', '拥挤战争']
-        //   },{
-        //     name: '保护气球',
-        //     applist: ['保护气球']
-        //   }
-        // ]
-
-        // if (!checkPermission(['admin', 'leader', 'operator'])) {
-        //   let data = {
-        //     username: this.name
-        //   }
-        //   let tothis = this
-        //   this.app_name_list = [
-        //     {
-        //       name: '全部',
-        //       applist: []
-        //     }, {
-        //       name: '拥挤城市',
-        //       applist: ['拥挤城市', '拥挤战争']
-        //     }
-        //   ]
-        //   // getResourceName(data).then(response => {
-        //   //   this.app_name_list = response.data
-        //   // }).catch(function (rs) {
-        //   //   console.error(rs)
-        //   // })
-        // } else {
-        //   let tothis = this
-        //   this.app_name_list = [
-        //     {
-        //       name: '全部',
-        //       applist: []
-        //     },{
-        //       name: '拥挤城市',
-        //       applist: ['拥挤城市', '拥挤战争']
-        //     }
-        //   ]
-        //   // getName().then(response => {
-        //   //   this.app_name_list = response.data
-        //   // }).catch(function (rs) {
-        //   //   tothis.listLoading = false
-        //   //   console.error(rs)
-        //   // })
-        // }
       },//初始化游戏名
       initchannel() {
         getChannel().then(response => {

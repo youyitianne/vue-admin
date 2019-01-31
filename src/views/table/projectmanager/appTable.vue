@@ -4,7 +4,8 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit"
                  @click="handleCreate">{{addButton}}
       </el-button>
-      <el-input placeholder="根据账号查找" v-model="inputName" style="width: 200px" class="filter-item" clearable @blur="getDatawithName"/>
+      <el-input placeholder="根据应用名查找" v-model="inputName" style="width: 200px" class="filter-item" clearable @blur="getDatawithName"/>
+      <el-input placeholder="根据项目名查找" v-model="projectName" style="width: 200px" class="filter-item" clearable @blur="getDatawithName"/>
     </div>
     <el-table
       height="850"
@@ -25,12 +26,17 @@
       <!--{{ scope.row.id }}-->
       <!--</template>-->
       <!--</el-table-column>-->
-      <el-table-column label="应用名" width="110" align="center" prop="date">
+      <el-table-column label="应用名" width="250" align="center" prop="date">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="平台" width="110" align="center" prop="app_name">
+      <el-table-column align="center" label="项目" prop="advertising_type" width="250">
+        <template slot-scope="scope">
+          <span>{{ scope.row.project }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="平台" width="250  " align="center" prop="app_name">
         <template slot-scope="scope">
           {{ scope.row.system }}
         </template>
@@ -40,12 +46,6 @@
           <span>{{ scope.row.icon }}</span>
         </template>
       </el-table-column>
-
-      <el-table-column align="center" label="介绍" prop="advertising_type">
-        <template slot-scope="scope">
-          <span>{{ scope.row.introduce }}</span>
-        </template>
-      </el-table-column>
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ '编辑' }}</el-button>
@@ -53,6 +53,8 @@
         </template>
       </el-table-column>
     </el-table>
+
+
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :model="app" label-position="left" label-width="90px"
                style="width: 400px; margin-left:50px;">
@@ -63,15 +65,27 @@
           <el-input v-model="app.name" placeholder="请输入游戏名字~" />
         </el-form-item>
 
+
+        <el-form-item label="项目">
+          <!--<el-input v-model="app.project" placeholder="比如别称~"/>-->
+          <el-select v-model="app.project" placeholder="请选择" filterable value-key="project_name">
+            <el-option
+              v-for="item in projectlist"
+              :key="item.project_name"
+              :label="item.project_name"
+              :value="item.project_name">
+            </el-option>
+          </el-select>
+        </el-form-item>
+
+
         <el-form-item label="平台">
           <el-input v-model="app.system" placeholder="默认填写安卓~"/>
         </el-form-item>
         <el-form-item label="图标">
           <el-input v-model="app.icon" placeholder="暂无此功能~" value="无"/>
         </el-form-item>
-        <el-form-item label="介绍">
-          <el-input v-model="app.introduce" placeholder="比如别称~"/>
-        </el-form-item>
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">{{ '取消'}}</el-button>
@@ -91,7 +105,7 @@
 </template>
 
 <script>
-  import {getApp, createApp, updateApp, deleteApp} from '@/api/table/projectmanager/appTable'
+  import {getApp, createApp, updateApp, deleteApp,getProject} from '@/api/table/projectmanager/appTable'
   import waves from '@/directive/waves'
   import {parseTime} from '@/utils'
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
@@ -111,6 +125,8 @@
     },
     data() {
       return {
+        projectName:'',
+        projectlist:[],
         create_flag:true,
         update_flag:true,
         inputName:'',
@@ -142,7 +158,7 @@
           name: undefined,
           system: undefined,
           icon: undefined,
-          introduce: undefined,
+          project: undefined,
         },
         textMap: {
           update: '编辑',
@@ -158,8 +174,14 @@
     },
     mounted() {
       this.handleFilter();
+      this.initProjectList();
     },
     methods: {
+      initProjectList(){
+        getProject().then(response => {
+          this.projectlist=response.data
+        })
+      },//初始化项目列表
       createData() {
         for (let i=0;i<this.hidlist.length;i++){
           if (this.hidlist[i].name===this.app.name) {
@@ -170,7 +192,7 @@
             return
           }
         }
-        if (this.app.introduce === '' || this.app.name === '' || this.app.icon === '' || this.app.system === '') {
+        if (this.app.project === '' || this.app.name === '' || this.app.icon === '' || this.app.system === '') {
           this.open3()
           return
         }
@@ -189,26 +211,25 @@
             type: 'success',
             duration: 2000
           })
-          this.create_flag=true
+          tothis.create_flag=true
         }).catch(function (rs) {
           tothis.dialogFormVisible = false
           tothis.$notify({
             title: '失败',
-            message: '请稍后重试',
+            message: '请稍后重试'+rs,
             type: 'error',
             duration: 2000
           })
-          this.create_flag=true
+          tothis.create_flag=true
         })
-      },
+      },//创建应用
       updateData() {
         let tothis=this
         const tempData = Object.assign({}, this.app)
-        if (tempData.introduce === '' || tempData.name === '' || tempData.icon === '' || tempData.system === '') {
+        if (tempData.project === '' || tempData.name === '' || tempData.icon === '' || tempData.system === '') {
           this.open3()
           return
         }
-
         if (!this.update_flag){
           return
         }
@@ -222,16 +243,15 @@
             type: 'success',
             duration: 2000
           })
-          this.update_flag=true
+          tothis.update_flag=true
         }).catch(function (rs) {
-          tothis.dialogFormVisible = false
           tothis.$notify({
             title: '失败',
-            message: '请稍后重试',
+            message: '请稍后重试'+rs,
             type: 'error',
             duration: 2000
           })
-          this.update_flag=true
+          tothis.update_flag=true
         })
       },
       handleCreate() {
@@ -281,7 +301,7 @@
           name: '',
           system: '安卓',
           icon: '无',
-          introduce: '无',
+          project: '无',
         }
       },
       open3() {
@@ -311,20 +331,34 @@
       getDatawithName(){
         this.listLoading=true
         let param=this.inputName
-        if (param==''){
-          this.list=this.hidlist;
-          this.listLoading=false
-          return
-        }
         let data=[]
-        for (let i=0;i<this.hidlist.length;i++){
-          if (this.hidlist[i].name.search(param)!=-1){
-            data.push(this.hidlist[i])
+        if (param===''){
+          data=this.hidlist;
+        }else {
+          for (let i=0;i<this.hidlist.length;i++){
+            if (this.hidlist[i].name.search(param)!==-1){
+              data.push(this.hidlist[i])
+            }
           }
         }
-        this.list = data
-        this.listLoading=false
-      },
+
+        let project=this.projectName
+        let data1=[]
+        if (project===''){
+          this.list = data
+          this.listLoading=false
+        } else {
+          for (let i=0;i<data.length;i++){
+            if (data[i].project.search(project)!==-1){
+              data1.push(data[i])
+            }
+          }
+          this.list = data1
+          this.listLoading=false
+        }
+
+
+      },//根据关键词筛选
       formatJson(filterVal, jsonData) {
         return jsonData.map(v => filterVal.map(j => v[j]))
       },

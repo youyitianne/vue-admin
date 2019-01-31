@@ -12,7 +12,7 @@
         @change="secondart_date_change">
       </el-date-picker>
 
-      <el-select v-model="chooseName" :placeholder="'选择游戏'" style="width: 140px" class="filter-item">
+      <el-select v-model="chooseName" :placeholder="'选择游戏'" style="width: 140px" class="filter-item" filterable>
         <el-option v-for="item in names" :key="item" :label="item" :value="item"/>
       </el-select>
       <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-search"
@@ -214,7 +214,7 @@
 
 <script>
   import {
-    getProject,
+    getProjectList,
     getList,
     getListdata,
     getdownload,
@@ -222,7 +222,7 @@
     getName,
     getarpufile,
     getarpufile1
-  } from '@/api/table/datamanager/select'
+  } from '@/api/table/datamanager/addata'
   import waves from '@/directive/waves'
   import {parseTime} from '@/utils'
   import checkPermission from '@/utils/permission' // 权限判断函数
@@ -655,12 +655,14 @@
     methods:
       {
         fetchProject() {
+          let tothis=this
           this.listLoading = true
-          getProject().then(response => {
+          getProjectList().then(response => {
+            console.log(response.data)
             this.app_name_list = response.data
           }).catch(function (rs) {
             console.log(rs)
-            this.listLoading = false
+            tothis.listLoading = false
           })
         },//获取项目名
         getnumlist() {

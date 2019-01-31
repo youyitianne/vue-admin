@@ -1,20 +1,31 @@
 <template>
   <div class="app-container">
     <div class="filter-container" style="margin: 15px;margin-top: -5px">
-      <span style="margin-left: 15px;margin-right: 5px">游戏:</span>
-      <el-select v-model="secondary_game" @change="getDatawithParam">
+      <!--<span style="margin-left: 15px;margin-right: 5px">游戏:</span>-->
+      <!--<el-select v-model="secondary_game" @change="getDatawithParam" filterable>-->
+      <!--<el-option key="全部" label="全部" value="">-->
+      <!--</el-option>-->
+      <!--<el-option v-for="(item,index) in app_name_list" :key="index" :label="item" :value="item">-->
+      <!--</el-option>-->
+      <!--</el-select>-->
+
+      <span style="margin-left: 15px;margin-right: 5px">项目:</span>
+      <el-select v-model="secondary_project" @change="getDatawithParam" value-key="project_name" filterable>
         <el-option key="全部" label="全部" value="">
         </el-option>
-        <el-option v-for="item in app_name_list" :key="item" :label="item" :value="item">
+        <el-option v-for="(item,index) in projectlist_select" :key="index" :label="item.project_name" :value="item">
         </el-option>
       </el-select>
       <span style="margin-left: 15px;margin-right: 5px">渠道:</span>
-      <el-select v-model="secondary_channel" @change="getDatawithParam">
+      <el-select v-model="secondary_channel" @change="getDatawithParam" filterable>
         <el-option key="全部" label="全部" value="">
         </el-option>
-        <el-option v-for="item in channel_mark_list" :key="item" :label="item" :value="item">
+        <el-option v-for="(item,index) in channel_mark_list" :key="index" :label="item" :value="item">
         </el-option>
       </el-select>
+      <span style="margin-left: 15px;margin-right: 5px">包名:</span>
+      <el-input placeholder="根据包名查找" v-model="secondary_package" style="width: 200px" class="filter-item" clearable
+                @blur="getDatawithParam"/>
       <el-checkbox v-model="checked" border style="margin-left: 15px" @change="getDatawithParam">展示最新配置表
       </el-checkbox>
     </div>
@@ -58,13 +69,13 @@
               <span>{{ props.row.versioncode_update_version }}</span>
             </el-form-item>
             <!--<el-form-item label="sdk配置:">-->
-              <!--<span>{{ props.row.sdk_config }}</span>-->
+            <!--<span>{{ props.row.sdk_config }}</span>-->
             <!--</el-form-item>-->
             <!--<el-form-item label="渠道特别要求:">-->
-              <!--<span>{{ props.row.sdk_require }}</span>-->
+            <!--<span>{{ props.row.sdk_require }}</span>-->
             <!--</el-form-item>-->
             <!--<el-form-item label="备注:">-->
-              <!--<span>{{ props.row.note }}</span>-->
+            <!--<span>{{ props.row.note }}</span>-->
             <!--</el-form-item>-->
           </el-form>
           <div>
@@ -117,126 +128,6 @@
         </template>
       </el-table-column>
     </el-table>
-
-
-
-    <!--<el-dialog-->
-      <!--:title="textMap[dialogStatus]"-->
-      <!--:visible.sync="dialogFormVisible"-->
-      <!--width="80%"-->
-      <!--:close-on-click-modal=false>-->
-      <!--<el-form ref="dataForm" :model="sdk" label-position="left" label-width="150px" :inline="true"-->
-               <!--style="margin-left:50px;" status-icon id="form-custom">-->
-        <!--<el-form-item label="时间" class="filter-item" v-if="this.dialogStatus === 'create'">-->
-          <!--<el-date-picker v-model="sdk.timevalue" type="datetime" :disabled=true>-->
-          <!--</el-date-picker>-->
-        <!--</el-form-item>-->
-        <!--<div>-->
-          <!--<el-form-item label="游戏名" :rules="[{ required: true, message: '游戏名不能为空'}]" prop="app_name">-->
-            <!--<el-input v-model="sdk.app_name" placeholder="必填~" class="dia-input" disabled/>-->
-          <!--</el-form-item>-->
-        <!--</div>-->
-        <!--<el-form-item label="包名" :rules="[{ required: true, message: '包名不能为空'}]" prop="package_name">-->
-          <!--<el-input v-model="sdk.package_name" placeholder="必填~" class="dia-input" disabled/>-->
-        <!--</el-form-item>-->
-        <!--<el-form-item label="渠道标记" :rules="[{ required: true, message: '渠道不能为空'}]" prop="channel_mark">-->
-          <!--<el-select v-model="sdk.channel_mark"  disabled>-->
-            <!--<el-option-->
-              <!--v-for="item in channel_mark_list_dia"-->
-              <!--:key="item.name"-->
-              <!--:label="item.program_mark"-->
-              <!--:value="item.program_mark">-->
-            <!--</el-option>-->
-          <!--</el-select>-->
-        <!--</el-form-item>-->
-        <!--<el-form-item label="外部版本-在线" class="filter-item" :rules="[{ required: true, message: '外部版本-在线不能为空'}]"-->
-                      <!--prop="version_online_version">-->
-          <!--<el-input v-model="sdk.version_online_version" placeholder="必填~" class="dia-input"/>-->
-        <!--</el-form-item>-->
-        <!--<el-form-item label="外部版本-更新" :rules="[{ required: true, message: '外部版本-更新不能为空'}]"-->
-                      <!--prop="version_update_version">-->
-          <!--<el-input v-model="sdk.version_update_version" placeholder="必填~" class="dia-input" disabled/>-->
-        <!--</el-form-item>-->
-        <!--<el-form-item label="内部版本-在线" :rules="[{ required: true, message: '内部版本-在线不能为空'}]"-->
-                      <!--prop="versioncode_online_version">-->
-          <!--<el-input v-model="sdk.versioncode_online_version" placeholder="必填~" class="dia-input"/>-->
-        <!--</el-form-item>-->
-        <!--<el-form-item label="内部版本_更新" :rules="[{ required: true, message: '内部版本_更新不能为空'}]"-->
-                      <!--prop="versioncode_update_version">-->
-          <!--<el-input v-model="sdk.versioncode_update_version" placeholder="必填~" class="dia-input" disabled/>-->
-        <!--</el-form-item>-->
-        <!--<el-form-item label="sdk配置" class="filter-item">-->
-          <!--<el-input v-model="sdk.sdk_config" placeholder="" class="dia-input"/>-->
-        <!--</el-form-item>-->
-        <!--<el-form-item label="渠道特别要求">-->
-          <!--<el-input type="textarea" v-model="sdk.sdk_require" class="dia-input" maxlength="150" :autosize="{maxRows: 5}"-->
-                    <!--placeholder=""/>-->
-        <!--</el-form-item>-->
-        <!--<br/>-->
-        <!--&lt;!&ndash;筛选输入框&ndash;&gt;-->
-        <!--<el-input placeholder="SDK模版筛选" v-model="sdk_template_name"-->
-                  <!--style="width: 200px;margin-bottom: 10px" class="filter-item" clearable-->
-                  <!--@change="getchannelmarklist"/>-->
-        <!--&lt;!&ndash;多选框 sdk模版控制&ndash;&gt;-->
-        <!--<el-checkbox-group v-model="checkedSdkTemplate" style="border-bottom: 15px" size="mini">-->
-          <!--<el-checkbox v-for="name in sdkTemplate" :label="name.mark" :key="name.mark" :value="name.name" @change="findSdkTemplate" border>-->
-            <!--<div class="grid-content bg-purple-light" style="width: 107px;margin-bottom: 15px">{{name}}</div>-->
-          <!--</el-checkbox>-->
-        <!--</el-checkbox-group>-->
-
-        <!--<br/>-->
-        <!--&lt;!&ndash;标签页&ndash;&gt;-->
-        <!--<el-tabs tab-position="left" style="width: 95%;background-color: #f4f4f5;height: 500px;padding: 1px" id="test1"-->
-                 <!--@tab-click="findtabname" type="border-card">-->
-          <!--<el-tab-pane v-for="name in checkedSdkTemplate" :label="name" :key="name"-->
-                       <!--style="font-size: 14px;font-family: Microsoft YaHei;width: 100%">-->
-            <!--<div name="pane_form" style="height: 500px;overflow: auto;">-->
-              <!--&lt;!&ndash;标签页内多选框&ndash;&gt;-->
-              <!--<el-checkbox-group-->
-                <!--size="mini"-->
-                <!--v-model="dialog_secondary_checked"-->
-                <!--v-if="dialog_secondary_visual"-->
-                <!--style="margin-bottom: 15px">-->
-                <!--<el-checkbox-button v-for="name in dialog_secondary_list" :label="name" :key="name"-->
-                                    <!--style="margin-left: 0px" >{{name}}-->
-                <!--</el-checkbox-button>-->
-              <!--</el-checkbox-group>-->
-
-              <!--<template v-for="option in options">-->
-                <!--<div style="font-size: 16px;font-family: Microsoft YaHei;margin-top: 8px;margin-bottom: 8px"-->
-                     <!--v-if="test1(option.sdk_name)">-->
-                  <!--{{option.param_name}}:-->
-                  <!--<el-select v-model="option.value" @change="test(option.param_name,option.value)">-->
-                    <!--<el-option-->
-                      <!--v-for="item in option.param"-->
-                      <!--:key="item.value"-->
-                      <!--:value="item.value">-->
-                    <!--</el-option>-->
-                  <!--</el-select>-->
-                <!--</div>-->
-              <!--</template>-->
-              <!--&lt;!&ndash;标签页内表单&ndash;&gt;-->
-              <!--<el-form-item v-for="(domain, index) in sdk.form.domains" :key="domain.key+index"-->
-                            <!--v-if="form_item_filter(domain)" style="margin-right: 1px"-->
-                            <!--v-model="page_name">-->
-                <!--<div>-->
-                  <!--<span style="margin-right: 20px;font-size: 14px;font-family: Microsoft YaHei">-->
-                    <!--{{domain.param_name}}：-->
-                  <!--</span>-->
-                  <!--<el-input v-model="domain.param" style="width: 300px;margin-right: 25px" placeholder="必填"/>-->
-                <!--</div>-->
-              <!--</el-form-item>-->
-            <!--</div>-->
-          <!--</el-tab-pane>-->
-        <!--</el-tabs>-->
-      <!--</el-form>-->
-      <!--<div slot="footer" class="dialog-footer">-->
-        <!--<el-button @click="dialogFormVisible = false">{{ '取消'}}</el-button>-->
-        <!--<el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">{{ '确认' }}</el-button>-->
-      <!--</div>-->
-    <!--</el-dialog>-->
-
-
   </div>
 </template>
 
@@ -244,8 +135,15 @@
   import waves from '@/directive/waves'
   import {parseTime} from '@/utils'
   import checkPermission from '@/utils/permission' // 权限判断函数
-  import {getSdkTemplate,getChannel} from '@/api/table/sdkmanager/projectconfigtable'
-  import {updateProjectConfig,getProjectConfigPublish} from '@/api/table/sdkmanager/projectconfigtable_publish'
+  //import {getSdkTemplate,getChannel} from '@/api/table/sdkmanager/projectconfigtable'
+  import {
+    updateProjectConfig,
+    getProjectConfigPublish,
+    getResourceName,
+    getProject
+  } from '@/api/table/sdkmanager/projectconfigtable_publish'
+  import store from '@/store'
+
 
   export default {
     filters: {
@@ -260,6 +158,9 @@
     },
     data() {
       return {
+        projectlist_select: [],
+        secondary_project: '',
+        secondary_package: '',
         tag_name: '',
         options: [],
         value: [],
@@ -357,42 +258,41 @@
     },
     created() {
       //this.fetchName()
-      this.test()
+      this.routeWithParam()
       //this.initchannel()  //获取渠道
-      this.initTemplate()   //获取sdk模版
+      //this.initTemplate()   //获取sdk模版
       this.initDate()   //初始化日期查询数据
     },
     methods: {
-      test() {
-        let name=this.$route.query.app_name
-        if (typeof(name)!='undefined'){
-          this.secondary_game=name
+      routeWithParam() {
+        let name = this.$route.query.package_name
+        if (typeof(name) != 'undefined') {
+          this.secondary_package = name
         }
-        let channel=this.$route.query.channel
-        if (typeof(channel)!='undefined'){
-          this.secondary_channel=channel
+        let channel = this.$route.query.channel
+        if (typeof(channel) != 'undefined') {
+          this.secondary_channel = channel
         }
-      },
-      handleDelete(data){
-        let tothis=this
+      },//带参跳转
+      handleDelete(data) {
+        let tothis = this
         this.$confirm('是否确定删除?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          updateProjectConfig(data).then(response=>{
+          updateProjectConfig(data).then(response => {
             this.handleFilter();
-          }).catch(rs=>{
+          }).catch(rs => {
             tothis.$notify({
-              title: '失败',
-              message: '请稍后重试',
+              title: '删除失败',
+              message: '请刷新页面后重试',
               type: 'error',
               duration: 2000
             })
           })
         })
-
-      },
+      },//删除方法
       test1(name) {
         if (name === this.tag_name) {
           return true
@@ -798,8 +698,8 @@
           this.update_flag = true
         }).catch(err => {
           tothis.$notify({
-            title: '失败',
-            message: '请稍后重试',
+            title: '编辑失败',
+            message: '请刷新页面后重试',
             type: 'error',
             duration: 2000
           })
@@ -822,40 +722,107 @@
             data1.push(data[i])
           }
         }
+
         let statuse = this.checked       //最新
         let data2 = []
         if (statuse === true) {
           for (let i = 0; i < data1.length; i++) {
-            if (data2.length === 0) {
+            let flag = true
+            for (let j = 0; j < data2.length; j++) {
+              if (data1[i].channel_mark === data2[j].channel_mark && data1[i].package_name === data2[j].package_name) {
+                flag = false
+              }
+            }
+            if (flag) {
               data2.push(data1[i])
-            } else {
-              let flag = true
-              for (let j = 0; j < data2.length; j++) {
-                if (data1[i].channel_mark === data2[j].channel_mark && data1[i].package_name === data2[j].package_name) {
-                  flag = false
-                }
-              }
-              if (flag) {
-                data2.push(data1[i])
-              }
             }
           }
         } else {
           data2 = data1
         }
 
-        this.list = data2
-        this.listLoading = false
+
+        let packageName = this.secondary_package
+        let package_data = []
+        for (let i = 0; i < data2.length; i++) {
+          if (data2[i].package_name.search(packageName) != -1) {
+            package_data.push(data2[i])
+          }
+        }
+
+
+        let project = this.secondary_project
+        let project_list = []
+        //console.log(package_data)   //package_name   channel_mark
+        //console.log(project.applist)  //package_name   channel
+        if (project === '') {
+          this.list = package_data
+          this.listLoading = false
+        } else {
+          for (let i = 0; i < package_data.length; i++) {
+            for (let j = 0; j < project.applist.length; j++) {
+              if (package_data[i].package_name === project.applist[j].package_name && package_data[i].channel_mark === project.applist[j].channel) {
+                project_list.push(package_data[i])
+                break
+              }
+            }
+          }
+          this.list = project_list
+          this.listLoading = false
+        }
+
+
       }, //table二次筛选  页面上方按钮
       handleFilter() {
         let tothis = this
         this.listLoading = true
+        let accountName = store.getters && store.getters.name
+        let name = {
+          username: accountName
+        }
         getProjectConfigPublish().then(response => {
-          this.list = response.data
-          this.hidlist = response.data
-          this.listLoading = false
-          this.getDatawithParam()
-          this.initfilterlist()
+          let projectPublishList = response.data
+          let valid = this.checkPermission(['leader']) || this.checkPermission(['admin']) || this.checkPermission(['operator'])
+          getResourceName(name).then(response => {
+            let projectlist = response.data
+            getProject().then(response => {
+              let todolist = response.data
+              this.projectlist_select = todolist
+              let newlist = []
+              if (!valid) {
+                for (let i = 0; i < todolist.length; i++) {
+                  for (let j = 0; j < projectlist.length; j++) {
+                    if (todolist[i].project_name === projectlist[j]) {
+                      newlist = newlist.concat(todolist[i].applist)
+                      break
+                    }
+                  }
+                }
+
+                let validlist = []
+                for (let i = 0; i < newlist.length; i++) {
+                  for (let j = 0; j < projectPublishList.length; j++) {
+                    if (newlist[i].package_name === projectPublishList[j].package_name && newlist[i].channel === projectPublishList[j].channel_mark) {
+                      validlist.push(projectPublishList[j])
+                    }
+                  }
+                }
+                this.list = validlist
+                this.hidlist = validlist
+                this.listLoading = false
+                this.getDatawithParam()
+                this.initfilterlist()
+              } else {
+                this.list = projectPublishList
+                this.hidlist = projectPublishList
+                this.listLoading = false
+                this.getDatawithParam()
+                this.initfilterlist()
+              }
+            })
+          }).catch(rs => {
+            console.error(rs)
+          })
         }).catch(function (rs) {
           tothis.listLoading = false
         })
@@ -908,8 +875,8 @@
         return ('00' + str).substr(str.length);
       },//日期转换
       initfilterlist() {
-        this.channel_mark_list=[]
-        this.app_name_list=[]
+        this.channel_mark_list = []
+        this.app_name_list = []
         for (let i = 0; i < this.hidlist.length; i++) {
           if (this.channel_mark_list.length === 0) {
             this.channel_mark_list.push(this.hidlist[i].channel_mark)
