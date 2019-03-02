@@ -19,6 +19,7 @@
           <span class="ts-title">[小米]:</span>小米.csv     或者小米_XXXXXXXXX.csv<br/>
           <span class="ts-title">[友盟]:</span>友盟_面条滑溜溜_渠道(meizu)_日趋势变化_20181022_20181027.csv<br/>
           <span class="ts-title">[友盟1]:</span>友盟1_面条滑溜溜_渠道(meizu)_日趋势变化_20181022_20181027.csv<br/>
+          <span class="ts-title">[友盟3]:</span>友盟3.xlsx（在页面上下载之后，检查表内应用名和渠道名是否正确）<br/>
           <span class="ts-title">[九游]:</span>九游.csv     或者九游_XXXXXXX.csv<br/>
           <span class="ts-title">[九游1]:</span>九游1.xls     或者九游1_XXXXXXX.xls<br/>
           <span class="ts-title">[头条]:</span>头条.xlsx <br/>
@@ -60,6 +61,7 @@
                 style="margin: 0 auto;margin-top: 30px"/>
     </div>
     <div class="uploadresponse1" v-html="value1" style="padding: 30px;font-family: 微软雅黑;line-height: 22px;font-size: 15px" ></div>
+
   </div>
 </template>
 
@@ -71,6 +73,8 @@ export default {
   components: { Dropzone },
   data(){
     return {
+      root:"els",
+      version:"1.0.0",
       value:"",
       value1:"",
     }

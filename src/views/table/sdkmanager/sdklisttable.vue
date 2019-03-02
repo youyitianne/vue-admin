@@ -388,7 +388,7 @@
         if (difference&&this.dialogStatus === 'create'){
           this.$notify({
             title: '警告！',
-            message: 'SDK标记不允许重复,请及时修改！',
+            message: 'SDK名称不允许重复,请及时修改！',
             type: 'warning',
             duration: 2000
           })

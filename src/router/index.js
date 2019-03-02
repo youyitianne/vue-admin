@@ -71,37 +71,15 @@ export default new Router({
 //异步挂载的路由
 //动态需要根据权限加载的路由表
 export const asyncRouterMap = [
-
   {
-    path: '/component',
+    path: '/data-summary',
     component: Layout,
-    redirect: '/component/dropzone',
+    redirect: '/data-summary/cline',
     name: 'Component',
     meta: {
-      title: '上传',
-      icon: 'upload (2) ',
-      roles: ['operator']
-    },
-    children: [
-      {
-        path: 'dropzone',
-        component: () => import('@/views/dropZone/dropzone'),
-        name: 'DropzoneDemo',
-        meta: {
-          title: 'Excel上传',
-          roles: ['operator','leader'],
-        }
-      }]
-  },
-  {
-    path: '/statistics',
-    component: Layout,
-    redirect: '/statistic/cline',
-    name: 'Statistics',
-    meta: {
-      title: '数据统计',
-      icon: 'chart',
-      roles: ['operator', 'planner', 'market']
+      title: '数据汇总',
+      icon: 'summary',
+      roles: ['director']
     },
     children: [
       {
@@ -112,7 +90,7 @@ export const asyncRouterMap = [
           title: '统计图表概览',
           noCache: true,
           icon: 'chart',
-          roles: ['operator', 'market', 'leader', 'planner']
+          roles: ['director']
         }
       },
       {
@@ -123,54 +101,22 @@ export const asyncRouterMap = [
           title: '计费统计图表',
           noCache: true,
           icon: 'chart',
-          roles: ['operator', 'market', 'leader', 'planner']
+          roles: ['director']
         }
       },
     ]
   },
   {
-    path: '/example',
+    path: '/data-acquire',
     component: Layout,
-    redirect: '/example/table',
-    name: 'Example',
+    redirect: '/data-acquire/yixin',
+    name: 'Component',
     meta: {
-      title: '数据管理',
-      icon: 'documentation',
-      roles: ['operator','market', 'leader']
+      title: '数据获取',
+      icon: 'download-source',
+      roles: ['director', 'operatorleader']
     },
     children: [
-      {
-        path: 'appTable',
-        component: () => import('@/views/table/projectmanager/appTable'),
-        name: 'AppTable',
-        meta: {
-          title: '应用名管理',
-          noCache: true,
-          icon: 'table',
-          roles: ['operator'],
-        }
-      },
-      {
-        path: 'table',
-        name: 'Table',
-        component: () => import('@/views/table/datamanager/addata'),
-        meta: {
-          title: '广告数据管理',
-          icon: 'table',
-          roles: ['operator','market', 'leader']
-        }
-      },
-      {
-        path: 'userdata',
-        component: () => import('@/views/table/datamanager/userdata'),
-        name: 'UserdataTable',
-        meta: {
-          title: '用户数据管理',
-          noCache: true,
-          icon: 'table',
-          roles: ['operator','market', 'leader']
-        }
-      },
       {
         path: 'yixin',
         component: () => import('@/views/table/datamanager/yixin'),
@@ -178,12 +124,120 @@ export const asyncRouterMap = [
         meta: {
           title: '移信数据下载',
           noCache: true,
-          icon: 'table',
-          roles: ['operator', 'leader']
+          icon: 'download3',
+          roles: ['director','operatorleader']
+        }
+      },
+      {
+        path: 'umeng',
+        component: () => import('@/views/table/datamanager/umeng'),
+        name: 'UmengTable',
+        meta: {
+          title: '友盟数据下载',
+          noCache: true,
+          icon: 'download3',
+          roles: ['director','operatorleader']
         }
       },
     ]
   },
+  {
+    path: '/component',
+    component: Layout,
+    redirect: '/component/dropzone',
+    name: 'Component',
+    meta: {
+      title: '数据录入',
+      icon: 'upload (2) ',
+      roles: ['director','operatorleader']
+    },
+    children: [
+      {
+        path: 'dropzone',
+        component: () => import('@/views/dropZone/dropzone'),
+        name: 'DropzoneDemo',
+        meta: {
+          title: '数据录入',
+          roles: ['director','operatorleader']
+        }
+      }]
+  },
+  {
+    path: '/data-analysis',
+    component: Layout,
+    redirect: '/data-analysis/cline',
+    name: 'Statistics',
+    meta: {
+      title: '数据分析',
+      icon: 'chart',
+      roles: ['director','operatorleader','operator','planner']
+    },
+    children: [
+      {
+        path: 'shoowtime_1',
+        name: 'showtimeTable1',
+        component: () => import('@/views/table/datamanager/showtime_1table'),
+        meta: {
+          title: '展次表（旧）',
+          icon: 'table',
+          roles: ['director', 'operatorleader', 'operator','planner']
+        }
+      },
+      {
+        path: 'shoowtime_2table',
+        name: 'showtimeTable2',
+        component: () => import('@/views/table/datamanager/showtime_2table'),
+        meta: {
+          title: '展次表（新）',
+          icon: 'table',
+          roles: ['director', 'operatorleader', 'operator','planner']
+        }
+      },
+      {
+        path: 'arpu',
+        name: 'arpuTable',
+        component: () => import('@/views/table/datamanager/arputable'),
+        meta: {
+          title: 'ARPU表',
+          icon: 'table',
+          roles: ['director', 'operatorleader', 'operator','planner']
+        }
+      },
+      {
+        path: 'earned',
+        name: 'earnedTable',
+        component: () => import('@/views/table/datamanager/earnedtable'),
+        meta: {
+          title: '收益表',
+          icon: 'table',
+          roles: ['director', 'operatorleader']
+        }
+      },
+      {
+        path: 'umengLifeTime',
+        component: () => import('@/views/table/datamanager/umengLifeTime'),
+        name: 'UmengLifeTimeTable',
+        meta: {
+          title: '友盟留存',
+          noCache: true,
+          icon: 'retention',
+          roles: ['director', 'operatorleader', 'operator','planner']
+        }
+      },
+      {
+        path: 'repeat',
+        component: () => import('@/views/table/repeat/repeat'),
+        name: 'repeatTable',
+        meta: {
+          title: '广告数据查重',
+          noCache: true,
+          icon: 'table',
+          roles: ['director', 'operatorleader']
+        }
+      },
+    ]
+  },
+
   {
     path: '/appmanager',
     component: Layout,
@@ -191,8 +245,8 @@ export const asyncRouterMap = [
     name: 'Example',
     meta: {
       title: '项目管理',
-      icon: 'list',
-      roles: ['operator','developer','market'],
+      icon: 'list4',
+      roles: ['director','operatorleader'],
     },
     children: [
       {
@@ -200,10 +254,10 @@ export const asyncRouterMap = [
         component: () => import('@/views/table/projectmanager/projectTable'),
         name: 'ProjectTable',
         meta: {
-          title: '所有项目',
+          title: '项目列表',
           noCache: true,
-          icon: 'table',
-          roles: ['operator','developer','market'],
+          icon: 'list',
+          roles: ['director'],
         }
       },
 
@@ -212,10 +266,10 @@ export const asyncRouterMap = [
         component: () => import('@/views/table/projectmanager/channelTable'),
         name: 'ChannelTable',
         meta: {
-          title: '渠道管理',
+          title: '渠道列表',
           noCache: true,
-          icon: 'table',
-          roles: ['operator'],
+          icon: 'list',
+          roles: ['director','operatorleader'],
         }
       },
       {
@@ -223,10 +277,10 @@ export const asyncRouterMap = [
         component: () => import('@/views/table/projectmanager/adTypeTable'),
         name: 'AdTypeTable',
         meta: {
-          title: '广告类型管理',
+          title: '广告类型列表',
           noCache: true,
-          icon: 'table',
-          roles: ['operator'],
+          icon: 'list',
+          roles: ['director','operatorleader'],
         }
       }
     ]
@@ -239,7 +293,7 @@ export const asyncRouterMap = [
     meta: {
       title: '人员管理',
       icon: 'peoples',
-      roles: ['leader']
+      roles: ['director']
     },
     children: [
       {
@@ -247,10 +301,10 @@ export const asyncRouterMap = [
         component: () => import('@/views/table/personalmanager/accountTable'),
         name: 'AccountTable',
         meta: {
-          title: '用户管理',
+          title: '帐号管理',
           noCache: true,
-          icon: 'table',
-          roles: ['admin']
+          icon: 'accountmanage',
+          roles: ['director']
         }
       },
       {
@@ -260,8 +314,8 @@ export const asyncRouterMap = [
         meta: {
           title: '角色管理',
           noCache: true,
-          icon: 'table',
-          roles: ['admin']
+          icon: 'role',
+          roles: ['director']
         }
       },
       {
@@ -269,9 +323,9 @@ export const asyncRouterMap = [
         component: () => import('@/views/table/personalmanager/resourceTable'),
         name: 'ResourceTable',
         meta: {
-          title: '资源管理',
-          icon: 'table',
-          roles: ['leader']
+          title: '项目分配',
+          icon: 'allot',
+          roles: ['director']
         }
       }
     ]
@@ -284,7 +338,6 @@ export const asyncRouterMap = [
     meta: {
       title: 'SDK管理',
       icon: 'excel',
-      roles: ['operator','developer', 'planner']
     },
     children: [
       {
@@ -292,8 +345,9 @@ export const asyncRouterMap = [
         component: () => import('@/views/table/sdkmanager/sdklisttable'),
         name: 'SDKManager',
         meta: {
-          title: 'SDK模版管理',
-          roles: ['leader'],
+          title: 'SDK模版列表',
+          icon:'model4',
+          roles: ['director','sdksuport'],
         }
       },
       {
@@ -301,8 +355,9 @@ export const asyncRouterMap = [
         component: () => import('@/views/table/sdkmanager/projectconfigtable'),
         name: 'ProjectConfigManager',
         meta: {
-          title: '配置表管理',
-          roles: ['operator', 'planner'],
+          title: 'SDK配置表',
+          icon:'sdkset1',
+          roles: ['director', 'operatorleader','sdksuport'],
         }
       }, {
         path: 'projectconfiglist',
@@ -310,9 +365,75 @@ export const asyncRouterMap = [
         name: 'ProjectConfigList',
         meta: {
           title: '配置表发布记录',
-          roles: ['operator','developer', 'planner'],
+          icon:'sdkshow',
         }
       }]
+  },
+  {
+    path: '/system',
+    component: Layout,
+    redirect: '/system/operationlog',
+    name: 'SystemSet',
+    meta: {
+      title: '系统设置',
+      icon: 'system1',
+    },
+    children: [
+      {
+        path: 'operationlog',
+        component: () => import('@/views/system/operationLog'),
+        name: 'OperationLog',
+        meta: {
+          title: '操作日志',
+          icon:'log2',
+          roles: ['director'],
+        }
+      },
+      {
+        path: 'help',
+        component: () => import('@/views/system/help'),
+        name: 'Help',
+        meta: {
+          title: '帮助',
+          icon:'help1',
+        }
+      }
+      ]
+  },
+  {
+    path: '/debug',
+    component: Layout,
+    redirect: '/debug/table',
+    name: 'Data',
+    meta: {
+      title: 'Debug',
+      icon: 'documentation',
+      roles: ['a']
+    },
+    children: [
+      {
+        path: 'cline',
+        name: 'Table',
+        component: () => import('@/views/debug/addata'),
+        meta: {
+          title: '广告数据',
+          icon: 'table',
+          roles: ['a']
+        }
+      },
+      {
+        path: 'userdata',
+        component: () => import('@/views/debug/userdata'),
+        name: 'UserdataTable',
+        meta: {
+          title: '用户数据',
+          noCache: true,
+          icon: 'table',
+          roles: ['a']
+        }
+      },
+
+    ]
   },
   {path: '*', redirect: '/404'}
 ];

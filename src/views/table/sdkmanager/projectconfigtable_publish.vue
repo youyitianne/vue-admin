@@ -8,7 +8,6 @@
       <!--<el-option v-for="(item,index) in app_name_list" :key="index" :label="item" :value="item">-->
       <!--</el-option>-->
       <!--</el-select>-->
-
       <span style="margin-left: 15px;margin-right: 5px">项目:</span>
       <el-select v-model="secondary_project" @change="getDatawithParam" value-key="project_name" filterable>
         <el-option key="全部" label="全部" value="">
@@ -122,7 +121,7 @@
       <el-table-column label="内部版本-更新" prop="versioncode_update_version">
       </el-table-column>
       <el-table-column label="操作" align="center" width="150px" class-name="small-padding fixed-width"
-                       v-if="checkPermission(['operator','admin','leader'])">
+                       v-if="checkPermission(['director','operatorleader','sdksuport'])">
         <template slot-scope="scope">
           <el-button type="danger" size="mini" @click="handleDelete(scope.row)">{{ "删除" }}</el-button>
         </template>
@@ -158,6 +157,7 @@
     },
     data() {
       return {
+        projectList: [],
         projectlist_select: [],
         secondary_project: '',
         secondary_package: '',
@@ -258,7 +258,7 @@
     },
     created() {
       //this.fetchName()
-      this.routeWithParam()
+      this.routeWithParam()  //带参跳转
       //this.initchannel()  //获取渠道
       //this.initTemplate()   //获取sdk模版
       this.initDate()   //初始化日期查询数据
@@ -338,8 +338,6 @@
             list.push(this.hidsdkTemplate[i])
           }
         }
-
-
         for (let i = 0; i < this.hidsdkTemplate.length; i++) {
           if (this.hidsdkTemplate[i].search(this.sdk_template_name) != -1) {
             list.push(this.hidsdkTemplate[i])
@@ -356,7 +354,6 @@
       //   this.dialogStatus = 'create'
       // },//以为模版创建
       initchannel() {
-
         getChannel().then(response => {
           this.channel_mark_list_dia = response.data
         })
@@ -401,7 +398,6 @@
             }
           }
         }
-
         this.dialog_secondary_visual = visual;
         this.dialog_secondary_list = list;
         this.filter_form_name = name  //联动对话框内标签页内容展示
@@ -477,7 +473,6 @@
             }
           }
         }
-
         //对话框二级表单展示
         let checked = []
         for (let i = 0; i < param.paramter.length; i++) {
@@ -532,7 +527,6 @@
               marks_list.push(param.paramter[i].mark)
             }
           }
-
         }
         let list = []
         for (let i = 0; i < marks_list.length; i++) {
@@ -609,7 +603,6 @@
         this.sdk.form.select = []
         this.sdk.form.select = this.sdk.form.select.concat(select)
         //
-
         let tothis = this
         let del = []
         for (let i = 0; i < this.sdk.form.domains.length; i++) {
@@ -740,8 +733,6 @@
         } else {
           data2 = data1
         }
-
-
         let packageName = this.secondary_package
         let package_data = []
         for (let i = 0; i < data2.length; i++) {
@@ -749,8 +740,6 @@
             package_data.push(data2[i])
           }
         }
-
-
         let project = this.secondary_project
         let project_list = []
         //console.log(package_data)   //package_name   channel_mark
@@ -770,8 +759,6 @@
           this.list = project_list
           this.listLoading = false
         }
-
-
       }, //table二次筛选  页面上方按钮
       handleFilter() {
         let tothis = this
@@ -782,12 +769,26 @@
         }
         getProjectConfigPublish().then(response => {
           let projectPublishList = response.data
-          let valid = this.checkPermission(['leader']) || this.checkPermission(['admin']) || this.checkPermission(['operator'])
+          let valid = this.checkPermission(['director']) || this.checkPermission(['admin']) || this.checkPermission(['operatorleader']) || this.checkPermission(['sdksuport'])
           getResourceName(name).then(response => {
             let projectlist = response.data
+            //获取资源分配列表
+            this.projectList = projectlist
             getProject().then(response => {
               let todolist = response.data
-              this.projectlist_select = todolist
+              if (!valid) {
+                //根据资源分配列表筛选项目选择栏
+                let newProjectList = []
+                for (let i = 0; i < projectlist.length; i++) {
+                  for (let j = 0; j < todolist.length; j++) {
+                    if (projectlist[i] === todolist[j].project_name) {
+                      newProjectList.push(todolist[j])
+                    }
+                  }
+                }
+                this.projectlist_select = newProjectList
+              }
+              //
               let newlist = []
               if (!valid) {
                 for (let i = 0; i < todolist.length; i++) {
@@ -798,7 +799,6 @@
                     }
                   }
                 }
-
                 let validlist = []
                 for (let i = 0; i < newlist.length; i++) {
                   for (let j = 0; j < projectPublishList.length; j++) {
@@ -848,7 +848,6 @@
         if (diff === 0 && arr1.length < arr2.length) {
           diff = -1
         }
-
         return diff
       },//比较版本号
       formatDate(date, fmt) {

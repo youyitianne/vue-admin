@@ -1,7 +1,6 @@
 <template>
   <div class="app-container">
-    <div class="filter-container" style="margin: 15px;margin-top: -5px"
-         v-if="checkPermission(['operator', 'planner','admin','leader','market'])">
+    <div class="filter-container" style="margin: 15px;margin-top: -5px">
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit"
                  @click="handleCreate">{{addButton}}
       </el-button>
@@ -26,18 +25,18 @@
             <el-form-item label="项目名:">
               <span>{{ props.row.project_name }}</span>
             </el-form-item>
-            <el-form-item label="预热:">
-              <span>{{ props.row.preheat }}</span>
-            </el-form-item>
-            <el-form-item label="排期:">
-              <span>{{ props.row.schedule }}</span>
-            </el-form-item>
-            <el-form-item label="竞品:">
-              <span>{{ props.row.compete_good }}</span>
-            </el-form-item>
-            <el-form-item label="版本计划:">
-              <span>{{ props.row.version_plan }}</span>
-            </el-form-item>
+            <!--<el-form-item label="预热:">-->
+              <!--<span>{{ props.row.preheat }}</span>-->
+            <!--</el-form-item>-->
+            <!--<el-form-item label="排期:">-->
+              <!--<span>{{ props.row.schedule }}</span>-->
+            <!--</el-form-item>-->
+            <!--<el-form-item label="竞品:">-->
+              <!--<span>{{ props.row.compete_good }}</span>-->
+            <!--</el-form-item>-->
+            <!--<el-form-item label="版本计划:">-->
+              <!--<span>{{ props.row.version_plan }}</span>-->
+            <!--</el-form-item>-->
             <el-form-item label="备注:">
               <span>{{ props.row.note }}</span>
             </el-form-item>
@@ -67,7 +66,7 @@
                     <span>
                       <el-button @click="link_Check(scope2.row)" type="info">查看key表</el-button>
                     </span>
-                    <span v-if="checkPermission(['operator','leader','admin'])">
+                    <span v-if="checkPermission(['director','admin'])">
                     <el-button @click="link_Edit(scope2.row)" type="success">编辑key表</el-button>
                     </span>
                   </template>
@@ -84,20 +83,20 @@
       </el-table-column>
       <el-table-column label="项目名" prop="project_name">
       </el-table-column>
-      <el-table-column label="预热" prop="preheat">
-      </el-table-column>
-      <el-table-column label="排期" prop="schedule">
-      </el-table-column>
-      <el-table-column label="竞品" prop="compete_good">
-      </el-table-column>
-      <el-table-column label="版本计划" prop="version_plan">
-      </el-table-column>
+      <!--<el-table-column label="预热" prop="preheat">-->
+      <!--</el-table-column>-->
+      <!--<el-table-column label="排期" prop="schedule">-->
+      <!--</el-table-column>-->
+      <!--<el-table-column label="竞品" prop="compete_good">-->
+      <!--</el-table-column>-->
+      <!--<el-table-column label="版本计划" prop="version_plan">-->
+      <!--</el-table-column>-->
       <el-table-column label="备注" prop="note">
       </el-table-column>
       <el-table-column label="操作" align="center" width="150px" class-name="small-padding fixed-width"
-                       v-if="checkPermission(['operator', 'planner','admin','leader','market'])">
+                       v-if="checkPermission(['director','admin'])">
         <template slot-scope="scope">
-          <div v-if="checkPermission(['admin','leader','operator'])">
+          <div  v-if="checkPermission(['director','admin'])">
             <el-button type="success" size="mini" @click="updateHandler(scope.row)">{{ "编辑" }}</el-button>
             <el-button type="danger" size="mini" @click="handleDelete(scope.row)">{{ "删除" }}</el-button>
           </div>
@@ -379,7 +378,7 @@
         this.dialogFormVisible = false
       },//关闭对话框
       fetchchannel() {
-        if (!this.checkPermission(['operator', 'planner', 'admin', 'leader'])) {
+        if (!this.checkPermission(['director', 'admin'])) {
           return
         }
         let tothis = this
@@ -588,7 +587,7 @@
         getResourceName(name).then(response => {
           let projectlist = response.data
           getProject().then(response => {
-            if (this.checkPermission(['leader']) || this.checkPermission(['admin'])|| this.checkPermission(['operator'])) {
+            if (this.checkPermission(['director']) || this.checkPermission(['admin'])) {
               this.uichange(response.data)
               this.hidlist = response.data
               this.list = response.data

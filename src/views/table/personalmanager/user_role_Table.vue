@@ -4,10 +4,8 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit"
                  @click="handleCreate">{{addButton}}
       </el-button>
-
-      <el-input placeholder="根据账号查找" v-model="inputName" style="width: 200px;" class="filter-item" clearable @blur="getRolewithName"/>
-
-
+      <el-input placeholder="根据账号查找" v-model="inputName" style="width: 200px;" class="filter-item" clearable
+                @blur="getRolewithName"/>
     </div>
     <el-table
       height="850"
@@ -125,18 +123,26 @@
 
 <script>
   import {getAccount} from '@/api/table/personalmanager/accountTable'
-  import {getRole, creatRole, updateRole, deleteRole, getPerms, createPerms} from '@/api/table/personalmanager/user_role_Table'
+  import {
+    getRole,
+    creatRole,
+    updateRole,
+    deleteRole,
+    getPerms,
+    createPerms
+  } from '@/api/table/personalmanager/user_role_Table'
   import waves from '@/directive/waves'
   import {parseTime} from '@/utils'
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
   const roleOptions = [
     {key: '管理员', val: 'admin'},
-    {key: '运营', val: 'operator'},
-    {key: '商务', val: 'market'},
+    {key: '总监', val: 'director'},
+    {key: '运营组长', val: 'operatorleader'},
+    {key: '运营专员', val: 'operator'},
     {key: '策划', val: 'planner'},
     {key: '技术', val: 'developer'},
-    {key: '组长', val: 'leader'},
+    {key: 'SDK支持', val: 'sdksuport'},
   ]
 
 
@@ -155,151 +161,182 @@
     },
     data() {
       return {
-        create_flag_perm:true,
-        create_flag_role:true,
-        update_flag_role:true,
-        inputName:'',
+        create_flag_perm: true,
+        create_flag_role: true,
+        update_flag_role: true,
+        inputName: '',
         detectionid: 12,
         hackReset: false,
         checkedlist: [],
-        hidlist:[],
-        data2: [{
-          id: 'fileupload-operate',
-          label: '上传文件',
-        }, {
-          label: '数据管理',
-          children: [{
-            id: 'addata-operate',
-            label: '广告数据管理'
-          }, {
-            id: 'yixindata-operate',
-            label: '移信数据下载'
-          }]
-        }, {
-          label: '项目管理',
-          children: [{
-            label: '应用管理',
+        hidlist: [],
+        data2: [
+          {
+            id: 'all',
+            label: '所有权限',
             children: [{
-              id: 'app-canList',
-              label: '应用展示'
+              id: 'fileupload-operate',
+              label: '上传文件',
             }, {
-              id: 'app-canCreate',
-              label: '应用添加'
+              label: '数据管理',
+              children: [{
+                id: 'addata-operate',
+                label: '广告数据管理'
+              }, {
+                id: 'yixindata-operate',
+                label: '移信数据下载'
+              }]
             }, {
-              id: 'app-canEdit',
-              label: '应用修改'
+              label: '项目管理',
+              children: [{
+                label: '应用管理',
+                children: [{
+                  id: 'app-canList',
+                  label: '应用展示'
+                }, {
+                  id: 'app-canCreate',
+                  label: '应用添加'
+                }, {
+                  id: 'app-canEdit',
+                  label: '应用修改'
+                }, {
+                  id: 'app-canDelete',
+                  label: '应用删除'
+                }]
+              }, {
+                label: '渠道管理',
+                children: [{
+                  id: 'channel-canList',
+                  label: '渠道展示'
+                }, {
+                  id: 'channel-canCreate',
+                  label: '渠道添加'
+                }, {
+                  id: 'channel-canEdit',
+                  label: '渠道修改'
+                }, {
+                  id: 'channel-canDelete',
+                  label: '渠道删除'
+                }]
+              }, {
+                label: '广告类型管理',
+                children: [{
+                  id: 'adtype-canList',
+                  label: '广告类型展示'
+                }, {
+                  id: 'adtype-canCreate',
+                  label: '广告类型添加'
+                }, {
+                  id: 'adtype-canEdit',
+                  label: '广告类型修改'
+                }, {
+                  id: 'adtype-canDelete',
+                  label: '广告类型删除'
+                }]
+              }]
             }, {
-              id: 'app-canDelete',
-              label: '应用删除'
-            }]
-          }, {
-            label: '渠道管理',
-            children: [{
-              id: 'channel-canList',
-              label: '渠道展示'
+              label: '系统管理',
+              children: [{
+                label: '用户管理',
+                children: [{
+                  id: 'user-canList',
+                  label: '用户展示'
+                }, {
+                  id: 'user-canCreate',
+                  label: '用户添加'
+                }, {
+                  id: 'user-canEdit',
+                  label: '用户修改'
+                }, {
+                  id: 'user-canDelete',
+                  label: '用户删除'
+                }]
+              }, {
+                label: '角色管理',
+                children: [{
+                  id: 'role-canList',
+                  label: '角色展示'
+                }, {
+                  id: 'role-canCreate',
+                  label: '角色添加'
+                }, {
+                  id: 'role-canEdit',
+                  label: '角色修改'
+                }, {
+                  id: 'role-canDelete',
+                  label: '角色删除'
+                }]
+              }, {
+                label: '权限管理',
+                children: [{
+                  id: 'permission-canList',
+                  label: '权限展示'
+                }, {
+                  id: 'permission-canCreate',
+                  label: '权限添加'
+                }, {
+                  id: 'permission-canEdit',
+                  label: '权限修改'
+                }, {
+                  id: 'permission-canDelete',
+                  label: '权限删除'
+                }]
+              }, {
+                label: '资源管理管理',
+                children: [{
+                  id: 'resource-canList',
+                  label: '资源展示'
+                }, {
+                  id: 'resource-canCreate',
+                  label: '资源添加'
+                }, {
+                  id: 'resource-canEdit',
+                  label: '资源修改'
+                }, {
+                  id: 'resource-canDelete',
+                  label: '资源删除'
+                }]
+              }],
             }, {
-              id: 'channel-canCreate',
-              label: '渠道添加'
+              label: 'SDK管理',
+              children: [{
+                id: 'sdk-canList',
+                label: 'SDK展示'
+              }, {
+                id: 'sdk-canCreate',
+                label: 'SDK创建'
+              }, {
+                id: 'sdk-canEdit',
+                label: 'SDK编辑'
+              }]
             }, {
-              id: 'channel-canEdit',
-              label: '渠道修改'
+              label: '项目管理',
+              children: [{
+                id: 'project-canCreate',
+                label: '项目创建'
+              }, {
+                id: 'project-canDelete',
+                label: '项目编辑'
+              }, {
+                id: 'project-canEdit',
+                label: '项目删除'
+              }]
             }, {
-              id: 'channel-canDelete',
-              label: '渠道删除'
-            }]
-          }, {
-            label: '广告类型管理',
-            children: [{
-              id: 'adtype-canList',
-              label: '广告类型展示'
-            }, {
-              id: 'adtype-canCreate',
-              label: '广告类型添加'
-            }, {
-              id: 'adtype-canEdit',
-              label: '广告类型修改'
-            }, {
-              id: 'adtype-canDelete',
-              label: '广告类型删除'
-            }]
-          }]
-        }, {
-          label: '系统管理',
-          children: [{
-            label: '用户管理',
-            children: [{
-              id: 'user-canList',
-              label: '用户展示'
-            }, {
-              id: 'user-canCreate',
-              label: '用户添加'
-            }, {
-              id: 'user-canEdit',
-              label: '用户修改'
-            }, {
-              id: 'user-canDelete',
-              label: '用户删除'
-            }]
-          }, {
-            label: '角色管理',
-            children: [{
-              id: 'role-canList',
-              label: '角色展示'
-            }, {
-              id: 'role-canCreate',
-              label: '角色添加'
-            }, {
-              id: 'role-canEdit',
-              label: '角色修改'
-            }, {
-              id: 'role-canDelete',
-              label: '角色删除'
-            }]
-          }, {
-            label: '权限管理',
-            children: [{
-              id: 'permission-canList',
-              label: '权限展示'
-            }, {
-              id: 'permission-canCreate',
-              label: '权限添加'
-            }, {
-              id: 'permission-canEdit',
-              label: '权限修改'
-            }, {
-              id: 'permission-canDelete',
-              label: '权限删除'
-            }]
-          }, {
-            label: '资源管理管理',
-            children: [{
-              id: 'resource-canList',
-              label: '资源展示'
-            }, {
-              id: 'resource-canCreate',
-              label: '资源添加'
-            }, {
-              id: 'resource-canEdit',
-              label: '资源修改'
-            }, {
-              id: 'resource-canDelete',
-              label: '资源删除'
-            }]
-          }, {
-            label: 'SDK管理',
-            children: [{
-              id: 'sdk-canList',
-              label: 'SDK展示'
-            }, {
-              id: 'sdk-canCreate',
-              label: 'SDK创建'
-            },{
-              id: 'sdk-canEdit',
-              label: 'SDK编辑'
-            }]
-          }
-          ],
-        }],
+              label: '数据分析',
+              children: [{
+                id: 'showtime-table',
+                label: '展次表'
+              }, {
+                id: 'addata-operate',
+                label: 'arpu表'
+              }, {
+                id: 'earned-table',
+                label: '收益表'
+              }, {
+                id: 'umengretention-table',
+                label: '友盟留存表'
+              }]
+            },]
+          },],
         defaultProps: {
           children: 'children',
           label: 'label'
@@ -373,7 +410,7 @@
         if (!this.create_flag_perm) {
           return
         }
-        this.create_flag_perm=false
+        this.create_flag_perm = false
         createPerms(data).then(() => {
           this.handleFilter();
           this.permFormVisible = false
@@ -383,7 +420,7 @@
             type: 'success',
             duration: 2000
           })
-          this.create_flag_perm=true
+          this.create_flag_perm = true
         }).catch(function (rs) {
           tothis.permFormClose();
           tothis.$notify({
@@ -392,7 +429,7 @@
             type: 'error',
             duration: 2000
           })
-          this.create_flag_perm=true
+          this.create_flag_perm = true
         })
       },
       handlePerm(row) {
@@ -432,10 +469,10 @@
           }
         }
         let tothis = this;
-        if (!this.create_flag_role){
+        if (!this.create_flag_role) {
           return
         }
-        this.create_flag_role=false
+        this.create_flag_role = false
         creatRole(this.app, username_mark).then(() => {
           this.handleFilter();
           this.list.unshift(this.app)
@@ -446,7 +483,7 @@
             type: 'success',
             duration: 2000
           })
-          this.create_flag_role=true
+          this.create_flag_role = true
         }).catch(function (rs) {
           tothis.dialogFormVisible = false
           tothis.$notify({
@@ -455,7 +492,7 @@
             type: 'error',
             duration: 2000
           })
-          this.create_flag_role=true
+          this.create_flag_role = true
         })
       },
       updateData() {
@@ -465,10 +502,10 @@
           return
         }
         let tothis = this;
-        if (!this.update_flag_role){
+        if (!this.update_flag_role) {
           return
         }
-        this.update_flag_role=false
+        this.update_flag_role = false
         updateRole(tempData).then(() => {
           this.handleFilter();
           this.$notify({
@@ -477,7 +514,7 @@
             type: 'success',
             duration: 2000
           })
-          this.update_flag_role=true
+          this.update_flag_role = true
           this.dialogFormVisible = false
         }).catch(function (rs) {
           tothis.dialogFormVisible = false
@@ -487,7 +524,7 @@
             type: 'error',
             duration: 2000
           })
-          this.update_flag_role=true
+          this.update_flag_role = true
         })
       },
       handleCreate() {
@@ -555,47 +592,47 @@
       handleFilter() {
         let tothis = this
         getRole().then(response => {
-          let todolist=response.data
-          let newlist=[]
-          for (let i=0;i<todolist.length;i++){
-            if (newlist.length===0){
+          let todolist = response.data
+          let newlist = []
+          for (let i = 0; i < todolist.length; i++) {
+            if (newlist.length === 0) {
               newlist.push(todolist[i])
             } else {
-              let flag=true
-              for (let j=0;j<newlist.length;j++){
-                if (todolist[i].username===newlist[j].username){
-                  flag=false
+              let flag = true
+              for (let j = 0; j < newlist.length; j++) {
+                if (todolist[i].username === newlist[j].username) {
+                  flag = false
                 }
               }
-              if (flag){
+              if (flag) {
                 newlist.push(todolist[i])
               }
             }
           }
           this.list = newlist
-          this.hidlist= newlist
+          this.hidlist = newlist
           this.listLoading = false
         }).catch(function (rs) {
           console.log(rs)
           tothis.listLoading = false
         })
       },
-      getRolewithName(){
-        this.listLoading=true
-        let param=this.inputName
-        if (param==''){
-          this.list=this.hidlist;
-          this.listLoading=false
+      getRolewithName() {
+        this.listLoading = true
+        let param = this.inputName
+        if (param == '') {
+          this.list = this.hidlist;
+          this.listLoading = false
           return
         }
-        let data=[]
-        for (let i=0;i<this.hidlist.length;i++){
-          if (this.hidlist[i].username.search(param)!=-1){
+        let data = []
+        for (let i = 0; i < this.hidlist.length; i++) {
+          if (this.hidlist[i].username.search(param) != -1) {
             data.push(this.hidlist[i])
           }
         }
         this.list = data
-        this.listLoading=false
+        this.listLoading = false
       },
       formatJson(filterVal, jsonData) {
         return jsonData.map(v => filterVal.map(j => v[j]))

@@ -7,10 +7,10 @@
       </el-button>
       <!--<span style="margin-left: 15px;margin-right: 5px">游戏:</span>-->
       <!--<el-select v-model="secondary_game" @change="getDatawithParam">-->
-        <!--<el-option key="全部" label="全部" value="">-->
-        <!--</el-option>-->
-        <!--<el-option v-for="(item,index) in app_name_list" :key="index" :label="item" :value="item">-->
-        <!--</el-option>-->
+      <!--<el-option key="全部" label="全部" value="">-->
+      <!--</el-option>-->
+      <!--<el-option v-for="(item,index) in app_name_list" :key="index" :label="item" :value="item">-->
+      <!--</el-option>-->
       <!--</el-select>-->
       <span style="margin-left: 15px;margin-right: 5px">项目:</span>
       <el-select v-model="secondary_project" @change="getDatawithParam" value-key="project_name" filterable>
@@ -118,7 +118,7 @@
       </el-table-column>
 
       <el-table-column label="操作" align="center" width="150px" class-name="small-padding fixed-width"
-                       v-if="checkPermission(['operator','admin','leader'])">
+                       v-if="checkPermission(['operator','admin','sdksuport'])">
         <template slot-scope="scope">
           <el-button type="success" size="mini" @click="handleUpdate(scope.row)">{{ "编辑" }}</el-button>
           <!--<el-button type="success" size="mini" @click="publish(scope.row)">发布</el-button>-->
@@ -241,8 +241,8 @@
               <el-form-item v-for="(domain, index) in sdk.form.domains" :key="domain.key+index"
                             v-if="form_item_filter(domain)" style="margin-right: 1px"
                             v-model="page_name">
-                <div>
-                  <span style="margin-right: 20px;font-size: 14px;font-family: Microsoft YaHei">
+                <div style="width: 700px">
+                  <span style="margin-right: 20px;font-size: 14px;font-family: Microsoft YaHei;width:200px;display: inline-block">
                     {{domain.param_name1}}：
                   </span>
                   <el-input v-model="domain.param" style="width: 300px;margin-right: 25px" placeholder="必填"/>
@@ -290,7 +290,7 @@
     },
     data() {
       return {
-        projectlist_select:[],
+        projectlist_select: [],
         secondary_project: '',
         secondary_package: '',
         rowvalue: '',
@@ -424,7 +424,6 @@
       },//获取对话框内标签页 名触发事件
       publish() {
         let tothis = this
-
         let newdomains = []
         for (let i = 0; i < this.checkedSdkTemplate.length; i++) {
           for (let j = 0; j < this.sdk.form.domains.length; j++) {
@@ -433,8 +432,6 @@
             }
           }
         }
-        console.log(newdomains)
-
         //二级未勾选的去掉
         let second_newdomains = []
         for (let i = 0; i < newdomains.length; i++) {
@@ -448,16 +445,13 @@
             second_newdomains.push(newdomains[i])
           }
         }
-
-        console.log(second_newdomains)
-
-        for(let i=0;i<second_newdomains.length;i++){
-          if (second_newdomains[i].param===''){
+        for (let i = 0; i < second_newdomains.length; i++) {
+          if (second_newdomains[i].param === '') {
             tothis.$notify({
               title: '发布失败',
               dangerouslyUseHTMLString: true,
               message: 'KEY表有参数没填！' + '' +
-                ' <br> -->' + this.sdk.form.domains[i].param_name,
+                ' <br> -->' + second_newdomains[i].param_name,
               type: 'error',
               duration: 4000
             })
@@ -465,9 +459,6 @@
           }
         }
         this.sdk.form.domains = second_newdomains
-
-
-
         //end
         //选择器提交
         let select = []
@@ -501,11 +492,10 @@
         this.sdk.form.select = select
         this.sdk.sdkstatus = '1'
         this.sdk.publish = '1'
-
         getProjectConfigPublish().then(response => {
           this.publishlist = response.data
           if (!this.valideSdkForm()) {
-            this.dialogFormVisible = false
+            //this.dialogFormVisible = false
             return
           }
           let timestamp = (new Date()).getTime()
@@ -983,9 +973,6 @@
         this.sdk.note = param.note
         this.sdk.publish = '0'
         //this.sdk.form.domains = param.paramter
-
-        console.log(param)
-        console.log(this.hidsdkTemplate)
         let marks_list = []
         for (let i = 0; i < param.paramter.length; i++) {
           if (marks_list.length === 0) {
@@ -1002,8 +989,6 @@
             }
           }
         }
-        console.log('marks_list')
-        console.log(marks_list)
         let list = []
         for (let i = 0; i < marks_list.length; i++) {
           for (let j = 0; j < this.sdkTemplatelibrary.length; j++) {
@@ -1069,110 +1054,63 @@
         this.dialogFormVisible = true
       }, //更新对话框展示
       updateData(val) {
-
-        // //未勾选的去掉  start
-        // let newdomains1 = []
-        // for (let i = 0; i < this.sdk.checked.length; i++) {
-        //   for (let j = 0; j < this.sdk.form.domains.length; j++) {
-        //     if (this.sdk.form.domains[j].param_name.split('-')[0] === this.sdk.checked[i]) {
-        //       newdomains1.push(this.sdk.form.domains[j])
-        //     }
-        //   }
-        // }
-        //
-        // //二级未勾选的去掉
-        // let second_newdomains = []
-        // for (let i = 0; i < newdomains1.length; i++) {
-        //   if (newdomains1[i].param_name.split('-').length === 3) {
-        //     for (let j = 0; j < this.sdk.second_checked.length; j++) {
-        //       if (this.sdk.second_checked[j] === newdomains1[i].param_name[1]) {
-        //         second_newdomains.push(newdomains1[i])
-        //       }
-        //     }
-        //   } else {
-        //     second_newdomains.push(newdomains1[i])
-        //   }
-        // }
-        // //this.sdk.form.domains = second_newdomains
-        // //end
-        // return
-        //
-        // let tothis = this
-        // let del = []
-        //
-        // for (let i = 0; i < this.sdk.form.domains.length; i++) {
-        //   let judge = this.sdk.form.domains[i].param_name === '' || this.sdk.form.domains[i].param === ''
-        //   let names = this.sdk.form.domains[i].param_name.split('-')
-        //   if (judge) {
-        //     let show_flag = false
-        //     if (names.length < 3) {
-        //       show_flag = true
-        //     } else {
-        //       let checked_falg = true
-        //       for (let j = 0; j < this.dialog_secondary_checked.length; j++) {
-        //         let checked = this.dialog_secondary_checked[j]
-        //         if (checked === names[1]) {
-        //           checked_falg = false
-        //           show_flag = true
-        //         }
-        //       }
-        //     }
-        //     if (show_flag) {
-        //       this.$notify({
-        //         title: '警告！',
-        //         dangerouslyUseHTMLString: true,
-        //         message: 'KEY表有参数没填！' + '' +
-        //           ' <br> -->' + this.sdk.form.domains[i].param_name,
-        //         type: 'error',
-        //         duration: 4000
-        //       })
-        //       return
-        //     }
-        //   }
-        //   if (names.length > 2) {
-        //     let checked_falg = true
-        //     for (let j = 0; j < this.dialog_secondary_checked.length; j++) {
-        //       let checked = this.dialog_secondary_checked[j]
-        //       if (checked === names[1]) {
-        //         checked_falg = false
-        //       }
-        //     }
-        //     if (checked_falg) {
-        //       del.push(i)
-        //     }
-        //   }
-        // }
-        //
-        //
-        // let newdomain = []
-        // for (let i = 0; i < this.sdk.form.domains.length; i++) {
-        //   let newflag = true
-        //   for (let j = 0; j < del.length; j++) {
-        //     if (i === del[j]) {
-        //       newflag = false
-        //     }
-        //   }
-        //   if (newflag) {
-        //     newdomain.push(this.sdk.form.domains[i])
-        //   }
-        // }
-
-
-
-        //this.sdk.form.domains = newdomain
-
-
-        //console.log(this.sdk)
-
-        // if (this.sdk.sdk_require === '') {
-        //   this.sdk.sdk_require = '暂无'
-        // }
-        // if (this.sdk.note === '') {
-        //   this.sdk.note = '暂无'
-        // }
-        // if (this.sdk.sdk_config === '') {
-        //   this.sdk.sdk_config = '暂无'
-        // }
+        let tothis = this
+        let valid_newdomains = []
+        for (let i = 0; i < this.checkedSdkTemplate.length; i++) {
+          for (let j = 0; j < this.sdk.form.domains.length; j++) {
+            if (this.sdk.form.domains[j].param_name.split('-')[0] === this.checkedSdkTemplate[i]) {
+              valid_newdomains.push(this.sdk.form.domains[j])
+            }
+          }
+        }
+        //二级未勾选的去掉
+        let second_newdomains = []
+        for (let i = 0; i < valid_newdomains.length; i++) {
+          if (valid_newdomains[i].param_name.split('-').length === 3) {
+            for (let j = 0; j < this.dialog_secondary_checked.length; j++) {
+              if (this.dialog_secondary_checked[j] === valid_newdomains[i].param_name.split('-')[1]) {
+                second_newdomains.push(valid_newdomains[i])
+              }
+            }
+          } else {
+            second_newdomains.push(valid_newdomains[i])
+          }
+        }
+        for (let i = 0; i < second_newdomains.length; i++) {
+          if (second_newdomains[i].param === '') {
+            tothis.$notify({
+              title: '发布失败',
+              dangerouslyUseHTMLString: true,
+              message: 'KEY表有参数没填！' + '' +
+                ' <br> -->' + second_newdomains[i].param_name,
+              type: 'error',
+              duration: 4000
+            })
+            return
+          }
+        }
+        let submit_object = {
+          app_name: this.sdk.app_name,
+          channel_mark: this.sdk.channel_mark,
+          checked: [],
+          form: {
+            select:[],
+            domains: this.sdk.form.domains
+          },
+          id: this.sdk.id,
+          note: 'note_unused',
+          package_name: this.sdk.package_name,
+          publish: '0',
+          sdk_config: 'config_unused',
+          sdk_require: 'require_unused',
+          sdkstatus: this.sdk.sdkstatus,
+          second_checked: [],
+          timevalue: this.sdk.timevalue,
+          version_online_version: this.sdk.version_online_version,
+          version_update_version: this.sdk.version_update_version,
+          versioncode_online_version: this.sdk.versioncode_online_version,
+          versioncode_update_version: this.sdk.versioncode_update_version
+        };
         //把所有有值的一起提交
         let newdomains = []
         for (let i = 0; i < this.sdkTemplatelibrary.length; i++) {
@@ -1182,11 +1120,16 @@
             }
           }
         }
-        this.sdk.form.domains = newdomains
+        //this.sdk.form.domains = newdomains
+        submit_object.form.domains = newdomains
         //把二级表单的checked一起保存
         //保留checkedSdkTemplate
-        this.sdk.checked = this.checkedSdkTemplate
-        this.sdk.second_checked = this.dialog_secondary_checked
+        //this.sdk.checked = this.checkedSdkTemplate
+        // this.sdk.second_checked = this.dialog_secondary_checked
+        submit_object.checked = this.checkedSdkTemplate
+        submit_object.second_checked =  this.dialog_secondary_checked
+
+
         //选择器提交
         let select = []
         for (let j = 0; j < this.options.length; j++) {
@@ -1211,9 +1154,14 @@
             }
           }
         }
-        this.sdk.form.select = []
-        this.sdk.form.select = select
+        //this.sdk.form.select = []
+        //this.sdk.form.select = select
+        submit_object.form.select = select
 
+
+        // console.log(this.sdk)
+        // console.log(submit_object)
+        // return
 
         // let num = new RegExp('^[0-9]*$')
         // if (!num.test(this.sdk.versioncode_online_version) && !num.test(this.sdk.versioncode_update_version)) {
@@ -1226,33 +1174,28 @@
         //   })
         //   return
         // }
-
-
         if (!this.update_flag) {
           return
         }
         this.update_flag = false
-
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            updateProjectConfig(this.sdk).then(response => {
+            updateProjectConfig(submit_object).then(response => {
               this.listLoading = true
               if (this.hidtimevalue != '') {
                 this.timevalue = this.hidtimevalue
                 this.handleFilter();
               }
-
               this.$notify({
                 title: '成功',
                 message: '保存成功',
                 type: 'success',
                 duration: 4000
               })
-
               if (val) {
                 this.handleFilter()
                 this.dialogFormVisible = false
-              }else {
+              } else {
                 this.publish()
               }
               this.update_flag = true
@@ -1323,16 +1266,15 @@
         }
 
 
-
-        let project=this.secondary_project
-        let project_list=[]
-        if (project===''){
+        let project = this.secondary_project
+        let project_list = []
+        if (project === '') {
           this.list = package_data
           this.listLoading = false
-        }else {
-          for (let i=0;i<package_data.length;i++){
-            for (let j=0;j<project.applist.length;j++){
-              if (package_data[i].package_name===project.applist[j].package_name&&package_data[i].channel_mark===project.applist[j].channel){
+        } else {
+          for (let i = 0; i < package_data.length; i++) {
+            for (let j = 0; j < project.applist.length; j++) {
+              if (package_data[i].package_name === project.applist[j].package_name && package_data[i].channel_mark === project.applist[j].channel) {
                 project_list.push(package_data[i])
               }
             }
@@ -1340,7 +1282,6 @@
           this.list = project_list
           this.listLoading = false
         }
-
 
 
       }, //table二次筛选  页面上方按钮

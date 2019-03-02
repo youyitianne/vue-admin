@@ -199,7 +199,7 @@
           let data = response.data
           let uselesslist=this.getUselessName(data)
           let newlist = [];
-          if (!checkPermission(['admin'])) {
+          if (!checkPermission(['admin','director'])) {
             if (checkPermission(['operator', 'planner', 'developer', 'market'])) {
               let role = this.check();
               for (let i = 0; i < data.length; i++) {
@@ -222,11 +222,11 @@
               if (data[i].username != accountName&&data[i].role != 'leader') {
                 //去掉不需要设置权限的人
                 let flag=true
-                for (let j=0;j<uselesslist.length;j++){
-                  if (data[i].username===uselesslist[j]){
-                    flag=false
-                  }
-                }
+                // for (let j=0;j<uselesslist.length;j++){
+                //   if (data[i].username===uselesslist[j]){
+                //     flag=false
+                //   }
+                // }
                 if (flag){
                   newlist.push(data[i])
                 }

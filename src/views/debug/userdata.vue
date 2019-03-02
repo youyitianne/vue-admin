@@ -74,13 +74,12 @@
         </template>
       </el-table-column>
     </el-table>
-
   </div>
 
 
 </template>
 <script>
-  import {getuserdata} from '@/api/table/datamanager/userdata'
+  import {getuserdata} from '@/api/debug/userdata'
   import waves from '@/directive/waves'
   import { parseTime } from '@/utils'
 

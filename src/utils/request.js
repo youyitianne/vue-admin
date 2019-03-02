@@ -34,14 +34,15 @@ service.interceptors.response.use(
      */
     const res = response.data
 
+
     if (res.msg=='Unauthorized'||res.status==status){
       console.error(res)
       console.error('--------》权限不足')
-      // Message({
-      //   message:'权限不足',
-      //   type: 'error',
-      //   duration: 5 * 1000
-      // })
+      Message({
+        message:'权限不足',
+        type: 'error',
+        duration: 5 * 1000
+      })
     }
     if (res.code === 50020) {           //登录失败 自定义
       return Promise.reject('登录失败，请检查帐号密码是否正确')
@@ -85,6 +86,14 @@ service.interceptors.response.use(
 
       if (response.data.type==='application/octet-stream'){
         return response.data
+      }
+      if (res.size===47){    //vx-gate-way   请求blob数据权限不足返回字符串长度为47
+        Message({
+          message:'权限不足',
+          type: 'error',
+          duration: 5 * 1000
+        })
+        return  Promise.reject('bad code')
       }
       return Promise.reject('bad code')
     } else {

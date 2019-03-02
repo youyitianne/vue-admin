@@ -1,8 +1,7 @@
 <template>
   <div class="app-container">
     <div class="filter-container"
-         style="margin: 15px;margin-top: -5px"
-         v-if="checkPermission(['admin','operator','leader'])">
+         style="margin: 15px;margin-top: -5px">
       <el-date-picker
         v-model="download_value"
         type="daterange"
@@ -18,79 +17,11 @@
         </el-option>
       </el-select>
       <el-button v-waves :loading="downloadLoading" type="primary" icon="el-icon-download" @click="handleDownloadAll">
-        {{'下载总表'}}
-      </el-button>
-      <br>
-    </div>
-    <div class="filter-container"
-         style="margin: 15px;margin-top: -5px"
-         v-if="checkPermission(['admin','operator','leader'])">
-      <el-date-picker
-        v-model="arpu_download_value"
-        type="daterange"
-        range-separator="-"
-        start-placeholder="开始日期"
-        end-placeholder="结束日期"
-        value-format="timestamp"
-        :picker-options="pickerOptions0">>
-      </el-date-picker>
-      <!--value-format="yyyy-MM-dd"-->
-      <el-select v-model="aupu_chooseNamed" style="margin-right: 20px" @change="" value-key="project_name"
-                 :placeholder="'选择项目'" filterable>
-        <el-option v-for="item in app_name_list" :key="item.project_name" :label="item.project_name" :value="item">
-        </el-option>
-      </el-select>
-      <el-button v-waves :loading="downloadLoading" type="primary" icon="el-icon-download"
-                 @click="arpu_handleDownloadAll">
-        {{'下载收益表'}}
-      </el-button>
-      <br>
-    </div>
-    <div class="filter-container"
-         style="margin: 15px;margin-top: -5px"
-         v-if="checkPermission(['admin','operator','leader'])">
-      <el-date-picker
-        v-model="daily_download_value"
-        type="daterange"
-        range-separator="-"
-        start-placeholder="开始日期"
-        end-placeholder="结束日期"
-        value-format="yyyy-MM-dd"
-        :picker-options="pickerOptions0">>
-      </el-date-picker>
-
-      <el-button v-waves :loading="downloadLoading" type="primary" icon="el-icon-download"
-                 @click="daily_download">
-        {{'下载产品日常信息表'}}
+        {{'下载展次表（旧）'}}
       </el-button>
       <br>
     </div>
 
-    <div class="filter-container"
-         style="margin: 15px;margin-top: -5px"
-         v-if="checkPermission(['admin','operator','leader'])">
-      <el-date-picker
-        v-model="daily_adtype_download_value"
-        type="daterange"
-        range-separator="-"
-        start-placeholder="开始日期"
-        end-placeholder="结束日期"
-        value-format="yyyy-MM-dd"
-        :picker-options="pickerOptions0">>
-      </el-date-picker>
-
-      <el-select v-model="daily_adtype_chooseNamed" style="margin-right: 20px" @change="" value-key="project_name"
-                 :placeholder="'选择项目'" filterable>
-        <el-option v-for="item in app_name_list" :key="item.project_name" :label="item.project_name" :value="item">
-        </el-option>
-      </el-select>
-
-      <el-button v-waves :loading="downloadLoading" type="primary" icon="el-icon-download"
-                 @click="daily_adtype_download">
-        {{'下载广告形式细分展次表'}}
-      </el-button>
-      <br>
-    </div>
     <el-dialog
       title="选择需要去除的部分"
       :visible.sync="hackReset"
@@ -110,25 +41,19 @@
       </div>
     </el-dialog>
   </div>
-
 </template>
 
 <script>
+  import checkPermission from '@/utils/permission' // 权限判断函数
+  import {getResourceName} from "@/api/resourceName"; //根据帐号获取被分配的项目列表
+  import store from '@/store'  //获取本地缓存信息
   import {
     getProjectList,
-    getList,
-    getListdata,
     getdownload,
-    getResourceName,
     getName,
-    getarpufile,
-    getarpufile1,
-    getDailyMsg,
-    getDailyAdtypeMsg
   } from '@/api/table/datamanager/addata'
   import waves from '@/directive/waves'
   import {parseTime} from '@/utils'
-  import checkPermission from '@/utils/permission' // 权限判断函数
   import {mapGetters} from 'vuex'
 
 
@@ -485,12 +410,6 @@
           },
         ],
         hackReset: false,
-        secondary_platform: '',
-        secondary_date: '',
-        secondary_channel: '',
-        secondary_adtype: '',
-        secondary_datelist: [],
-        hidlist: [],
         options: [{
           value: '全部',
           label: '全部'
@@ -514,13 +433,7 @@
         },
         directives: {waves},
         downloadLoading: false,
-        layout: '',
-        chooseName: '选择游戏',
-        chooseNamed: '选择游戏',
-        aupu_chooseNamed: '选择项目',
-        select_value: '',
         download_value: '',
-        arpu_download_value: '',
         downloadParam: {
           start: undefined,
           end: undefined,
@@ -528,193 +441,48 @@
           namelist: '',
           list: []
         },
-        aupu_downloadParam: {
-          start: undefined,
-          end: undefined,
-          name: undefined,
-        },
-        searchName: '搜索',
-        tableKey: 0,
         list: null,
-        total: 0,
         listLoading: true,
-        listQuery: {
-          importance: undefined,
-          title: undefined,
-          type: undefined,
-        },
-        listParam: {
-          start: undefined,
-          end: undefined,
-          name: undefined,
-        },
-        importanceOptions: [1, 2, 3],
         names: [],
-        sortOptions: [{label: 'ID Ascending', key: '+id'}, {label: 'ID Descending', key: '-id'}],
-        statusOptions: ['published', 'draft', 'deleted'],
+
       }
     },
     created() {
-      this.fetchName()
+      //this.fetchName()
       this.fetchProject()
     },
     methods: {
-      arpu_handleDownloadAll() {    //下载收益表
-        let tothis = this
-        let time = 6 * 24 * 60 * 60 * 1000
-        if (this.aupu_downloadParam === null) {
-          this.open3()
-          return
-        }
-        if (this.aupu_downloadParam.name === '选择项目') {
-          this.open3()
-          return
-        }
-        if (this.arpu_download_value[0] === undefined) {
-          this.open3()
-          return
-        }
-        if (this.arpu_download_value[1] === undefined) {
-          this.open3()
-          return
-        }
-        if (this.arpu_download_value[1] - this.arpu_download_value[0] > time) {
-          tothis.$notify({
-            title: '',
-            message: '时间范围最多选择7天',
-            type: 'warning',
-            duration: 2000
-          })
-          return
-        }
-        this.aupu_downloadParam.start = this.formatDate(new Date(this.arpu_download_value[0]), 'yyyy-MM-dd')
-        this.aupu_downloadParam.end = this.formatDate(new Date(this.arpu_download_value[1]), 'yyyy-MM-dd')
-        this.aupu_downloadParam.name = this.aupu_chooseNamed
-        //this.aupu_downloadParam.name = '全部'  //收益表为下载所有
-        this.downloadLoading = true
-        getarpufile1(this.aupu_downloadParam).then(data => {
-          if (!data) {
-            return
-          }
-          let url = window.URL.createObjectURL(new Blob([data]))
-          let link = document.createElement('a')
-          link.style.display = 'none'
-          link.href = url
-          link.setAttribute('download', this.aupu_downloadParam.start + '_' + this.aupu_downloadParam.end + this.aupu_downloadParam.name.project_name + '_arpu.xls')
-          document.body.appendChild(link)
-          link.click()
-          this.downloadLoading = false
-        }).catch(function (rs) {
-          console.log(rs.toString())
-          tothis.downloadLoading = false
-          tothis.$notify({
-            title: '下载失败',
-            message: '刷新试试',
-            type: 'error',
-            duration: 2000
-          })
-        })
-      }//日常产品总收益表下载方法
-      , daily_download() {
-        let tothis = this
-        if (this.daily_download_value === null) {
-          this.open3()
-          return
-        }
-        if (this.daily_download_value[0] === undefined) {
-          this.open3()
-          return
-        }
-        if (this.daily_download_value[1] === undefined) {
-          this.open3()
-          return
-        }
-        this.downloadLoading = true
-
-        let param = {
-          start: this.daily_download_value[0],
-          end: this.daily_download_value[1],
-          list: this.app_name_list
-        }
-        getDailyMsg(param).then(data => {
-          if (!data) {
-            return
-          }
-          let url = window.URL.createObjectURL(new Blob([data]))
-          let link = document.createElement('a')
-          link.style.display = 'none'
-          link.href = url
-          link.setAttribute('download', param.start + '_' + param.end + '_产品收益表.xls')
-          document.body.appendChild(link)
-          link.click()
-          this.downloadLoading = false
-        }).catch(function (rs) {
-          console.log(rs.toString())
-          tothis.downloadLoading = false
-          tothis.$notify({
-            title: '下载失败',
-            message: '刷新试试',
-            type: 'error',
-            duration: 2000
-          })
-        })
-      }//日常收益，arpu表下载
-      , daily_adtype_download() {
-        // daily_adtype_download_value:[],
-        // daily_adtype_chooseNamed:'',
-        let tothis = this
-        if (this.daily_adtype_download_value === null) {
-          this.open3()
-          return
-        }
-        if (this.daily_adtype_chooseNamed.name === '选择项目') {
-          this.open3()
-          return
-        }
-        if (this.daily_adtype_download_value[0] === undefined) {
-          this.open3()
-          return
-        }
-        if (this.daily_adtype_download_value[1] === undefined) {
-          this.open3()
-          return
-        }
-        this.downloadLoading = true
-
-        let param = {
-          start: this.daily_adtype_download_value[0],
-          end: this.daily_adtype_download_value[1],
-          list: this.daily_adtype_chooseNamed
-        }
-        getDailyAdtypeMsg(param).then(data => {
-          if (!data) {
-            return
-          }
-          let url = window.URL.createObjectURL(new Blob([data]))
-          let link = document.createElement('a')
-          link.style.display = 'none'
-          link.href = url
-          link.setAttribute('download', param.start + '_' + param.end + param.list.project_name + '_arpu.xls')
-          document.body.appendChild(link)
-          link.click()
-          this.downloadLoading = false
-        }).catch(function (rs) {
-          console.log(rs.toString())
-          tothis.downloadLoading = false
-          tothis.$notify({
-            title: '下载失败',
-            message: '刷新试试',
-            type: 'error',
-            duration: 2000
-          })
-        })
-      },//广告形式细分表下载
       fetchProject() {
         let tothis = this
         this.listLoading = true
         getProjectList().then(response => {
-          //console.log(response.data)
-          this.app_name_list = response.data
+          let appslist=response.data
+          console.log(response.data)
+          //根据资源分配调整项目列表start
+          let valid = this.checkPermission(['director']) || this.checkPermission(['admin']) || this.checkPermission(['operatorleader']) || this.checkPermission(['sdksuport'])
+          console.log(valid)
+          if (valid) {
+            this.app_name_list = appslist
+          } else {
+            let newoptionlist = []
+            let accountName = store.getters && store.getters.name
+            let name = {
+              username: accountName
+            }
+            getResourceName(name).then(response => {
+              let projectlist = response.data
+              for (let i = 0; i < appslist.length; i++) {
+                for (let j = 0; j < projectlist.length; j++) {
+                  if (appslist[i].project_name.indexOf(projectlist[j]) != -1) {
+                    newoptionlist.push(appslist[i])
+                  }
+                }
+              }
+            });
+            this.app_name_list = newoptionlist
+          }
+          //end
+
         }).catch(function (rs) {
           console.log(rs)
           tothis.listLoading = false
@@ -842,30 +610,6 @@
         }
       }//获取应用名
       ,
-      handleFilter() {
-        this.downloadLoading = true
-        let tothis = this
-        this.listParam.name = this.chooseName
-        if (this.listParam.name === '选择游戏' || this.select_value === '' || this.select_value == null) {
-          this.open3()
-          this.downloadLoading = false
-          return
-        }
-        this.listParam.start = this.select_value[0]
-        this.listParam.end = this.select_value[1]
-        this.listLoading = true
-        getListdata(this.listParam).then(response => {
-          console.log()
-          this.list = response.data
-          this.hidlist = response.data
-          this.listLoading = false
-          this.downloadLoading = false
-        }).catch(function (rs) {
-          tothis.listLoading = false
-          tothis.downloadLoading = false
-        })
-      } // 表格查找数据
-      ,
       handleDownloadAll() {
         let tothis = this
         if (this.download_value === null) {
@@ -889,43 +633,6 @@
         }
         this.hackReset = true
       }//总表下载对话框
-      ,
-
-      handleDownload() {   //下载请求
-        this.downloadLoading = true
-        if (this.list === null) {
-          this.open4()
-          this.downloadLoading = false
-          return
-        }
-        import('@/vendor/Export2Excel').then(excel => {
-          const tHeader = ['id', 'date', 'app_name', 'channel', 'advertising_type', 'earned', 'click_rate', 'ecpm', 'impression', 'click', 'fill_rate', 'platform']
-          const filterVal = ['id', 'date', 'app_name', 'channel', 'advertising_type', 'earned', 'click_rate', 'ecpm', 'impression', 'click', 'fill_rate', 'platform']
-          const data = this.formatJson(filterVal, this.list)
-          excel.export_json_to_excel({
-            header: tHeader,
-            data,
-            filename: 'table-list'
-          })
-          this.downloadLoading = false
-        })
-      }
-      ,
-      /**
-       * 获取指定日期(字符串类型)到当前时间的天数
-       * @param {Object} sDate1 格式:2018-01-04
-       */
-      secondart_date_change() {
-        if (this.select_value === null) {
-          return
-        }
-        this.secondary_datelist = this.getdate(new Date(this.select_value[0]), new Date(this.select_value[1]))
-      }
-      ,
-
-      formatJson(filterVal, jsonData) {
-        return jsonData.map(v => filterVal.map(j => v[j]))
-      }
       ,
       checkPermission,
       parseTime,
