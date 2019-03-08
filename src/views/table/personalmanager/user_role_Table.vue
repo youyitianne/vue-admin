@@ -26,21 +26,21 @@
           <span>{{ scope.row.username }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="角色名称" width="300" align="center" prop="app_name">
-        <template slot-scope="scope">
-          {{ scope.row.role_name }}
-        </template>
-      </el-table-column>
+      <!--<el-table-column label="角色名称" width="300" align="center" prop="app_name">-->
+      <!--<template slot-scope="scope">-->
+      <!--{{ scope.row.role_name }}-->
+      <!--</template>-->
+      <!--</el-table-column>-->
       <el-table-column label="角色标识" width="300" align="center" prop="app_name">
         <template slot-scope="scope">
           {{ scope.row.role }}
         </template>
       </el-table-column>
-      <el-table-column label="角色描述" width="300" align="center" prop="app_name">
-        <template slot-scope="scope">
-          {{ scope.row.role_describe }}
-        </template>
-      </el-table-column>
+      <!--<el-table-column label="角色描述" width="300" align="center" prop="app_name">-->
+      <!--<template slot-scope="scope">-->
+      <!--{{ scope.row.role_describe }}-->
+      <!--</template>-->
+      <!--</el-table-column>-->
       <el-table-column label="备注" align="center" prop="channel">
         <template slot-scope="scope">
           <span>{{ scope.row.note }}</span>
@@ -58,7 +58,8 @@
       <el-form ref="dataForm" :model="app" label-position="left" label-width="90px"
                style="width: 400px; margin-left:50px;">
         <el-form-item label="帐号">
-          <el-select v-model="app.username" class="filter-item" placeholder="帐号" v-if="dialogStatus==='create'">
+          <el-select v-model="app.username" class="filter-item" placeholder="帐号" v-if="dialogStatus==='create'"
+                     filterable>
             <el-option v-for="item in userlist" :key="item.username" :label="item.username" :value="item.username"/>
           </el-select>
           <el-select v-model="app.username" class="filter-item" placeholder="帐号" v-if="dialogStatus==='update'"
@@ -66,9 +67,9 @@
             <el-option v-for="item in userlist" :key="item.username" :label="item.username" :value="item.username"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="角色名字">
-          <el-input v-model="app.role_name" placeholder="必填" value="无"/>
-        </el-form-item>
+        <!--<el-form-item label="角色名字">-->
+        <!--<el-input v-model="app.role_name" placeholder="必填" value="无"/>-->
+        <!--</el-form-item>-->
 
         <el-form-item label="角色标识">
           <el-select v-model="app.role" class="filter-item" placeholder="请选择权限">
@@ -76,9 +77,9 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="角色描述">
-          <el-input v-model="app.role_describe" placeholder="必填" value="无"/>
-        </el-form-item>
+        <!--<el-form-item label="角色描述">-->
+        <!--<el-input v-model="app.role_describe" placeholder="必填" value="无"/>-->
+        <!--</el-form-item>-->
         <el-form-item label="备注">
           <el-input v-model="app.note" placeholder="必填" value="无"/>
         </el-form-item>
@@ -99,9 +100,14 @@
       </span>
     </el-dialog>
     <!--权限-->
-
     <el-dialog :title="textMap.perm" :visible.sync="permFormVisible" :detectionid="detectionid" v-if="hackReset">
+      <el-button round @click="setoperatorLeader">运营组长</el-button>
+      <el-button round @click="setoperator">运营专员</el-button>
+      <el-button round @click="setplanner">策划</el-button>
+      <el-button round @click="setdeveloper">技术</el-button>
+      <el-button round @click="setsdksupport">SDK支持</el-button>
       <el-tree
+        STYLE="margin-top: 20px"
         ref="tree"
         :data="data2"
         node-key="id"
@@ -145,7 +151,6 @@
     {key: 'SDK支持', val: 'sdksuport'},
   ]
 
-
   export default {
     components: {Pagination},
     directives: {waves},
@@ -179,14 +184,14 @@
             }, {
               label: '数据管理',
               children: [{
-                id: 'addata-operate',
-                label: '广告数据管理'
+                id: 'umeng-operate',
+                label: '友盟数据管理'
               }, {
                 id: 'yixindata-operate',
                 label: '移信数据下载'
               }]
             }, {
-              label: '项目管理',
+              label: '应用渠道广告类型管理',
               children: [{
                 label: '应用管理',
                 children: [{
@@ -298,16 +303,20 @@
               }],
             }, {
               label: 'SDK管理',
-              children: [{
-                id: 'sdk-canList',
-                label: 'SDK展示'
-              }, {
-                id: 'sdk-canCreate',
-                label: 'SDK创建'
-              }, {
-                id: 'sdk-canEdit',
-                label: 'SDK编辑'
-              }]
+              children: [
+                {
+                  id: 'sdk_pub-canList',
+                  label: 'SDK记录展示'
+                }, {
+                  id: 'sdk-canList',
+                  label: 'SDK展示'
+                }, {
+                  id: 'sdk-canCreate',
+                  label: 'SDK创建'
+                }, {
+                  id: 'sdk-canEdit',
+                  label: 'SDK编辑'
+                }]
             }, {
               label: '项目管理',
               children: [{
@@ -341,7 +350,6 @@
           children: 'children',
           label: 'label'
         },
-
         grade: {
           box: false,
           check: []
@@ -396,6 +404,25 @@
       this.getUsernames();
     },
     methods: {
+      setoperatorLeader() {
+        this.$refs.tree.setCheckedKeys([
+          'showtime-table','addata-operate','earned-table','umengretention-table','sdk_pub-canList','umeng-operate',
+        'adtype-canList','adtype-canCreate','adtype-canEdit','adtype-canDelete','channel-canList','app-canEdit','app-canDelete',
+          'channel-canCreate','channel-canEdit','channel-canDelete','app-canList','app-canCreate','app-canList',
+          'fileupload-operate','yixindata-operate','sdk-canList','sdk-canCreate','sdk-canEdit']);
+      },//设置运营组长权限
+      setoperator() {
+        this.$refs.tree.setCheckedKeys(['showtime-table','addata-operate','earned-table','umengretention-table','sdk_pub-canList']);
+      },//设置运营专员权限
+      setplanner() {
+        this.$refs.tree.setCheckedKeys(['showtime-table','addata-operate','earned-table','umengretention-table','sdk_pub-canList']);
+      },//设置策划权限
+      setdeveloper() {
+        this.$refs.tree.setCheckedKeys(['sdk_pub-canList']);
+      },//设置技术权限
+      setsdksupport() {
+        this.$refs.tree.setCheckedKeys(['sdk_pub-canList','sdk-canList','sdk-canCreate','sdk-canEdit','app-canList']);
+      },//设置sdk支持权限
       permFormClose() {
         this.permFormVisible = false
       },
@@ -572,9 +599,9 @@
         this.app = {
           username: "",
           role: "",
-          note: "",
-          role_name: "",
-          role_describe: "",
+          note: "暂无",
+          role_name: "nul",
+          role_describe: "nul",
         }
       },
       open3() {
@@ -593,24 +620,24 @@
         let tothis = this
         getRole().then(response => {
           let todolist = response.data
-          let newlist = []
-          for (let i = 0; i < todolist.length; i++) {
-            if (newlist.length === 0) {
-              newlist.push(todolist[i])
-            } else {
-              let flag = true
-              for (let j = 0; j < newlist.length; j++) {
-                if (todolist[i].username === newlist[j].username) {
-                  flag = false
-                }
-              }
-              if (flag) {
-                newlist.push(todolist[i])
-              }
-            }
-          }
-          this.list = newlist
-          this.hidlist = newlist
+          // let newlist = []
+          // for (let i = 0; i < todolist.length; i++) {
+          //   if (newlist.length === 0) {
+          //     newlist.push(todolist[i])
+          //   } else {
+          //     let flag = true
+          //     for (let j = 0; j < newlist.length; j++) {
+          //       if (todolist[i].username === newlist[j].username) {
+          //         flag = false
+          //       }
+          //     }
+          //     if (flag) {
+          //       newlist.push(todolist[i])
+          //     }
+          //   }
+          // }
+          this.list = todolist
+          this.hidlist = todolist
           this.listLoading = false
         }).catch(function (rs) {
           console.log(rs)

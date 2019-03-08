@@ -30,12 +30,27 @@
         </div>
         <el-button icon="el-icon-question" style="padding: 0px;border: none;background-color: #FFFF;margin-top: 20px">广告与用户数据上传说明</el-button>
       </el-tooltip>
-      <dropzone id="myVueDropzone"
-                defaultMsg="统计数据"
-                url="http://192.168.1.144:8083/fileupload"
-                @dropzone-removedFile="dropzoneR"
-                @dropzone-success="dropzoneS"
-                style="margin: 0 auto;margin-top: 30px"/>
+      <el-upload action="http://192.168.1.144:8083/fileupload"
+                 accept='.csv,.xls,.xlsx'
+                 :headers="dataObj"
+                 drag
+                 :multiple="true"
+                 :on-success="dropzoneS"
+                 :before-upload="beforeUpload"
+                  style="width:360px">
+        <i class="el-icon-upload"></i>
+        <div class="el-upload__text">统计数据上传</div>
+        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+      </el-upload>
+
+
+      <!--<dropzone id="myVueDropzone"-->
+                <!--defaultMsg="统计数据"-->
+                <!--headers=token-->
+                <!--url="http://192.168.1.144:8083/fileupload"-->
+                <!--@dropzone-removedFile="dropzoneR"-->
+                <!--@dropzone-success="dropzoneS"-->
+                <!--style="margin: 0 auto;margin-top: 30px"/>-->
     </div>
     <div class="uploadresponse" v-html="value" style="padding: 30px;font-family: 微软雅黑;line-height: 22px;font-size: 15px" ></div>
 
@@ -53,12 +68,25 @@
         </div>
         <el-button icon="el-icon-question" style="padding: 0px;border: none;background-color: #FFFF">计费数据上传说明</el-button>
       </el-tooltip>
-      <dropzone id="myVueDropzone1"
-                defaultMsg="支付数据"
-                url="http://192.168.1.144:8086/fileupload"
-                @dropzone-removedFile="dropzoneR1"
-                @dropzone-success="dropzoneS1"
-                style="margin: 0 auto;margin-top: 30px"/>
+
+      <el-upload action="http://192.168.1.144:8086/fileupload"
+                 style="width:360px"
+                 accept='.csv,.xls,.xlsx'
+                 :headers="dataObj"
+                 drag
+                 :multiple="true"
+                 :on-success="dropzoneS1"
+                 :before-upload="beforeUpload">
+        <i class="el-icon-upload"></i>
+        <div class="el-upload__text">支付数据上传</div>
+        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+      </el-upload>
+      <!--<dropzone id="myVueDropzone1"-->
+                <!--defaultMsg="支付数据"-->
+                <!--url="http://192.168.1.144:8086/fileupload"-->
+                <!--@dropzone-removedFile="dropzoneR1"-->
+                <!--@dropzone-success="dropzoneS1"-->
+                <!--style="margin: 0 auto;margin-top: 30px"/>-->
     </div>
     <div class="uploadresponse1" v-html="value1" style="padding: 30px;font-family: 微软雅黑;line-height: 22px;font-size: 15px" ></div>
 
@@ -67,12 +95,17 @@
 
 <script>
 import Dropzone from '@/components/Dropzone'
+import { getToken } from '@/utils/auth'
 
 export default {
   name: 'DropzoneDemo',
   components: { Dropzone },
   data(){
     return {
+      dataObj: { 'Authorization':''},
+      token:{
+        Authorization:'Bear '+getToken()
+      },
       root:"els",
       version:"1.0.0",
       value:"",
@@ -80,13 +113,23 @@ export default {
     }
   },
   methods: {
+    beforeUpload(file) {
+      let maxsize=8*1024*1024
+      if (file.size > maxsize) {
+        this.$message.error('上传失败，文件超过8000KB');
+        return false
+      }
+      console.log('Bear '+getToken())
+      this.dataObj.Authorization='Bearer '+getToken()
+    },
     dropzoneS(response) {
-      let data=response.xhr.responseText.substring(15,response.xhr.responseText.lastIndexOf("~")+1);
+      console.log(response)
+      let data=response.data;
       this.value=data+"<br>"+this.value;
       this.$message({ message: data, type: 'success' })
     },
     dropzoneS1(response) {
-      let data=response.xhr.responseText.substring(15,response.xhr.responseText.lastIndexOf("~")+1);
+      let data=response.data;
       this.value1=data+"<br>"+this.value1;
       this.$message({ message: data, type: 'success' })
     },

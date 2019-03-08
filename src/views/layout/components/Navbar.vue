@@ -5,6 +5,7 @@
 
     <el-dropdown class="avatar-container" trigger="click">
       <div class="avatar-wrapper">
+        <!--<span style="margin-bottom: 4px;margin-right: 6px">欢迎:{{ name }}</span>-->
         <!--<img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">-->
         <img src="https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif" class="user-avatar">
         <i class="el-icon-caret-bottom"/>
@@ -12,7 +13,7 @@
       <el-dropdown-menu slot="dropdown" class="user-dropdown">
         <router-link class="inlineBlock" to="/">
           <el-dropdown-item>
-            主页
+            欢迎:{{ name }}
           </el-dropdown-item>
         </router-link>
         <el-dropdown-item divided>
@@ -35,7 +36,8 @@ export default {
   computed: {
     ...mapGetters([
       'sidebar',
-      'avatar'
+      'avatar',
+      'name',
     ])
   },
   methods: {

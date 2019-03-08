@@ -2,6 +2,8 @@ import axios from 'axios'
 import { Message, MessageBox } from 'element-ui'
 import store from '../store'
 import { getToken } from '@/utils/auth'
+import { getMyOutIp,getMyInnerIp } from '@/utils/ip'
+
 
 // 创建axios实例
 const service = axios.create({
@@ -15,6 +17,9 @@ service.interceptors.request.use(
   config => {
     if (store.getters.token) {
       let token = 'Bearer '+getToken()
+      let outerip=getMyOutIp()
+      let innerip=getMyInnerIp()
+      //config.headers['ip'] = outerip+','+innerip // 让每个请求携带自定义token 请根据实际情况自行修改
       config.headers['Authorization'] = token // 让每个请求携带自定义token 请根据实际情况自行修改
     }
     return config

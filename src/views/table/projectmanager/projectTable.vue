@@ -116,16 +116,16 @@
                       prop="project_name">
           <el-input v-model="project.project_name" placeholder="请输入项目名~"/>
         </el-form-item>
-        <el-form-item label="预热" :rules="{required: true, message: '预热名不能为空', trigger: 'blur'}" prop="preheat">
+        <el-form-item label="预热" :rules="{required: true, message: '预热名不能为空', trigger: 'blur'}" prop="preheat" v-if="false">
           <el-input v-model="project.preheat"/>
         </el-form-item>
-        <el-form-item label="排期" :rules="{required: true, message: '排期名不能为空', trigger: 'blur'}" prop="schedule">
+        <el-form-item label="排期" :rules="{required: true, message: '排期名不能为空', trigger: 'blur'}" prop="schedule" v-if="false">
           <el-input v-model="project.schedule"/>
         </el-form-item>
-        <el-form-item label="竞品" :rules="{required: true, message: '竞品不能为空', trigger: 'blur'}" prop="compete_good">
+        <el-form-item label="竞品" :rules="{required: true, message: '竞品不能为空', trigger: 'blur'}" prop="compete_good" v-if="false">
           <el-input v-model="project.compete_good"/>
         </el-form-item>
-        <el-form-item label="版本计划" :rules="{required: true, message: '版本计划不能为空', trigger: 'blur'}" prop="version_plan">
+        <el-form-item label="版本计划" :rules="{required: true, message: '版本计划不能为空', trigger: 'blur'}" prop="version_plan" v-if="false">
           <el-input v-model="project.version_plan"/>
         </el-form-item>
         <el-form-item label="备注" :rules="{required: true, message: '备注不能为空', trigger: 'blur'}" prop="note">
@@ -587,7 +587,7 @@
         getResourceName(name).then(response => {
           let projectlist = response.data
           getProject().then(response => {
-            if (this.checkPermission(['director']) || this.checkPermission(['admin'])) {
+            if (this.checkPermission(['director']) || this.checkPermission(['admin'])||this.checkPermission(['operatorleader'])) {
               this.uichange(response.data)
               this.hidlist = response.data
               this.list = response.data

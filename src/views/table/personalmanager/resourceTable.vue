@@ -20,7 +20,7 @@
           <span>{{ scope.row.username }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="角色名称" width="300" align="center" prop="app_name">
+      <el-table-column label="角色名称" width="300" align="center" prop="app_name" v-if="false">
         <template slot-scope="scope">
           {{ scope.row.role_name }}
         </template>
@@ -30,7 +30,7 @@
           {{ scope.row.role }}
         </template>
       </el-table-column>
-      <el-table-column label="角色描述" width="300" align="center" prop="app_name">
+      <el-table-column label="角色描述" width="300" align="center" prop="app_name" v-if="false">
         <template slot-scope="scope">
           {{ scope.row.role_describe }}
         </template>
@@ -48,11 +48,18 @@
     </el-table>
     <!--资源表-->
     <el-dialog :title="resourceName" :visible.sync="resourceFormVisible">
+      <el-input
+        style="width: 200px;margin-bottom: 15px;margin-right: 20px"
+        placeholder="输入关键字进行过滤"
+        v-model="filterText">
+      </el-input>
+      <el-button round @click="election">全选</el-button>
       <el-tree
         ref="tree"
         :data="data2"
         show-checkbox
         node-key="id"
+        :filter-node-method="filterNode"
         :default-checked-keys="checkedlist"
         :props="defaultProps">
       </el-tree>
@@ -73,6 +80,11 @@
   import store from '@/store'
 
   export default {
+    watch: {
+      filterText(val) {
+        this.$refs.tree.filter(val);
+      }
+    },
     components: {Pagination},
     directives: {waves},
     filters: {
@@ -87,6 +99,8 @@
     },
     data() {
       return {
+        select:true,
+        filterText:'',
         create_flag:true,
         update_flag:true,
         inputName:'',
@@ -109,6 +123,27 @@
       this.initTree();
     },
     methods: {
+      election(){
+        if (this.select){
+          let data=this.data2
+          let list=[]
+          for (let i=0;i<data.length;i++){
+            let id=data[i].id
+            list.push(id)
+          }
+          this.$refs.tree.setCheckedKeys(list);
+          this.select=false
+        } else {
+          this.$refs.tree.setCheckedKeys([]);
+          this.select=true
+        }
+
+
+      },
+      filterNode(value, data) {
+        if (!value) return true;
+        return data.label.indexOf(value) !== -1;
+      },
       initTree() {
         let tothis = this
         getProject().then(rs => {
@@ -173,6 +208,7 @@
         })
       },//更新资源
       handleResource(row) {
+        this.select=true
         let tothis=this
         this.resourcelist = row
         this.app = Object.assign({}, row) // copy obj

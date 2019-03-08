@@ -25,11 +25,11 @@
           <span>{{ scope.row.username }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="密码" width="300" align="center" prop="app_name">
-        <template slot-scope="scope">
-          {{ scope.row.psd }}
-        </template>
-      </el-table-column>
+      <!--<el-table-column label="密码" width="300" align="center" prop="app_name">-->
+        <!--<template slot-scope="scope">-->
+          <!--{{ scope.row.psd }}-->
+        <!--</template>-->
+      <!--</el-table-column>-->
       <el-table-column label="所属部门"  align="center" prop="app_name">
         <template slot-scope="scope">
           {{ scope.row.department }}
@@ -71,13 +71,29 @@
         </el-form-item>
 
         <el-form-item label="密码">
-          <el-input v-model="app.psd" placeholder="必填~" v-on:blur="passwordLenth()"/>
+          <el-input v-model="app.psd" placeholder="必填~" v-on:blur="passwordLenth()" type="password"></el-input>
         </el-form-item>
         <el-form-item label="所属部门">
-          <el-input v-model="app.department" placeholder="必填~"/>
+          <el-select v-model="app.department" placeholder="请选择">
+            <el-option
+              v-for="item in departmentList"
+              :key="item"
+              :label="item"
+              :value="item">
+            </el-option>
+          </el-select>
+          <!--<el-input v-model="app.department" placeholder="必填~"/>-->
         </el-form-item>
         <el-form-item label="职位">
-          <el-input v-model="app.position" placeholder="必填~"/>
+          <el-select v-model="app.position" placeholder="请选择">
+            <el-option
+              v-for="item in positionList"
+              :key="item"
+              :label="item"
+              :value="item">
+            </el-option>
+          </el-select>
+          <!--<el-input v-model="app.position" placeholder="必填~"/>-->
         </el-form-item>
         <el-form-item label="介绍">
           <el-input v-model="app.note" placeholder="必填~" value="暂无"/>
@@ -121,6 +137,8 @@
     },
     data() {
       return {
+        departmentList:['运营','策划','开发','市场'],
+        positionList:['组长','组员','总监'],
         create_flag:true,
         update_flag:true,
         inputName:'',
@@ -147,13 +165,7 @@
         statusOptions: ['published', 'draft', 'deleted'],
         dialogStatus: '',
         dialogFormVisible: false,
-        app: {
-          id: undefined,
-          name: undefined,
-          system: undefined,
-          icon: undefined,
-          introduce: undefined,
-        },
+        app: {},
         textMap: {
           update: '编辑',
           create: '创建'
@@ -287,9 +299,10 @@
         this.app = {
           username:"",
           psd:"",
+          department:"策划",
+          position:"组员",
           note:"",
-          department:"",
-          position:"",
+
         }
       },
       passwordLenth(){

@@ -2,7 +2,7 @@
   <div class="app-container">
     <div class="filter-container" style="margin: 15px;margin-top: -5px">
       <el-button class="filter-item" style="margin-left: 10px;margin-right: 20px" type="primary" icon="el-icon-edit"
-                 v-if="checkPermission(['operator','admin','leader'])"
+                 v-if="checkPermission(['operatorleader','admin','sdksuport','director','operator'])"
                  @click="handleCreate">添加配置表
       </el-button>
       <!--<span style="margin-left: 15px;margin-right: 5px">游戏:</span>-->
@@ -31,7 +31,6 @@
                 @blur="getDatawithParam"/>
       <!--<el-checkbox v-model="checked" border style="margin-left: 15px" @change="getDatawithParam">展示正常</el-checkbox>-->
       <!--<el-checkbox v-model="checked1" border style="margin-left: 15px" @change="getDatawithParam">显示删除状态配置表</el-checkbox>-->
-
     </div>
     <!--<button @click="test">aasdasaaaaa</button>-->
     <el-table
@@ -118,7 +117,7 @@
       </el-table-column>
 
       <el-table-column label="操作" align="center" width="150px" class-name="small-padding fixed-width"
-                       v-if="checkPermission(['operator','admin','sdksuport'])">
+                       v-if="checkPermission(['operatorleader','admin','sdksuport','director','operator'])">
         <template slot-scope="scope">
           <el-button type="success" size="mini" @click="handleUpdate(scope.row)">{{ "编辑" }}</el-button>
           <!--<el-button type="success" size="mini" @click="publish(scope.row)">发布</el-button>-->
@@ -638,7 +637,7 @@
           }
         }
         for (let i = 0; i < this.hidsdkTemplate.length; i++) {
-          if (this.hidsdkTemplate[i].name.search(this.sdk_template_name) != -1) {
+          if (this.hidsdkTemplate[i].name.search(this.sdk_template_name) != -1||this.hidsdkTemplate[i].mark.search(this.sdk_template_name) != -1) {
             list.push(this.hidsdkTemplate[i])
           }
         }
@@ -673,6 +672,7 @@
         getSdkTemplate().then(response => {
           this.sdkTemplate = response.name_list     //对话框内sdk模版列表
           this.hidsdkTemplate = response.name_list   //对话框内sdk模版列表
+          console.log(this.hidsdkTemplate)
           this.sdkTemplatelibrary = response.list
           this.options = response.select_list
           this.listLoading = false
@@ -754,11 +754,9 @@
             }
           }
         }
-
         this.sdk.form.select = []
         this.sdk.form.select = this.sdk.form.select.concat(select)
         //
-
         let tothis = this
         let dellist = []
         for (let i = 0; i < this.sdk.form.domains.length; i++) {

@@ -8,11 +8,19 @@
 <script>
 import Dropzone from 'dropzone'
 import 'dropzone/dist/dropzone.css'
+import { getToken } from '@/utils/auth'
 // import { getToken } from 'api/qiniu';
 
 Dropzone.autoDiscover = false
 
 export default {
+  data(){
+    return {
+      token:{
+        Authorization:"Bear "+getToken
+      },
+    }
+  },
   props: {
     id: {
       type: String,
@@ -92,6 +100,7 @@ export default {
     const element = document.getElementById(this.id)
     const vm = this
     this.dropzone = new Dropzone(element, {
+      headers:this.token,
       clickable: this.clickable,
       thumbnailWidth: this.thumbnailWidth,
       thumbnailHeight: this.thumbnailHeight,

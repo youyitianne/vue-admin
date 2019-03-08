@@ -4,11 +4,13 @@
       <el-button class="filter-item" style="margin-left: 10px;margin-right: 20px" type="primary" icon="el-icon-edit"
                  @click="handleCreate">添加SDK
       </el-button>
-      <el-input placeholder="根据SDK名称二次筛选" v-model="secondary_sdk_name"
+      <el-input placeholder="根据SDK标记二次筛选" v-model="secondary_sdk_name"
                 style="width: 200px;margin-top: 10px;margin-left: 10px" class="filter-item" clearable
+                @keyup.native="getDatawithParam"
                 @blur="getDatawithParam"/>
-      <el-input placeholder="根据SDK标记二次筛选" v-model="secondary_sdk_mark"
+      <el-input placeholder="根据SDK名称二次筛选" v-model="secondary_sdk_mark"
                 style="width: 200px;margin-top: 10px;margin-left: 20px" class="filter-item" clearable
+                @keyup.native="getDatawithParam"
                 @blur="getDatawithParam"/>
       <!--<el-checkbox v-model="checked" border style="margin-left: 15px" @change="change">展示可见</el-checkbox>-->
       <el-checkbox v-model="checked1" border style="margin-left: 15px" @change="change">显示删除状态SDK模版</el-checkbox>

@@ -121,7 +121,7 @@
       <el-table-column label="内部版本-更新" prop="versioncode_update_version">
       </el-table-column>
       <el-table-column label="操作" align="center" width="150px" class-name="small-padding fixed-width"
-                       v-if="checkPermission(['director','operatorleader','sdksuport'])">
+                       v-if="checkPermission(['director','admin','sdksuport','operatorleader'])">
         <template slot-scope="scope">
           <el-button type="danger" size="mini" @click="handleDelete(scope.row)">{{ "删除" }}</el-button>
         </template>
@@ -787,6 +787,8 @@
                   }
                 }
                 this.projectlist_select = newProjectList
+              }else {
+                this.projectlist_select=todolist
               }
               //
               let newlist = []

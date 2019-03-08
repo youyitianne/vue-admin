@@ -57,7 +57,7 @@
 
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :model="adtype" label-position="left" label-width="90px"
+      <el-form ref="dataForm" :model="adtype" label-position="left" label-width="120px"
                style="width: 400px; margin-left:50px;">
         <el-form-item label="广告类型名称" v-if="this.dialogStatus==='update'">
           <el-input v-model="adtype.name" placeholder="请输入广告类型名称~" disabled/>

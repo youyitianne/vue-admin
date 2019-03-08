@@ -109,7 +109,7 @@ export const asyncRouterMap = [
   {
     path: '/data-acquire',
     component: Layout,
-    redirect: '/data-acquire/yixin',
+    redirect: '/data-acquire/umeng',
     name: 'Component',
     meta: {
       title: '数据获取',
@@ -148,16 +148,27 @@ export const asyncRouterMap = [
     name: 'Component',
     meta: {
       title: '数据录入',
-      icon: 'upload (2) ',
+      icon: 'upload1',
       roles: ['director','operatorleader']
     },
     children: [
+      {
+        path: 'apps',
+        name: 'apps',
+        component: () => import('@/views/table/projectmanager/appTable.vue'),
+        meta: {
+          title: '应用列表',
+          icon: 'table',
+          roles: ['director', 'operatorleader', 'operator','planner']
+        }
+      },
       {
         path: 'dropzone',
         component: () => import('@/views/dropZone/dropzone'),
         name: 'DropzoneDemo',
         meta: {
           title: '数据录入',
+          icon: 'upload1',
           roles: ['director','operatorleader']
         }
       }]
@@ -165,7 +176,7 @@ export const asyncRouterMap = [
   {
     path: '/data-analysis',
     component: Layout,
-    redirect: '/data-analysis/cline',
+    redirect: '/data-analysis/shoowtime_2table',
     name: 'Statistics',
     meta: {
       title: '数据分析',
@@ -235,13 +246,13 @@ export const asyncRouterMap = [
           roles: ['director', 'operatorleader']
         }
       },
+
     ]
   },
-
   {
     path: '/appmanager',
     component: Layout,
-    redirect: '/appmanager/appTable',
+    redirect: '/appmanager/projectTable',
     name: 'Example',
     meta: {
       title: '项目管理',
@@ -257,7 +268,7 @@ export const asyncRouterMap = [
           title: '项目列表',
           noCache: true,
           icon: 'list',
-          roles: ['director'],
+          roles: ['director','operatorleader'],
         }
       },
 
@@ -288,7 +299,7 @@ export const asyncRouterMap = [
   {
     path: '/accountmanager',
     component: Layout,
-    redirect: '/accountmanager/appTable',
+    redirect: '/accountmanager/accountTable',
     name: 'Example',
     meta: {
       title: '人员管理',
@@ -333,7 +344,7 @@ export const asyncRouterMap = [
   {
     path: '/sdkmanager',
     component: Layout,
-    redirect: '/sdkmanager/sdklist',
+    redirect: '/sdkmanager/projectconfiglist',
     name: 'Component',
     meta: {
       title: 'SDK管理',
@@ -357,7 +368,7 @@ export const asyncRouterMap = [
         meta: {
           title: 'SDK配置表',
           icon:'sdkset1',
-          roles: ['director', 'operatorleader','sdksuport'],
+          roles: ['director', 'operatorleader'],
         }
       }, {
         path: 'projectconfiglist',
@@ -372,7 +383,7 @@ export const asyncRouterMap = [
   {
     path: '/system',
     component: Layout,
-    redirect: '/system/operationlog',
+    redirect: '/system/help',
     name: 'SystemSet',
     meta: {
       title: '系统设置',

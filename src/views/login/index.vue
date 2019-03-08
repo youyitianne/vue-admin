@@ -2,15 +2,12 @@
   <div class="login-container">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
       <h3 class="title">登录</h3>
-
       <el-form-item prop="username">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
         <el-input v-model="loginForm.username" name="username" type="text" auto-complete="on" placeholder="帐号:" />
       </el-form-item>
-
-
       <el-form-item prop="password">
         <span class="svg-container">
           <svg-icon icon-class="password" />
@@ -26,8 +23,6 @@
           <svg-icon icon-class="eye" />
         </span>
       </el-form-item>
-
-
       <el-form-item>
         <el-button :loading="loading" type="primary" style="width:100%;" @click.native.prevent="handleLogin">
           登录
@@ -39,14 +34,25 @@
       <!--</div>-->
       <div style="font-size: 10px;color: lightslategrey;margin-top: -15px;margin-left: 15px">若忘记密码请联系管理员.</div>
     </el-form>
+    <remote-js src="http://pv.sohu.com/cityjson?ie=utf-8"></remote-js>
   </div>
 </template>
 
 <script>
 import { isvalidUsername } from '@/utils/validate'
-
+import { setMyOutIp,setMyInnerIp } from '@/utils/ip'
 
 export default {
+  components:{
+    'remote-js': {
+      render(createElement) {
+        return createElement('script', { attrs: { type: 'text/javascript', src: this.src }});
+      },
+      props: {
+        src: { type: String, required: true },
+      },
+    },
+  },
   name: 'Login',
   data() {
     const validateUsername = (rule, value, callback) => {
@@ -64,6 +70,7 @@ export default {
       }
     }
     return {
+      innerip:'',
       loginForm: {
         username: '',
         password: ''
@@ -85,6 +92,9 @@ export default {
       immediate: true
     }
   },
+  mounted(){
+    this.getInnerIp()
+  },
   methods: {
     showPwd() {
       if (this.pwdType === 'password') {
@@ -94,6 +104,19 @@ export default {
       }
     },
     handleLogin() {
+      try {
+        let outip = returnCitySN["cip"]
+        setMyOutIp(outip)
+      }catch (e) {
+        setMyOutIp('0.0.0.0')
+      }
+      let innerip= this.innerip
+      if (innerip.length!=0){
+        setMyInnerIp(innerip)
+      }else {
+        setMyInnerIp('0.0.0.0')
+      }
+      //登录按钮
       let tothis=this
       this.$refs.loginForm.validate(valid => {
         if (valid) {
@@ -116,7 +139,62 @@ export default {
           return false
         }
       })
-    }
+    },
+    getInnerIp(){
+      let tothis=this
+      let RTCPeerConnection = window.RTCPeerConnection || window.webkitRTCPeerConnection || window.mozRTCPeerConnection;
+      if (RTCPeerConnection) (function () {
+        let rtc = new RTCPeerConnection({iceServers:[]});
+        if (1 || window.mozRTCPeerConnection) {
+          rtc.createDataChannel('', {reliable:false});
+        };
+
+        rtc.onicecandidate = function (evt) {
+          if (evt.candidate) grepSDP("a="+evt.candidate.candidate);
+        };
+        rtc.createOffer(function (offerDesc) {
+          grepSDP(offerDesc.sdp);
+          rtc.setLocalDescription(offerDesc);
+        }, function (e) { console.warn("offer failed", e); });
+
+
+        let addrs = Object.create(null);
+        addrs["0.0.0.0"] = false;
+
+        function updateDisplay(newAddr) {
+          if (newAddr in addrs) return;
+          else addrs[newAddr] = true;
+          let displayAddrs = Object.keys(addrs).filter(function (k) { return addrs[k]; });
+          for(let i = 0; i < displayAddrs.length; i++){
+            if(displayAddrs[i].length > 16){
+              displayAddrs.splice(i, 1);
+              i--;
+            }
+          }
+          tothis.innerip=displayAddrs[0]
+          //console.log(displayAddrs[0]);      //打印出内网ip
+        }
+
+        function grepSDP(sdp) {
+          let hosts = [];
+          sdp.split('\r\n').forEach(function (line, index, arr) {
+            if (~line.indexOf("a=candidate")) {
+              let parts = line.split(' '),
+                addr = parts[4],
+                type = parts[7];
+              if (type === 'host') updateDisplay(addr);
+            } else if (~line.indexOf("c=")) {
+              let parts = line.split(' '),
+                addr = parts[2];
+              updateDisplay(addr);
+            }
+          });
+        }
+      })();
+      else{
+        console.log("请使用主流浏览器：chrome,firefox,opera,safari");
+      }
+    },
   }
 }
 </script>
