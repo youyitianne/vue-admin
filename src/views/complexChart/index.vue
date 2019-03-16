@@ -1,5 +1,4 @@
 <template>
-
   <div class="dashboard-editor-container" v-loading.fullscreen.lock="listLoading">
     <div class="top_condition">
       <span style="font-size: 36px;font-family:'Microsoft YaHei UI';color: dimgray">用户与广告数据统计</span>

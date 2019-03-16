@@ -2,6 +2,7 @@
   <div class="app-container">
     <div class="filter-container" style="margin: 15px;margin-top: -5px">
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit"
+                 v-if="checkPermission(['director','operatorleader'])"
                  @click="handleCreate">{{addButton}}
       </el-button>
       <el-input placeholder="根据项目名查找" v-model="inputName" style="width: 200px" class="filter-item" clearable
@@ -66,7 +67,7 @@
                     <span>
                       <el-button @click="link_Check(scope2.row)" type="info">查看key表</el-button>
                     </span>
-                    <span v-if="checkPermission(['director','admin'])">
+                    <span v-if="checkPermission(['director','operatorleader','admin'])">
                     <el-button @click="link_Edit(scope2.row)" type="success">编辑key表</el-button>
                     </span>
                   </template>
@@ -357,7 +358,6 @@
               } else {
                 names = json.applist[j].app_name
               }
-
             }
             let flag = true
             for (let x = 0; x < newapplist.length; x++) {

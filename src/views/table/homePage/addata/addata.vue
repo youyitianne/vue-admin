@@ -1,33 +1,12 @@
 <template>
 
-  <div class="dashboard-editor-container" v-loading.fullscreen.lock="listLoading">
+  <div class="dashboard-editor-container" v-loading="listLoading">
     <div class="top_condition">
-      <span style="font-size: 36px;font-family:'Microsoft YaHei UI';color: dimgray">用户与广告数据统计</span>
       <div style="float: right;width: 85%;margin-bottom: 15px">
         <div
           style="font-size: 14px;color: dimgray;font-family: 微软雅黑;
           font-weight: bolder;margin-bottom: -7px;
           text-align: right;float: right;width: 117%">
-          <span style="font-size: 14px;color: dimgray;font-family: 微软雅黑;font-weight: bolder;margin-right: 20px">
-             <el-tooltip class="item" effect="light" placement="right" style="size: 50px">
-        <div slot="content"
-             style="font-size: 14px;font-family:'Microsoft YaHei UI';
-                 border-radius:0 80px 0 0/0 60px 0 0;
-                 line-height: 24px;
-                 color: #8494A5;
-                  background-color: white;border: 1px white">
-          说明：<br/>
-          <span style="font-size: 15px;font-weight: bolder">[按月查询]:</span>根据所选日期的跨越的月份查询<br/>
-           <span style="font-size: 15px;font-weight: bolder">[按年查询]:</span>根据所选日期的跨越的年份查询（暂不可用）<br/>
-        </div>
-        <el-button icon="el-icon-question" style="padding: 0px;border: none;background-color: #F0F2F5">查询方式：</el-button>
-            </el-tooltip>
-              <el-radio-group v-model="query_way" size="mini" @change="fetchdata">
-                <el-radio-button label="年" disabled></el-radio-button>
-                <el-radio-button label="月"></el-radio-button>
-                <el-radio-button label="日"></el-radio-button>
-            </el-radio-group>
-          </span>
           <span style="font-size: 14px;color: dimgray;font-family: 微软雅黑;font-weight: bolder">原始数据：</span>
           <el-date-picker
             @change="fetchdata"
@@ -55,43 +34,20 @@
             style="margin-top: 5px;margin-right: 0px;margin-bottom: 5px">
           </el-date-picker>
           <br/>
-          <el-tooltip class="item" placement="right-end" effect="light"
-                      style="font-size: 23px;font-family:'Microsoft YaHei UI';display: inline;float: left;background-color: white">
-            <div slot="content"
-                 style="font-size: 14px;font-family:'Microsoft YaHei UI';
-                 border-radius:0 80px 0 0/0 60px 0 0;
-                 line-height: 24px;
-                 color: #8494A5;
-                  background-color: white;border: 1px white">
-              说明：<br/>
-              <span style="font-size: 15px;font-weight: bolder">[新增用户]:</span>原始数据的新增用户的总和<br/>
-              <span style="font-size: 15px;font-weight: bolder">[活跃用户]:</span>原始数据的活跃用户的总和<br/>
-              <span style="font-size: 15px;font-weight: bolder">[总ARPU]:</span>原始数据的每天流水的总和/原始数据的活跃用户的总和<br/>
-              <span style="font-size: 15px;font-weight: bolder">[总流水]:</span>原始数据的每天流水的总和<br/>
-              <span style="font-size: 15px;font-weight: bolder">[横幅总人均展次]:</span>原始数据的横幅的总和/原始数据的活跃用户的总和<br/>
-              <span style="font-size: 15px;font-weight: bolder">[视频总人均展次]:</span>原始数据的视频的总和/原始数据的活跃用户的总和<br/>
-              <span style="font-size: 15px;font-weight: bolder">[插屏总人均展次]:</span>原始数据的插屏的总和/原始数据的活跃用户的总和<br/>
-              <span style="font-size: 15px;font-weight: bolder">[开屏总人均展次]:</span>原始数据的开屏的总和/原始数据的活跃用户的总和<br/>
-              <br/>
-              <span style="font-size: 15px;font-weight: bolder">备注：数据会根据右上角的条件随动</span>
-              <br/>&nbsp;&nbsp;&nbsp;例如：若渠道选择oppo,此处只会展示oppo渠道的各项数据总和
-            </div>
-            <el-button icon="el-icon-info" style="padding: 0px;border: none;background-color: #F0F2F5">汇总</el-button>
-
-          </el-tooltip>
 
           <span class="card-panel-icon-wrapper icon-message" style="margin-right: 20px">
-            <el-checkbox-button v-model="arpu_checked" label="查看ARPU" border size="mini" style="margin-right: 20px"
-                                @change="arpu_change"></el-checkbox-button>
+            <!--<el-checkbox-button v-model="arpu_checked" label="查看ARPU" border size="mini" style="margin-right: 20px"-->
+            <!--@change="arpu_change"></el-checkbox-button>-->
               <el-button size="mini" round @click="showchart()"><svg-icon icon-class="change"
-                                                                          class-name="card-panel-icon"/>&nbsp;折线图隐藏</el-button>
+                                                                          class-name="card-panel-icon"/>&nbsp;查看人均展次折线图</el-button>
           </span>
           <span class="card-panel-icon-wrapper icon-message" style="margin-right: 20px">
               <el-button size="mini" round @click="restore1()"><svg-icon icon-class="restore"
                                                                          class-name="card-panel-icon"/>&nbsp;还原</el-button>
           </span>
           项目：
-          <el-select v-model="secondary_game" style="margin-right: 20px" size="mini" @change="paramchange()" value-key="project_name" filterable>
+          <el-select v-model="secondary_game" style="margin-right: 20px" size="mini" @change="paramchange()"
+                     value-key="project_name" filterable>
             <!--<el-option key="全部" label="全部" value="全部"></el-option>-->
             <el-option v-for="item in app_name_list" :key="item.project_name" :label="item.project_name" :value="item">
             </el-option>
@@ -106,7 +62,8 @@
             </el-option>
           </el-select>
           平台：
-          <el-select v-model="secondary_platform" style="margin-top: -10px" size="mini" @change="paramchange()" filterable>
+          <el-select v-model="secondary_platform" style="margin-top: -10px" size="mini" @change="paramchange()"
+                     filterable>
             <el-option key="全部" label="全部" value="全部">
             </el-option>
             <el-option key="广点通" label="广点通" value="广点通">
@@ -121,46 +78,15 @@
     <div v-if="panel_view">
       <panel-group
         @handleSetLineChartData="handleSetLineChartData"
-        style="margin-bottom: -45px" v-bind:statistical_data="statistical_data"/>
+        style="margin-top: -20px;margin-bottom: -10px" v-bind:statistical_data="statistical_data"/>
     </div>
-
-    <div v-if="arpu_chartline&&chartline" class="line-chart" style="margin-right: 100px;margin-top: 40px">
-      <span class="font_cline">ARPU</span>
-      <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
-        <line-chart :chart-data="list_arpu"/>
-      </el-row>
-    </div>
-    <div v-if="!arpu_chartline" class="line-chart" style="margin-top: 60px;margin-bottom: -150px">
-      <span class="font_cline">ARPU</span>
-      <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
-        <line-chart :chart-data="list_arpu"/>
-      </el-row>
-    </div>
-    <div v-if="chartline" class="line-chart" style="margin-top: 40px">
-      <span class="font_cline">总流水</span>
-      <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
-        <line-chart :chart-data="list4"/>
-      </el-row>
-    </div>
-    <div v-if="chartline" class="line-chart" style="margin-right: 100px;margin-top: -100px">
-      <span class="font_cline">新增用户</span>
-      <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
-        <line-chart :chart-data="list1" :title="1"/>
-      </el-row>
-    </div>
-    <div v-if="chartline" class="line-chart" style="margin-top: -100px">
-      <span class="font_cline">活跃用户</span>
-      <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
-        <line-chart :chart-data="list2"/>
-      </el-row>
-    </div>
-    <div v-if="chartline" class="line-chart" style="margin-right: 100px;margin-top: -100px">
+    <div v-if="chartline" class="line-chart" style="margin-right: 100px;margin-top: 100px">
       <span class="font_cline">横幅人均展次</span>
       <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
         <line-chart :chart-data="list_banner_pershow" :title="1"/>
       </el-row>
     </div>
-    <div v-if="chartline" class="line-chart" style="margin-top: -100px">
+    <div v-if="chartline" class="line-chart" style="margin-top: 100px">
       <span class="font_cline">视频人均展次</span>
       <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
         <line-chart :chart-data="list_video_pershow"/>
@@ -178,8 +104,6 @@
         <line-chart :chart-data="list_splash_pershow"/>
       </el-row>
     </div>
-
-
     <div v-if="chartline"
          style="margin-top: -90px;float: left;width: 95%;margin-left: 30px;margin-bottom: 70px;size: 50px ">
       <el-tooltip class="item" effect="light" placement="right" style="size: 50px">
@@ -190,6 +114,7 @@
                  color: #8494A5;
                   background-color: white;border: 1px white">
           说明：<br/>
+          <span style="font-size: 15px;font-weight: bolder">[启动次数]:</span>当前日期的启动次数<br/>
           <span style="font-size: 15px;font-weight: bolder">[DAU]:</span>当前日期的活跃人数<br/>
           <span style="font-size: 15px;font-weight: bolder">[MAU]:</span>从当月1号到当前日期的总活跃人数<br/>
           <span style="font-size: 15px;font-weight: bolder">[总收益]:</span>当日的总收益<br/>
@@ -239,45 +164,8 @@
         </el-table-column>
         <el-table-column
           width="100px"
-          prop="dau"
-          label="DAU">
-        </el-table-column>
-        <el-table-column
-          v-if="this.query_way==='日'"
-          width="100px"
-          prop="mau"
-          label="MAU">
-        </el-table-column>
-        <el-table-column
-          width="100px"
-          prop="earned"
-          label="总收益">
-        </el-table-column>
-        <el-table-column
-          width="100px"
-          prop="dauarpu"
-          label="ARPU">
-        </el-table-column>
-        <el-table-column
-          width="100px"
-          prop="dnu"
-          label="DNU">
-        </el-table-column>
-        <el-table-column
-          v-if="this.query_way==='日'"
-          width="100px"
-          prop="mnu"
-          label="MNU">
-        </el-table-column>
-        <el-table-column
-          width="100px"
           prop="showtime"
           label="总展次">
-        </el-table-column>
-        <el-table-column
-          width="100px"
-          prop="ecpm_all"
-          label="总ECPM">
         </el-table-column>
         <el-table-column
           width="100px"
@@ -306,6 +194,33 @@
         </el-table-column>
 
         <el-table-column
+          width="100px"
+          prop="click_count_rate"
+          label="总点击率">
+        </el-table-column>
+        <el-table-column
+          width="100px"
+          prop="banner_click"
+          label="横幅点击率">
+        </el-table-column>
+        <el-table-column
+          width="100px"
+          prop="video_click"
+          label="视频点击率">
+        </el-table-column>
+        <el-table-column
+          width="100px"
+          prop="splash_click"
+          label="开屏点击率">
+        </el-table-column>
+        <el-table-column
+          width="100px"
+          prop="inline_click"
+          label="插屏点击率">
+        </el-table-column>
+
+
+        <el-table-column
           width="120px"
           prop="banner_pershow"
           label="横幅人均展次">
@@ -324,50 +239,6 @@
           width="120px"
           prop="inline_pershow"
           label="插屏人均展次">
-        </el-table-column>
-
-        <el-table-column
-          width="100px"
-          prop="banner_earned"
-          label="横幅收益">
-        </el-table-column>
-        <el-table-column
-          width="100px"
-          prop="video_earned"
-          label="视频收益">
-        </el-table-column>
-        <el-table-column
-          width="100px"
-          prop="splash_earned"
-          label="开屏收益">
-        </el-table-column>
-        <el-table-column
-          width="100px"
-          prop="inline_earned"
-          label="插屏收益">
-        </el-table-column>
-        <el-table-column
-          width="100px"
-          prop="banner_ecpm"
-          label="横幅ECPM">
-        </el-table-column>
-
-        <el-table-column
-          width="100px"
-          prop="video_ecpm"
-          label="视频ECPM">
-        </el-table-column>
-
-        <el-table-column
-          width="100px"
-          prop="splash_ecpm"
-          label="开屏ECPM">
-        </el-table-column>
-
-        <el-table-column
-          width="100px"
-          prop="inline_ecpm"
-          label="插屏ECPM">
         </el-table-column>
       </el-table>
       <el-pagination
@@ -393,12 +264,9 @@
           说明：<br/>
           <span style="font-size: 15px;font-weight: bolder">[DAU]:</span>当前日期的活跃人数<br/>
           <span style="font-size: 15px;font-weight: bolder">[MAU]:</span>从当月1号到当前日期的总活跃人数<br/>
-          <span style="font-size: 15px;font-weight: bolder">[总收益]:</span>当日的总收益<br/>
-          <span style="font-size: 15px;font-weight: bolder">[ARPU]:</span>每用户的平均收益（当日总收益/当日活跃用户）<br/>
           <span style="font-size: 15px;font-weight: bolder">[DNU]:</span>当日的新增用户<br/>
           <span style="font-size: 15px;font-weight: bolder">[MNU]:</span>从当月1号到当前日期的总新增用户<br/>
           <span style="font-size: 15px;font-weight: bolder">[总展次]:</span>当日的总展次<br/>
-          <span style="font-size: 15px;font-weight: bolder">[总ECPM]:</span>当日的千次广告展示收益<br/>
           <span style="font-size: 15px;font-weight: bolder">[人均展次]:</span>当日的总人均展次<br/>
           <span style="font-size: 15px;font-weight: bolder">[横幅]:</span>当日的横幅总展次<br/>
           <span style="font-size: 15px;font-weight: bolder">[视频]:</span>当日的视频总展次<br/>
@@ -408,24 +276,15 @@
           <span style="font-size: 15px;font-weight: bolder">[视频人均展次]:</span>当日的视频总展次/当日的活跃人数<br/>
           <span style="font-size: 15px;font-weight: bolder">[开屏人均展次]:</span>当日的开屏总展次/当日的活跃人数<br/>
           <span style="font-size: 15px;font-weight: bolder">[插屏人均展次]:</span>当日的插屏总展次/当日的活跃人数<br/>
-          <span style="font-size: 15px;font-weight: bolder">[横幅收益]:</span>当日的横幅收益<br/>
-          <span style="font-size: 15px;font-weight: bolder">[视频收益]:</span>当日的视频收益<br/>
-          <span style="font-size: 15px;font-weight: bolder">[开屏收益]:</span>当日的开屏收益<br/>
-          <span style="font-size: 15px;font-weight: bolder">[插屏收益]:</span>当日的插屏收益<br/>
-          <span style="font-size: 15px;font-weight: bolder">[横幅ECPM]:</span>当日的横幅千次展示收益（当日的横幅收益/当日的横幅总展次*1000）<br/>
-          <span style="font-size: 15px;font-weight: bolder">[视频ECPM]:</span>当日的视频千次展示收益（当日的视频总展次/当日的视频总展次*1000）<br/>
-          <span style="font-size: 15px;font-weight: bolder">[开屏ECPM]:</span>当日的开屏千次展示收益（当日的开屏总展次/当日的开屏总展次*1000）<br/>
-          <span style="font-size: 15px;font-weight: bolder">[插屏ECPM]:</span>当日的插屏千次展示收益（当日的插屏总展次/当日的插屏总展次*1000）<br/>
-
           <br/>
           <span style="font-size: 15px;font-weight: bolder">备注：数据会根据右上角的条件随动</span>
           <br/>&nbsp;&nbsp;&nbsp;例如：若渠道选择oppo,此处只会展示oppo渠道的各项数据总和
         </div>
         <el-button icon="el-icon-question" style="padding: 0px;border: none;background-color: #FFFF">详情</el-button>
       </el-tooltip>
-      <el-button style="padding: 0px;border: none;background-color: #FFFF" @click="downloadhandler">
-        <svg-icon icon-class="download" class-name="card-panel-icon"/>
-      </el-button>
+      <!--<el-button style="padding: 0px;border: none;background-color: #FFFF" @click="downloadhandler">-->
+      <!--<svg-icon icon-class="download" class-name="card-panel-icon"/>-->
+      <!--</el-button>-->
       <el-table :data="tableData" border stripe style="width: 100%" height="450">
         <el-table-column
           type="index"
@@ -441,44 +300,8 @@
         </el-table-column>
         <el-table-column
           width="100px"
-          prop="dau"
-          label="DAU">
-        </el-table-column>
-        <el-table-column
-          v-if="this.query_way==='日'"
-          width="100px"
-          prop="mau"
-          label="MAU">
-        </el-table-column>
-        <el-table-column
-          width="100px"
-          prop="earned"
-          label="总收益">
-        </el-table-column>
-        <el-table-column
-          width="100px"
-          prop="dauarpu"
-          label="ARPU">
-        </el-table-column>
-        <el-table-column
-          width="100px"
-          prop="dnu"
-          label="DNU">
-        </el-table-column>
-        <el-table-column v-if="this.query_way==='日'"
-                         width="100px"
-                         prop="mnu"
-                         label="MNU">
-        </el-table-column>
-        <el-table-column
-          width="100px"
           prop="showtime"
           label="总展次">
-        </el-table-column>
-        <el-table-column
-          width="100px"
-          prop="ecpm_all"
-          label="总ECPM">
         </el-table-column>
         <el-table-column
           width="100px"
@@ -506,6 +329,31 @@
           label="插屏">
         </el-table-column>
         <el-table-column
+          width="100px"
+          prop="click_count_rate"
+          label="总点击率">
+        </el-table-column>
+        <el-table-column
+          width="100px"
+          prop="banner_click"
+          label="横幅点击率">
+        </el-table-column>
+        <el-table-column
+          width="100px"
+          prop="video_click"
+          label="视频点击率">
+        </el-table-column>
+        <el-table-column
+          width="100px"
+          prop="splash_click"
+          label="开屏点击率">
+        </el-table-column>
+        <el-table-column
+          width="100px"
+          prop="inline_click"
+          label="插屏点击率">
+        </el-table-column>
+        <el-table-column
           width="120px"
           prop="banner_pershow"
           label="横幅人均展次">
@@ -527,24 +375,10 @@
         </el-table-column>
         <el-table-column
           width="100px"
-          prop="banner_earned"
-          label="横幅收益">
+          prop="ecpm_all"
+          label="总ECPM">
         </el-table-column>
-        <el-table-column
-          width="100px"
-          prop="video_earned"
-          label="视频收益">
-        </el-table-column>
-        <el-table-column
-          width="100px"
-          prop="splash_earned"
-          label="开屏收益">
-        </el-table-column>
-        <el-table-column
-          width="100px"
-          prop="inline_earned"
-          label="插屏收益">
-        </el-table-column>
+
         <el-table-column
           width="100px"
           prop="banner_ecpm"
@@ -584,12 +418,19 @@
 </template>
 
 <script>
-  import PanelGroup from './components/PanelGroup'
-  import LineChart from './components/LineChart'
+  import PanelGroup from '@/views/table/homePage/addata/components/PanelGroup'
+  import LineChart from '@/views/table/homePage/addata/components/LineChart'
   import {gettest} from '@/api/lineMarker'
-  import {getResourceName, getName, getChannel, getappdata,getProjectList} from '@/api/complexChart/user_ad_addata_line_chart'
+  import {
+    getResourceName,
+    getName,
+    getChannel,
+    getappdata,
+    getProjectList
+  } from '@/api/complexChart/user_ad_addata_line_chart'
   import checkPermission from '@/utils/permission' // 权限判断函数
   import formatDate from '@/utils/timetransform'
+  import store from '@/store'
 
   let lineChartData = {}
 
@@ -601,12 +442,21 @@
     },
     data() {
       return {
+        retentionList: [],
+        singleList: [],
+        startList: [],
+        startList1: [],
+        startup: {
+          original: 0,
+          contrast: 0,
+          change: 0
+        },
         total_page: 0,
         query_way: '日',
         panel_view: true,
         arpu_checked: false,
-        arpu_chartline: true,
-        chartline: true,
+        arpu_chartline: false,
+        chartline: false,
         secondary_platform: '全部',
         platform_list: [],
         totaltabledata: [],
@@ -656,9 +506,9 @@
           name: '',
         },
         app_name_list: [],
-        secondary_game:{
-          project_name:'全部',
-          applist:[]
+        secondary_game: {
+          project_name: '全部',
+          applist: []
         },
         original_time: [],
         contrast_time: [],
@@ -776,6 +626,7 @@
       this.fetchdata()
     },
     methods: {
+      checkPermission,
       handleCurrentChange(val) {
         this.tableData = this.totaltabledata.slice((val - 1) * 10, val * 10)
       },
@@ -825,32 +676,10 @@
           this.panel_view = true
         }
       },
-      downloadhandler() {
-        import('@/vendor/Export2Excel').then(excel => {
-          const tHeader = ['日期', 'DAU', 'MAU', '总收益',
-            'DAUARPU', 'DNU', 'MNU', '总展次',
-            '总ECPM', '人均展次', '横幅', '视频',
-            '开屏', '插屏', '横幅收益', '视频收益',
-            '开屏收益', '插屏收益', '横幅ECPM', '视频ECPM',
-            '开屏ECPM', '插屏ECPM']
-          const filterVal = ['date', 'dau', 'mau', 'earned',
-            'dauarpu', 'dnu', 'mnu',
-            'showtime', 'ecpm_all', 'per_showtime', 'banner',
-            'video', 'splash', 'inline', 'banner_earned',
-            'video_earned', 'splash_earned', 'inline_earned', 'banner_ecpm',
-            'video_ecpm', 'splash_ecpm', 'inline_ecpm']
-          const data = this.formatJson(filterVal, this.tableData)
-          excel.export_json_to_excel({
-            header: tHeader,
-            data,
-            filename: '广告数据统计表'
-          })
-        })
-      },//下载统计图表
       showchart() {
         if (this.chartline === true) {
-          this.arpu_chartline = true
           this.chartline = false
+          this.arpu_chartline = true
         } else {
           this.chartline = true
           this.arpu_chartline = false
@@ -860,8 +689,8 @@
         this.secondary_platform = '全部'
         this.secondary_channel.program_mark = '全部'
         this.secondary_game = {
-          project_name:'全部',
-          applist:[]
+          project_name: '全部',
+          applist: []
         }
         this.analysisdata()
       },//重置按钮
@@ -902,6 +731,8 @@
         getappdata(listParam).then(response => {
           this.original_list = response.data
           this.original_list_app = response.data1
+          console.log(this.original_list)
+          console.log(this.original_list_app)
           this.original_mon = response.mon
           getappdata(listParam1).then(response => {
             this.contrast_list = response.data
@@ -919,6 +750,18 @@
         })
       },//根据时间查找数据
       analysisdata() {
+        //初始化启动次数list start
+        this.startup = {
+          original: 0,
+          contrast: 0,
+          change: 0
+        }
+        this.startList = []
+        this.startList1 = []
+        this.retentionList = []
+        this.singleList = []
+        //end
+
         this.resetchart()
         let times
         let times1
@@ -965,6 +808,16 @@
         let video_earned_list = []
         let inline_earned_list = []
         let splash_earned_list = []
+        let sum_original_start = 0
+        let sum_contrast_start = 0
+        let sum_original_single = 0
+        let sum_contrast_single = 0
+
+        let original_banner_click_list = []
+        let original_video_click_list = []
+        let original_inline_click_list = []
+        let original_splash_click_list = []
+
         for (let j = 0; j < times.length; j++) {
           let contrast_dau = 0
           let contrast_dnu = 0
@@ -984,6 +837,11 @@
           let contrast_splash = 0
           let original_dau = 0
           let original_dnu = 0
+          let original_start = 0   //启动次数
+          let contrast_start = 0
+          let original_single = []
+          let contrast_single = []
+          let original_retention = []
           //原始数据
           for (let i = 0; i < this.original_list.length; i++) {
             let channel = false
@@ -1009,12 +867,31 @@
             if (times[j] === this.original_list[i].date && game && channel) {
               original_dau = original_dau + this.original_list[i].dau
               original_dnu = original_dnu + this.original_list[i].dnu
+              original_start = original_start + this.original_list[i].startup_time
+              original_single.push(this.original_list[i].single_use_time)
+              original_retention.push(this.original_list[i].retention)
+
             }
           }
           original_sumdau = original_sumdau + original_dau
           original_sumdnu = original_sumdnu + original_dnu
+          sum_original_start = sum_original_start + original_start
           this.list1.firstData.push(original_dnu)
           this.list2.firstData.push(original_dau)
+          this.startList.push(original_start)
+          this.singleList.push()
+          let result = this.list_to_average(original_single).toFixed(0)
+          if (result == 'NaN') {
+            result = 0
+          }
+          this.singleList.push(result)
+          sum_original_single += parseInt(result)
+
+          let result_retention = this.list_to_average1(original_retention).toFixed(2)
+          if (result_retention == 'NaN') {
+            result_retention = 0
+          }
+          this.retentionList.push(result_retention)
 
           //对比数据
           for (let i = 0; i < this.contrast_list.length; i++) {
@@ -1036,25 +913,31 @@
                   game = true
                 }
               }
-
-
             }
             if (times1[j] === this.contrast_list[i].date && game && channel) {
               contrast_dau = contrast_dau + this.contrast_list[i].dau
               contrast_dnu = contrast_dnu + this.contrast_list[i].dnu
+              contrast_start = contrast_start + this.contrast_list[i].startup_time
+              contrast_single.push(this.contrast_list[i].single_use_time)
+
             }
           }
           contrast_sumdau = contrast_sumdau + contrast_dau
           contrast_sumdnu = contrast_sumdnu + contrast_dnu
+          sum_contrast_start = contrast_start + sum_contrast_start
           this.list1.secondData.push(contrast_dnu)
           this.list2.secondData.push(contrast_dau)
-
+          this.startList1.push(contrast_start)
+          let contrast_result = this.list_to_average(contrast_single).toFixed(0)
+          sum_contrast_single += parseInt(contrast_result)
           this.statistical_data.newuser = original_sumdnu
           this.statistical_data.contrast_newuser = contrast_sumdnu
           this.statistical_data.newuser_change = ((original_sumdnu - contrast_sumdnu) / contrast_sumdnu * 100).toFixed(2)
           this.statistical_data.activeuser = original_sumdau
           this.statistical_data.contrast_activeuser = contrast_sumdau
           this.statistical_data.activeuser_change = ((original_sumdau - contrast_sumdau) / contrast_sumdau * 100).toFixed(2)
+
+
           /**
            newuser: 1,
            contrast_newuser: 2,
@@ -1147,7 +1030,6 @@
           this.statistical_data.showtimes = parseInt(original_sumdau) === 0 ? 0 : (parseInt(original_sumearned) / original_sumdau).toFixed(4)
           this.statistical_data.contrast_showtimes = parseInt(contrast_sumdau) === 0 ? 0 : (parseInt(contrast_sumearned) / contrast_sumdau).toFixed(4)
           this.statistical_data.showtimes_change = parseInt(original_sumdau) === 0 || parseInt(contrast_sumdau) === 0 ? 0 : ((parseInt(original_sumearned) / original_sumdau - parseInt(contrast_sumearned) / contrast_sumdau) / (parseInt(contrast_sumearned) / contrast_sumdau) * 100).toFixed(2)
-
           this.statistical_data.earned = parseInt(original_sumearned)
           this.statistical_data.contrast_earned = parseInt(contrast_sumearned)
           this.statistical_data.earned_change = ((original_sumearned - contrast_sumearned) / contrast_sumearned * 100).toFixed(2)
@@ -1159,7 +1041,13 @@
            contrast_earned: 8,
            earned_change: -90,
            */
-          //各类型
+            //各类型
+
+          let original_banner_click = 0
+          let original_video_click = 0
+          let original_inline_click = 0
+          let original_splash_click = 0
+
 
           //原始数据
           for (let i = 0; i < this.original_list_app.length; i++) {
@@ -1192,24 +1080,34 @@
                 case '横幅':
                   orginal_banner = orginal_banner + this.original_list_app[i].impression
                   banner_earned = banner_earned + this.original_list_app[i].earned
+                  original_banner_click += this.original_list_app[i].click
                   break
                 case '视频':
                   orginal_video = orginal_video + this.original_list_app[i].impression
                   video_earned = video_earned + this.original_list_app[i].earned
+                  original_video_click += this.original_list_app[i].click
                   break
                 case '插屏':
                   orginal_inline = orginal_inline + this.original_list_app[i].impression
                   inline_earned = inline_earned + this.original_list_app[i].earned
+                  original_inline_click += this.original_list_app[i].click
                   break
                 case '开屏':
                   orginal_splash = orginal_splash + this.original_list_app[i].impression
                   splash_earned = splash_earned + this.original_list_app[i].earned
+                  original_splash_click += this.original_list_app[i].click
                   break
                 default:
                   break
               }
             }
           }
+
+          original_banner_click_list.push(original_banner_click)
+          original_video_click_list.push(original_video_click)
+          original_inline_click_list.push(original_inline_click)
+          original_splash_click_list.push(original_splash_click)
+
           banner_earned_list.push(banner_earned)
           video_earned_list.push(video_earned)
           inline_earned_list.push(inline_earned)
@@ -1288,6 +1186,20 @@
           this.list_inline_pershow.secondData.push(this.list2.secondData[j] === 0 ? 0 : (contrast_inline / this.list2.secondData[j]).toFixed(2))
           this.list_splash_pershow.secondData.push(this.list2.secondData[j] === 0 ? 0 : (contrast_splash / this.list2.secondData[j]).toFixed(2))
         }
+        //启动次数
+        this.startup.original = sum_original_start
+        this.startup.contrast = sum_contrast_start
+        this.startup.change = parseInt(sum_original_start) === 0 ? 0 : ((sum_original_start - sum_contrast_start) / sum_original_start).toFixed(4) * 100
+        //借用流水的图标
+        this.statistical_data.earned = this.startup.original
+        this.statistical_data.contrast_earned = this.startup.contrast
+        this.statistical_data.earned_change = this.startup.change
+        //借用展次的图标
+        this.statistical_data.showtimes = (sum_original_single / 7).toFixed(2)
+        this.statistical_data.contrast_showtimes = (sum_contrast_single / 7).toFixed(2)
+        this.statistical_data.showtimes_change = (sum_original_single / 7) === 0 ? 0 : (((sum_original_single / 7) - (sum_contrast_single / 7)) / (sum_original_single / 7)).toFixed(2)
+
+
         this.statistical_data.banner = parseInt(original_sumdau) === 0 ? 0 : (original_sumbanner / original_sumdau).toFixed(2)
         this.statistical_data.contrast_banner = parseInt(contrast_sumdau) === 0 ? 0 : (contrast_sumbanner / contrast_sumdau).toFixed(2)
         this.statistical_data.banner_change = parseInt(original_sumdau) === 0 || parseInt(contrast_sumdau) === 0 ? 0 : ((original_sumbanner / original_sumdau - contrast_sumbanner / contrast_sumdau) / (contrast_sumbanner / contrast_sumdau) * 100).toFixed(2)
@@ -1353,6 +1265,9 @@
             mondnu = this.list1.firstData[i]
           }
           let one = {
+            start: this.startList[i],
+            single: this.singleList[i],
+            retention: this.retentionList[i],
             mau: mondau + dau,
             mnu: mondnu + dnu,
             date: times[i],
@@ -1366,6 +1281,12 @@
             video: this.list_video.firstData[i],
             splash: this.list_splash.firstData[i],
             inline: this.list_inline.firstData[i],
+            click_count:(original_banner_click_list[i]+original_video_click_list[i]+original_inline_click_list[i]+original_splash_click_list[i]),
+            click_count_rate:this.list3.firstData[i]===0?0:((original_banner_click_list[i]+original_video_click_list[i]+original_inline_click_list[i]+original_splash_click_list[i])/this.list3.firstData[i]*100).toFixed(2),
+            banner_click: this.list_banner.firstData[i]===0?0:(original_banner_click_list[i]/this.list_banner.firstData[i]*100).toFixed(2),
+            video_click: this.list_video.firstData[i]===0?0:(original_video_click_list[i]/this.list_video.firstData[i]*100).toFixed(2),
+            inline_click: this.list_inline.firstData[i]===0?0:(original_inline_click_list[i]/this.list_inline.firstData[i]*100).toFixed(2),
+            splash_click: this.list_splash.firstData[i]===0?0:(original_splash_click_list[i]/this.list_splash.firstData[i]*100).toFixed(2),
             banner_pershow: (this.list2.firstData[i] === 0 ? 0 : this.list_banner.firstData[i] / this.list2.firstData[i]).toFixed(2),
             video_pershow: (this.list2.firstData[i] === 0 ? 0 : this.list_video.firstData[i] / this.list2.firstData[i]).toFixed(2),
             splash_pershow: (this.list2.firstData[i] === 0 ? 0 : this.list_splash.firstData[i] / this.list2.firstData[i]).toFixed(2),
@@ -1388,10 +1309,16 @@
         this.listLoading = false
 
       },//数据整合
-      paramchange()   {
+      paramchange() {
         this.listLoading = true
         this.analysisdata()
       },//根据游戏渠道变动
+      showretention() {
+        let routeData = this.$router.resolve({
+          name: 'UmengLifeTimeTable',
+        });
+        window.open(routeData.href, '_blank');
+      },//查看留存
       resetchart() {
         this.list1 = {
           name: ["原始数据-新增用户", "对比数据-新增用户"],
@@ -1470,15 +1397,40 @@
         }
       },//重置线性表内数据
       fetchName() {
-        this.listLoading=true
+        let accountName = store.getters && store.getters.name
+        let name = {
+          username: accountName
+        }
+        let valid = this.checkPermission(['director']) || this.checkPermission(['admin']) || this.checkPermission(['operatorleader']) || this.checkPermission(['sdksuport'])
+        this.listLoading = true
         getProjectList().then(response => {
-          this.app_name_list.push( {
-            project_name: '全部',
-            applist: []
-          })
-          let list=response.data
-          console.log(list)
-          this.app_name_list=this.app_name_list.concat(list)
+          let todolist = response.data
+          if (valid) {
+            this.app_name_list.push({
+              project_name: '全部',
+              applist: []
+            })
+            let list = response.data
+            this.app_name_list = this.app_name_list.concat(list)
+          } else {
+            getResourceName(name).then(response => {
+              let newlist = []
+              let projectlist = response.data
+              for (let i = 0; i < todolist.length; i++) {
+                for (let j = 0; j < projectlist.length; j++) {
+                  if (todolist[i].project_name === projectlist[j]) {
+                    newlist.push(todolist[i])
+                    break
+                  }
+                }
+              }
+              this.app_name_list = newlist
+              if (newlist.length > 0) {
+                this.secondary_game = newlist[0]
+              }
+
+            });
+          }
         }).catch(function (rs) {
           console.log(rs)
           this.listLoading = false
@@ -1492,8 +1444,8 @@
       initdate() {
         const end = new Date();
         const start = new Date();
-        start.setTime(start.getTime() - 3600 * 1000 * 24 * 6);
-        end.setTime(end.getTime());
+        start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+        end.setTime(end.getTime() - 3600 * 1000 * 24);
         //this.original_time.push(start)
         //this.original_time.push(end)
 
@@ -1501,8 +1453,8 @@
         this.original_time.push(this.formatDate(new Date(end), 'yyyy-MM-dd'))
         const end1 = new Date();
         const start1 = new Date();
-        start1.setTime(start1.getTime() - 3600 * 1000 * 24 * 13);
-        end1.setTime(end1.getTime() - 3600 * 1000 * 24 * 7);
+        start1.setTime(start1.getTime() - 3600 * 1000 * 24 * 14);
+        end1.setTime(end1.getTime() - 3600 * 1000 * 24 * 8);
         //this.contrast_time.push(start1)
         //this.contrast_time.push(end1)
 
@@ -1512,6 +1464,41 @@
       handleSetLineChartData(type) {
         this.lineChartData = lineChartData[type]
       },//点击panel group时间  已失效
+      /**
+       * 时间转为秒
+       * @param time 时间(00:00:00)
+       * @returns {string} 时间戳（单位：秒）
+       */
+      time_to_sec(time) {
+        let s = '';
+        let hour = time.split(':')[0];
+        let min = time.split(':')[1];
+        let sec = time.split(':')[2];
+        s = Number(hour * 3600) + Number(min * 60) + Number(sec);
+        return s;
+      },
+      list_to_average(list) {
+        if (list.length < 1) {
+          return 0
+        }
+        let sum = 0
+        for (let i = 0; i < list.length; i++) {
+          sum += this.time_to_sec(list[i])
+        }
+        return sum / list.length
+
+      },
+      list_to_average1(list) {
+        if (list.length < 1) {
+          return 0
+        }
+        let sum = 0
+        for (let i = 0; i < list.length; i++) {
+          sum += list[i]
+        }
+        return sum / list.length
+
+      },
       getdate(startDate, endDate) {
 
         const dateList = []

@@ -125,6 +125,7 @@
         @handleSetLineChartData="handleSetLineChartData"
         style="margin-bottom: -45px" v-bind:statistical_data="statistical_data"/>
     </div>
+
     <div v-if="chartline" class="line-chart" style="margin-right: 100px;margin-top: 40px">
       <span class="font_cline">支付金额</span>
       <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">

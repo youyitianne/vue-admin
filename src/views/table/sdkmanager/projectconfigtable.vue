@@ -115,7 +115,6 @@
       </el-table-column>
       <el-table-column label="内部版本-更新" prop="versioncode_update_version">
       </el-table-column>
-
       <el-table-column label="操作" align="center" width="150px" class-name="small-padding fixed-width"
                        v-if="checkPermission(['operatorleader','admin','sdksuport','director','operator'])">
         <template slot-scope="scope">
@@ -672,7 +671,6 @@
         getSdkTemplate().then(response => {
           this.sdkTemplate = response.name_list     //对话框内sdk模版列表
           this.hidsdkTemplate = response.name_list   //对话框内sdk模版列表
-          console.log(this.hidsdkTemplate)
           this.sdkTemplatelibrary = response.list
           this.options = response.select_list
           this.listLoading = false
@@ -708,7 +706,6 @@
         this.filter_form_name = name  //联动对话框内标签页内容展示
       },//根据点击的标签页名，渲染
       findSdkTemplate() {
-        this.tag_name = ''
         this.sdk.form.domains = []
         for (let i = 0; i < this.checkedSdkTemplate.length; i++) {
           for (let j = 0; j < this.sdkTemplatelibrary.length; j++) {
@@ -722,7 +719,11 @@
           }
         }
         this.filter_form_name = this.page_name
-        this.change_pagename(this.page_name)
+        console.log(this.tag_name)
+        if (this.tag_name==='暂无'&&this.checkedSdkTemplate.length>0){
+          this.tag_name=this.checkedSdkTemplate[0]
+        }
+        this.change_pagename(this.tag_name)
       },//sdk模版根据多选框变动
       createData() {
         //dia 选择器提交
@@ -997,7 +998,6 @@
         }
         this.sdk.form.domains = list
 
-
         if (param.sdk_status === 1) {
           this.sdk.sdkstatus = '1'
         } else {
@@ -1027,7 +1027,6 @@
           }
         }
         this.filter_form_name = this.page_name
-        this.change_pagename(this.page_name)
         //展示时sdk模版多选框等于checked start
         let checked1 = param.checked.split(',')
         let newchecked1 = []
@@ -1037,7 +1036,6 @@
           }
         }
         this.checkedSdkTemplate = newchecked1
-
         let checked2 = param.second_checked.split(',')
         let newchecked2 = []
         for (let i = 0; i < checked2.length; i++) {
@@ -1047,9 +1045,19 @@
         }
         this.dialog_secondary_checked = newchecked2
         //end
+
+
         this.rowvalue = param
         this.dialogStatus = 'update'
+        //获取row 参数中的checked
+        if (param.checked.split(',').length>0){
+          let data=param.checked.split(',')[0]
+          this.tag_name = data
+          this.change_pagename(data)
+        }
+
         this.dialogFormVisible = true
+
       }, //更新对话框展示
       updateData(val) {
         let tothis = this

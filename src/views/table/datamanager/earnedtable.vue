@@ -12,11 +12,42 @@
         value-format="yyyy-MM-dd"
         :picker-options="pickerOptions0">>
       </el-date-picker>
+
+      <el-button v-waves :loading="downloadLoading" type="primary" icon="el-icon-download"
+                 @click="daily_download1">
+        {{'预览'}}
+      </el-button>
+
       <el-button v-waves :loading="downloadLoading" type="primary" icon="el-icon-download"
                  @click="daily_download">
         {{'下载收益表'}}
       </el-button>
-      <br>
+
+      <el-tabs type="border-card" style="margin-top: 20px">
+        <el-tab-pane label="总收益预览">
+          <table class="gridtable">
+            <tr v-for="outer in earnedList">
+              <td v-for="inner in outer">{{inner}}</td>
+            </tr>
+          </table>
+        </el-tab-pane>
+        <el-tab-pane label="ARPU预览">
+          <table class="gridtable">
+            <tr v-for="outer in arpuList">
+              <td v-for="inner in outer">{{inner}}</td>
+            </tr>
+          </table>
+        </el-tab-pane>
+        <el-tab-pane label="DAU预览">
+          <table class="gridtable">
+            <tr v-for="outer in dauList">
+              <td v-for="inner in outer">{{inner}}</td>
+            </tr>
+          </table>
+        </el-tab-pane>
+      </el-tabs>
+
+
     </div>
   </div>
 
@@ -39,7 +70,9 @@
   import {parseTime} from '@/utils'
   import checkPermission from '@/utils/permission' // 权限判断函数
   import {mapGetters} from 'vuex'
-
+  import {
+    getDailyMsg1,
+  } from '@/api/table/datamanager/earnedtable'
 
   export default {
     directives: {waves},
@@ -61,6 +94,9 @@
     },
     data() {
       return {
+        arpuList: [],
+        dauList: [],
+        earnedList: [],
         daily_download_value: [],
         app_name_list: [],
         secondary_project: '选择项目',
@@ -90,7 +126,7 @@
       this.fetchProject()
     },
     methods: {
-       daily_download() {
+      daily_download() {
         let tothis = this
         if (this.daily_download_value === null) {
           this.open3()
@@ -124,7 +160,74 @@
           link.click()
           this.downloadLoading = false
         }).catch(function (rs) {
-          console.log(rs.toString()+'asdasdas')
+          console.log(rs.toString() + 'asdasdas')
+          tothis.downloadLoading = false
+          tothis.$notify({
+            title: '下载失败',
+            message: '刷新试试',
+            type: 'error',
+            duration: 2000
+          })
+        })
+      },//日常收益，arpu表下载
+      daily_download1() {
+        let tothis = this
+        if (this.daily_download_value === null) {
+          this.open3()
+          return
+        }
+        if (this.daily_download_value[0] === undefined) {
+          this.open3()
+          return
+        }
+        if (this.daily_download_value[1] === undefined) {
+          this.open3()
+          return
+        }
+        this.downloadLoading = true
+
+        let param = {
+          start: this.daily_download_value[0],
+          end: this.daily_download_value[1],
+          list: this.app_name_list
+        }
+        this.earnedList=[]
+        this.dauList=[]
+        this.arpuList=[]
+        getDailyMsg1(param).then(response => {
+          if (!response) {
+            return
+          }
+          let arpuList1 = response.data.arpu
+          for (let j = 0; j < arpuList1[0].length; j++) {
+            let newList=[]
+            for (let i = 0; i < arpuList1.length; i++) {
+              newList.push(arpuList1[i][j])
+            }
+            this.arpuList.push(newList)
+          }
+          let dauList1 = response.data.dau
+          for (let j = 0; j < dauList1[0].length; j++) {
+            let newList=[]
+            for (let i = 0; i < dauList1.length; i++) {
+              newList.push(dauList1[i][j])
+            }
+            this.dauList.push(newList)
+          }
+
+          let earnedList1 = response.data.earned
+          for (let j = 0; j < earnedList1[0].length; j++) {
+            let newList=[]
+            for (let i = 0; i < earnedList1.length; i++) {
+              newList.push(earnedList1[i][j])
+            }
+            this.earnedList.push(newList)
+          }
+
+
+          this.downloadLoading = false
+        }).catch(function (rs) {
+          console.log(rs.toString() + 'asdasdas')
           tothis.downloadLoading = false
           tothis.$notify({
             title: '下载失败',
@@ -170,7 +273,7 @@
           })
         }
       }//获取应用名
-      ,handleDownloadAll() {
+      , handleDownloadAll() {
         let tothis = this
         if (this.download_value === null) {
           this.open3()
@@ -233,7 +336,7 @@
           }
         }
         return fmt;
-      },padLeftZero(str) {
+      }, padLeftZero(str) {
         return ('00' + str).substr(str.length);
       }
       ,
@@ -246,3 +349,27 @@
     }
   }
 </script>
+
+<style type="text/css">
+  .gridtable {
+    font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+    font:14px bolder;
+    border-collapse: collapse;
+  }
+  .gridtable tr {
+    border-width: 1px;
+    padding: 0px;
+    border-style: solid;
+    border-color: #99a9bf;
+    background-color: #dedede;
+  }
+  .gridtable td {
+    margin: 0px;
+    border-width: 1px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #666666;
+    background-color: #ffffff;
+  }
+</style>
+

@@ -158,7 +158,7 @@
         tableKey: 0,
         list: null,
         total: 0,
-        listLoading: false,
+        listLoading: true,
         importanceOptions: [1, 2, 3],
         names: [],
         sortOptions: [{label: 'ID Ascending', key: '+id'}, {label: 'ID Descending', key: '-id'}],

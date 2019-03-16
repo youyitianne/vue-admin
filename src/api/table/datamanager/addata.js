@@ -89,3 +89,12 @@ export function getDailyAdtypeMsg(param) {
     data:param
   })
 }
+
+export function getarpufile_preview(param) {
+  return request({
+    url: '/arpufile_preview/'+param.start+'_'+param.end,
+    method: 'post',
+    params:param,
+    data:param
+  })
+}

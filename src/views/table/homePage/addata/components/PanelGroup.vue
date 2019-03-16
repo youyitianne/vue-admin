@@ -1,84 +1,9 @@
 <template>
   <el-row :gutter="40" class="panel-group">
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-      <div class="card-panel" @click="handleSetLineChartData('newVisitis')">
-        <div class="card-panel-icon-wrapper icon-people">
-          <svg-icon icon-class="peoples" class-name="card-panel-icon" />
-        </div>
-        <div class="card-panel-description">
-          <div class="card-panel-text">新增用户</div>
-          <count-to :start-val="0" :end-val="this.statistical_data.newuser" :duration="10" class="card-panel-num"/>
-        </div>
-        <div style="margin-top: 20px;margin-left: 50px;font-size: 14px;font-weight: bolder">
-            对比新增用户：{{statistical_data.contrast_newuser}}<br><br>
-            同比:
-          <span style="color: limegreen" v-if="statistical_data.newuser_change<0">↘ &nbsp;{{statistical_data.newuser_change}}%</span>
-          <span style="color:  hotpink" v-if="statistical_data.newuser_change>0">↗ &nbsp;{{statistical_data.newuser_change}}%</span>
-          <span style="color: grey" v-if="statistical_data.newuser_change==0"> &nbsp;≈&nbsp;0&nbsp;%</span>
-          </div>
-      </div>
-    </el-col>
-    <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-      <div class="card-panel" @click="handleSetLineChartData('messages')">
-        <div class="card-panel-icon-wrapper icon-message">
-          <svg-icon icon-class="peoples" class-name="card-panel-icon" />
-        </div>
-        <div class="card-panel-description">
-          <div class="card-panel-text">活跃用户</div>
-          <count-to :start-val="0" :end-val="this.statistical_data.activeuser" :duration="10" class="card-panel-num"/>
-        </div>
-        <div style="margin-top: 20px;margin-left: 50px;font-size: 14px;font-weight: bolder">
-          对比活跃用户：{{statistical_data.contrast_activeuser}}<br><br>
-          同比:
-          <span style="color:  limegreen" v-if="statistical_data.activeuser_change<0">↘ &nbsp;{{statistical_data.activeuser_change}}%</span>
-          <span style="color: hotpink" v-if="statistical_data.activeuser_change>0">↗ &nbsp;{{statistical_data.activeuser_change}}%</span>
-          <span style="color: grey" v-if="statistical_data.activeuser_change==0"> &nbsp;≈&nbsp;0&nbsp;%</span>
-        </div>
-      </div>
-    </el-col>
-    <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-      <div class="card-panel" @click="handleSetLineChartData('purchases')">
-        <div class="card-panel-icon-wrapper icon-money">
-          <svg-icon icon-class="documentation" class-name="card-panel-icon" />
-        </div>
-        <div class="card-panel-description">
-          <div class="card-panel-text">总ARPU</div>
-          <span style="font-size: 20px;font-weight: bold">{{statistical_data.showtimes}}</span>
-          <!--<count-to :start-val="0" :end-val="this.statistical_data.showtimes" :duration="10" class="card-panel-num"/>-->
-        </div>
-        <div style="margin-top: 20px;margin-left: 50px;font-size: 14px;font-weight: bolder">
-          对比总ARPU：{{statistical_data.contrast_showtimes}}<br><br>
-          同比:
-          <span style="color:  limegreen" v-if="statistical_data.showtimes_change<0">↘ &nbsp;{{statistical_data.showtimes_change}}%</span>
-          <span style="color: hotpink" v-if="statistical_data.showtimes_change>0">↗ &nbsp;{{statistical_data.showtimes_change}}%</span>
-          <span style="color: grey" v-if="statistical_data.showtimes_change==0"> &nbsp;≈&nbsp;0&nbsp;%</span>
-        </div>
-      </div>
-    </el-col>
-    <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
       <div class="card-panel" @click="handleSetLineChartData('shoppings')">
         <div class="card-panel-icon-wrapper icon-money">
-          <svg-icon icon-class="money" class-name="card-panel-icon" />
-        </div>
-        <div class="card-panel-description">
-          <div class="card-panel-text">总流水</div>
-          <count-to :start-val="0" :end-val="this.statistical_data.earned" :duration="10" class="card-panel-num"/>
-        </div>
-        <div style="margin-top: 20px;margin-left: 50px;font-size: 14px;font-weight: bolder">
-          对比总流水：{{statistical_data.contrast_earned}}<br><br>
-          同比:
-          <span style="color:  limegreen" v-if="statistical_data.earned_change<0">↘ &nbsp;{{statistical_data.earned_change}}%</span>
-          <span style="color: hotpink" v-if="statistical_data.earned_change>0">↗ &nbsp;{{statistical_data.earned_change}}%</span>
-          <span style="color: grey" v-if="statistical_data.earned_change==0"> &nbsp;≈&nbsp;0&nbsp;%</span>
-        </div>
-      </div>
-    </el-col><br>
-
-
-    <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-      <div class="card-panel" @click="handleSetLineChartData('shoppings')">
-        <div class="card-panel-icon-wrapper icon-money">
-          <svg-icon icon-class="banner" class-name="card-panel-icon" />
+          <svg-icon icon-class="banner" class-name="card-panel-icon"/>
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">横幅人均展次</div>
@@ -96,7 +21,7 @@
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
       <div class="card-panel" @click="handleSetLineChartData('shoppings')">
         <div class="card-panel-icon-wrapper icon-money">
-          <svg-icon icon-class="video" class-name="card-panel-icon" />
+          <svg-icon icon-class="video" class-name="card-panel-icon"/>
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">视频人均展次</div>
@@ -107,7 +32,8 @@
           对比视频人均展次：{{statistical_data.contrast_video}}<br><br>
           同比:
           <span style="color:  limegreen" v-if="statistical_data.video_change<0">↘ &nbsp;{{statistical_data.video_change}}%</span>
-          <span style="color: hotpink" v-if="statistical_data.video_change>0">↗ &nbsp;{{statistical_data.video_change}}%</span>
+          <span style="color: hotpink"
+                v-if="statistical_data.video_change>0">↗ &nbsp;{{statistical_data.video_change}}%</span>
           <span style="color: grey" v-if="statistical_data.video_change==0"> &nbsp;≈&nbsp;0&nbsp;%</span>
         </div>
       </div>
@@ -115,7 +41,7 @@
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
       <div class="card-panel" @click="handleSetLineChartData('shoppings')">
         <div class="card-panel-icon-wrapper icon-money">
-          <svg-icon icon-class="inline" class-name="card-panel-icon" />
+          <svg-icon icon-class="inline" class-name="card-panel-icon"/>
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">插屏人均展次</div>
@@ -134,7 +60,7 @@
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
       <div class="card-panel" @click="handleSetLineChartData('shoppings')">
         <div class="card-panel-icon-wrapper icon-money">
-          <svg-icon icon-class="splash" class-name="card-panel-icon" />
+          <svg-icon icon-class="splash" class-name="card-panel-icon"/>
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">开屏人均展次</div>
@@ -154,41 +80,39 @@
 </template>
 
 <script>
-import CountTo from 'vue-count-to'
-import Index from "../../../components/Dropzone/index";
+  import CountTo from 'vue-count-to'
+  import Index from "@/components/Dropzone/index.vue";
 
-export default {
-  components: {
-    Index,
-    CountTo
-  },
-  props:{
-    statistical_data:{
-      type:Object,
-      default:'765'
+  export default {
+    components: {
+      Index,
+      CountTo
+    },
+    props: {
+      statistical_data: {
+        type: Object,
+        default: '765'
+      }
+    }
+    ,
+    data() {
+      return {}
+    },
+    mounted() {
+
+    },
+    methods: {
+      handleSetLineChartData(type) {
+        this.$emit('handleSetLineChartData', type)
+      }
     }
   }
-  ,
-  data(){
-    return{
-
-    }
-  },
-  mounted(){
-
-  },
-  methods: {
-    handleSetLineChartData(type) {
-      this.$emit('handleSetLineChartData', type)
-    }
-  }
-}
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
   .panel-group {
     margin-top: 18px;
-    .card-panel-col{
+    .card-panel-col {
       margin-bottom: 32px;
     }
     .card-panel {

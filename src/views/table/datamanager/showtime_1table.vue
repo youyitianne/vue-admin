@@ -11,7 +11,9 @@
         value-format="yyyy-MM-dd"
         :picker-options="pickerOptions0">>
       </el-date-picker>
-      <el-select v-model="secondary_project" style="margin-right: 20px" @change="" value-key="project_name"
+      <el-select v-model="secondary_project"
+                 style="margin-right: 20px"
+                 value-key="project_name"
                  :placeholder="'选择项目'" filterable>
         <el-option v-for="item in app_name_list" :key="item.project_name" :label="item.project_name" :value="item">
         </el-option>
@@ -77,6 +79,7 @@
     },
     data() {
       return {
+        appList_choosed:[],
         daily_adtype_download_value: [],
         daily_adtype_chooseNamed: '选择项目',
         daily_download_value: [],
@@ -511,7 +514,7 @@
           let link = document.createElement('a')
           link.style.display = 'none'
           link.href = url
-          link.setAttribute('download', this.downloadParam.start + '_' + this.downloadParam.end + '_' + this.downloadParam.name.project_name + '.xls')
+          link.setAttribute('download', this.downloadParam.name.project_name + '_' + this.downloadParam.start + '_' + this.downloadParam.end + '_' + '.xls')
           document.body.appendChild(link)
           link.click()
           this.downloadLoading = false

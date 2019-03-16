@@ -3,7 +3,7 @@
     <remote-js src="http://pv.sohu.com/cityjson?ie=utf-8"></remote-js>
     <el-tabs style="height: 200px;">
       <el-tab-pane label="个人信息">
-        <div class="passwod">名字:{{ name }}</div>
+        <div class="passwod">账号:{{ name }}</div>
         <div class="passwod">角色:<span v-for="role in roles" :key="role">{{ role }} </span></div>
       </el-tab-pane>
       <el-tab-pane label="更换密码">

@@ -115,7 +115,7 @@
         resourceFormVisible: false,
         resourceName: '资源编辑',
         list: null,
-        listLoading: false,
+        listLoading: true,
       }
     },
     mounted() {

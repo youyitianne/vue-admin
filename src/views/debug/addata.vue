@@ -1037,6 +1037,7 @@
           }
         }
         let data2 = []
+
         let date = this.secondary_date
         if (date == '' || date == '全部') {
           data2 = data1

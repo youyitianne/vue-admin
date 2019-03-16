@@ -10,7 +10,14 @@
         value-format="yyyy-MM-dd"
         :picker-options="pickerOptions0">>
       </el-date-picker>
-      <el-select v-model="select_value" filterable placeholder="请选择应用" value-key="name">
+      <el-select v-model="select_value1"
+                 style="width: 200px"
+                 filterable
+                 placeholder="请选择应用"
+                 value-key="name"
+                 multiple
+                 :multiple-limit=5
+                 collapse-tags>
         <el-option
           v-loading.fullscreen.lock="fullscreenLoading"
           v-for="item in options"
@@ -20,7 +27,7 @@
         </el-option>
       </el-select>
       <el-button :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-search"
-                 @click="handleFilter">{{ searchName }}
+                 @click="handleFilter1">{{ searchName }}
       </el-button>
       <el-button v-waves :loading="downloadLoading" type="primary" icon="el-icon-download" @click="handleDownload">
         {{'下载'}}
@@ -93,7 +100,6 @@
         </template>
       </el-table-column>
     </el-table>
-
   </div>
 
 
@@ -118,6 +124,7 @@
     },
     data() {
       return {
+        select_value1:[],
         fullscreenLoading: false,
         options: '',
         select_value: '',
@@ -173,10 +180,67 @@
           tothis.fullscreenLoading = false
         });
       },
-      handleFilter() {
+      // handleFilter() {
+      //   let tothis = this
+      //   this.downloadLoading = true
+      //   if (this.timevalue === '' || this.timevalue == null || this.timevalue[0] === 'undefined' || this.timevalue[1] === 'undefined' || this.select_value === '') {
+      //     this.$message({
+      //       message: '记得选择查询范围~',
+      //       type: 'warning'
+      //     });
+      //     this.downloadLoading = false
+      //     return
+      //   }
+      //   let time = 30 * 24 * 60 * 60 * 1000
+      //   let startdate = new Date(this.timevalue[0]).getTime()
+      //   let enddate = new Date(this.timevalue[1]).getTime()
+      //   if (enddate - startdate > time) {
+      //     tothis.$notify({
+      //       title: '',
+      //       message: '时间范围最多选择30天',
+      //       type: 'warning',
+      //       duration: 2000
+      //     })
+      //     this.downloadLoading = false
+      //     return
+      //   }
+      //   this.listParam.start = this.timevalue[0]
+      //   this.listParam.end = this.timevalue[1]
+      //   this.listParam.name = this.select_value.name
+      //   this.listParam.appkey = this.select_value.appkey
+      //   this.listLoading = true
+      //   getumeng(this.listParam).then(response => {
+      //     let newlist = []
+      //     let list = response.data.data
+      //     let channel = response.data.channel
+      //     for (let i = 0; i < list.length; i++) {
+      //       let name = list[i].app_name;
+      //       let list1 = list[i].list
+      //       for (let j = 0; j < list1.length; j++) {
+      //         let object = list1[j];
+      //         object.id = name
+      //         if (typeof (object.launch) === 'undefined') {
+      //           object.launch = '--'
+      //         }
+      //         if (typeof (object.duration) === 'undefined') {
+      //           object.duration = '--'
+      //         }
+      //         object = this.setretention(object, channel)
+      //         newlist.push(object)
+      //       }
+      //     }
+      //     this.list = newlist
+      //     this.listLoading = false
+      //     this.downloadLoading = false
+      //   }).catch(function (rs) {
+      //     tothis.listLoading = false
+      //     tothis.downloadLoading = false
+      //   })
+      // },
+      handleFilter1() {
         let tothis = this
         this.downloadLoading = true
-        if (this.timevalue === '' || this.timevalue == null || this.timevalue[0] === 'undefined' || this.timevalue[1] === 'undefined' || this.select_value === '') {
+        if (this.timevalue === '' || this.timevalue == null || this.timevalue[0] === 'undefined' || this.timevalue[1] === 'undefined' || this.select_value1 === []) {
           this.$message({
             message: '记得选择查询范围~',
             type: 'warning'
@@ -197,12 +261,14 @@
           this.downloadLoading = false
           return
         }
-        this.listParam.start = this.timevalue[0]
-        this.listParam.end = this.timevalue[1]
-        this.listParam.name = this.select_value.name
-        this.listParam.appkey = this.select_value.appkey
         this.listLoading = true
-        getumeng(this.listParam).then(response => {
+        let data={
+          data:this.select_value1,
+          start:this.timevalue[0],
+          end:this.timevalue[1]
+        }
+        getumeng(data).then(response => {
+          let z=0
           let newlist = []
           let list = response.data.data
           let channel = response.data.channel
@@ -218,7 +284,7 @@
               if (typeof (object.duration) === 'undefined') {
                 object.duration = '--'
               }
-              object = this.setretention(object, channel)
+              object = this.setretention1(object, channel,z++)
               newlist.push(object)
             }
           }
@@ -226,7 +292,6 @@
           this.listLoading = false
           this.downloadLoading = false
         }).catch(function (rs) {
-          console.error(rs)
           tothis.listLoading = false
           tothis.downloadLoading = false
         })
@@ -236,6 +301,27 @@
           let channelName = listval[i].channelName
           let list = listval[i].list
           if (val.channel === channelName) {
+            for (let j = 0; j < list.length; j++) {
+              if (list[j].install_period === val.date) {
+                val.total_install = list[j].retention_rate[0]
+                val.total_install_rate = 0
+                return val
+              }
+            }
+          }
+        }
+        val.total_install = 0
+        val.total_install_rate = 0
+        return val
+      },
+      setretention1(val, listval,num) {
+        //total_install_rate 版本号
+        //total_install 次留
+        for (let i = 0; i < listval.length; i++) {
+          let channelName = listval[i].channelName
+          let appName= listval[i].list.appName
+          let list = listval[i].list.channelList
+          if (val.channel === channelName&&appName === val.id) {
             for (let j = 0; j < list.length; j++) {
               if (list[j].install_period === val.date) {
                 val.total_install = list[j].retention_rate[0]

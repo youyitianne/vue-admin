@@ -41,7 +41,7 @@
       highlight-current-row
       @expand-change="expandrowhandler">
       <el-table-column type="expand" label="展开" width="100px">
-        <template slot-scope="props">
+        <template slot-scope="props" style="margin: 60px">
           <el-form label-position="left" inline class="demo-table-expand">
             <el-form-item label="时间:">
               <span>{{ props.row.date1}}</span>
@@ -77,7 +77,7 @@
             <!--<span>{{ props.row.note }}</span>-->
             <!--</el-form-item>-->
           </el-form>
-          <div>
+          <div style="margin-bottom: 70px">
             <el-table
               stripe
               border
@@ -101,6 +101,7 @@
               </el-table-column>
             </el-table>
           </div>
+          <HR style="border:3px double #001528" width="95%" color=#987cb9 SIZE=3></HR>
         </template>
       </el-table-column>
       <el-table-column label="序号" align="center" width="60">
@@ -120,13 +121,74 @@
       </el-table-column>
       <el-table-column label="内部版本-更新" prop="versioncode_update_version">
       </el-table-column>
-      <el-table-column label="操作" align="center" width="150px" class-name="small-padding fixed-width"
-                       v-if="checkPermission(['director','admin','sdksuport','operatorleader'])">
+      <el-table-column label="操作" align="center" width="150px" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button type="danger" size="mini" @click="handleDelete(scope.row)">{{ "删除" }}</el-button>
+          <el-button type="danger" size="mini" @click="handleDelete(scope.row)" v-if="checkPermission(['director','admin','sdksuport','operatorleader'])">{{ "删除" }}</el-button>
+          <el-button type="success" size="mini" @click="handleView(scope.row)" >{{ "查看" }}</el-button>
         </template>
       </el-table-column>
     </el-table>
+
+    <el-dialog
+      :close-on-click-modal=false
+      title="详情"
+      :visible.sync="dialogVisible"
+      width="70%">
+      <el-form label-position="left" inline class="demo-table-expand" :model="dialogForm" label-width="200px">
+        <el-form-item label="时间:">
+          <span>{{ dialogForm.date1}}</span>
+        </el-form-item>
+        <el-form-item label="游戏名:">
+          <span>{{ dialogForm.app_name }}</span>
+        </el-form-item>
+        <el-form-item label="包名:">
+          <span>{{ dialogForm.package_name }}</span>
+        </el-form-item>
+        <el-form-item label="渠道标记:">
+          <span>{{ dialogForm.channel_mark }}</span>
+        </el-form-item>
+        <el-form-item label="外部版本-在线:">
+          <span>{{ dialogForm.version_online }}</span>
+        </el-form-item>
+        <el-form-item label="内部版本-在线:">
+          <span>{{ dialogForm.versioncode_online_version }}</span>
+        </el-form-item>
+        <el-form-item label="外部版本-更新:">
+          <span>{{ dialogForm.version_update }}</span>
+        </el-form-item>
+        <el-form-item label="内部版本_更新:">
+          <span>{{ dialogForm.versioncode_update_version }}</span>
+        </el-form-item>
+      </el-form>
+      <el-table
+        stripe
+        border
+        :data="projectObject.paramter"
+        style="width: 90%;margin-bottom: 30px;margin-top: 30px"
+        :span-method="objectSpanMethod">
+        <el-table-column
+          prop="mark"
+          label="模块名"
+          style="width: 200px">
+        </el-table-column>
+        <el-table-column
+          prop="param_name1"
+          label="参数名"
+          style="width: 300px">
+        </el-table-column>
+        <el-table-column
+          prop="param"
+          label="参数">
+        </el-table-column>
+      </el-table>
+      <span>链接:{{link}}</span>
+      <span slot="footer" class="dialog-footer">
+    <el-button @click="dialogVisible = false">取 消</el-button>
+  </span>
+    </el-dialog>
+
+
+
   </div>
 </template>
 
@@ -157,6 +219,10 @@
     },
     data() {
       return {
+        link:'',
+        dialogForm:{},
+        projectObject:{},
+        dialogVisible:false,
         projectList: [],
         projectlist_select: [],
         secondary_project: '',
@@ -264,6 +330,14 @@
       this.initDate()   //初始化日期查询数据
     },
     methods: {
+      handleView(value){
+        this.link='http://192.168.1.144:8085/sdkapi?timestamp='+value.timestamp+'&name='+value.app_name+'&channel='+value.channel_mark
+        this.dialogForm=value
+        this.getSpanArr(value.paramter)
+        this.projectObject=value
+        this.dialogVisible=true
+
+      },//查看按钮
       routeWithParam() {
         let name = this.$route.query.package_name
         if (typeof(name) != 'undefined') {
@@ -908,6 +982,8 @@
         }
       },//table查询条件初始化
       expandrowhandler(row, expandedRows) {
+        console.log(row)
+        console.log(expandedRows)
         let that = this
         if (expandedRows.length) {
           that.expands = []

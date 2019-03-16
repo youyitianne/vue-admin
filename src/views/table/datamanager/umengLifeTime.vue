@@ -49,7 +49,7 @@
       <el-tag type="success">生命周期：{{average.lt}}</el-tag>
     </el-card>
     <el-table
-      height="850"
+      height="700"
       v-loading="listLoading"
       :data="list"
       element-loading-text="Loading"
@@ -253,10 +253,14 @@
             getResourceName(name).then(response => {
               let projectlist = response.data
               for (let i = 0; i < optionlist.length; i++) {
+                let flag = false
                 for (let j = 0; j < projectlist.length; j++) {
                   if (optionlist[i].name.indexOf(projectlist[j]) != -1) {
-                    newoptionlist.push(optionlist[i])
+                    flag = true
                   }
+                }
+                if (flag) {
+                  newoptionlist.push(optionlist[i])
                 }
               }
             });
@@ -396,14 +400,15 @@
           this.downloadLoading = false
           return
         }
+        console.log(this.list)
         import('@/vendor/Export2Excel').then(excel => {
-          const tHeader = ['时间', '应用名', '渠道', '新增人数', '活跃人数', '启动次数', '单次启动时长', '次日留存率', '版本']
-          const filterVal = ['date', 'id', 'channel', 'install', 'active_user', 'launch', 'duration', 'total_install', 'total_install_rate']
+          const tHeader = ['时间', '次日留存', '二日留存', '三日留存', '四日留存', '五日留存', '六日留存', '七日留存', '十四日留存', '三十日留存', '生命周期']
+          const filterVal = ['date', 'oneDay', 'twoDay', 'threeDay', 'fourDay', 'fiveDay', 'sixDay', 'sevenDay', 'halfmonth', 'onemonth', 'lt']
           const data = this.formatJson(filterVal, this.list)
           excel.export_json_to_excel({
             header: tHeader,
             data,
-            filename: '友盟3'
+            filename: '友盟留存'
           })
           this.downloadLoading = false
         })
