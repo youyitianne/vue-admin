@@ -23,8 +23,8 @@
       <el-table
         v-loading="tableLoading"
         style="margin-top: 10px"
-        height="750"
-        :data="list"
+        height="730"
+        :data="tablelist"
         element-loading-text="Loading"
         border
         fit
@@ -66,6 +66,16 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-pagination
+        :page-size=12
+        background
+        layout="prev, pager, next"
+        @current-change="handleCurrentChange"
+        @next-click="handleCurrentChange"
+        @prev-click="handleCurrentChange"
+        :total="total_page"
+        style="margin-left: 15px;margin-top: 10px">
+      </el-pagination>
       <el-dialog
         title="详细信息"
 
@@ -94,6 +104,8 @@
   export default {
     data() {
       return {
+        tablelist:[],
+        total_page: 0,
         tableLoading:false,
         buttonLoading:false,
         dialogcard: {},
@@ -121,6 +133,11 @@
       //this.initData();
     },
     methods: {
+      handleCurrentChange(val) {
+
+        this.tablelist = this.list.slice((val - 1) * 12, val * 12)
+
+      },
       showDetails(data) {
         this.dialogvisible = true
         this.dialogcard = data
@@ -181,6 +198,10 @@
         getOperationLog(data).then(response => {
           this.list = response.data
           this.hidList = response.data
+
+          this.tablelist = this.list.slice(0, 12)
+          this.total_page = this.list.length
+
           this.tableLoading=false
           this.buttonLoading=false
         }).catch(err => {

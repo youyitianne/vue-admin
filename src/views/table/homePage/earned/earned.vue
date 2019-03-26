@@ -6,8 +6,7 @@
                v-loading="tabLoading"
                element-loading-text="信息获取中"
                element-loading-spinner="el-icon-loading"
-               element-loading-background="rgba(0, 0, 0, 0.8)"
-      >
+               element-loading-background="rgba(0, 0, 0, 0.8)">
         <el-tab-pane label="收益概览">
           <div style="margin-bottom: 0px">
             <el-row :gutter="40" class="panel-group" style="margin-left: 0%">
@@ -465,7 +464,10 @@
               dau_table.push(dau_one)
               dnu_table.push(dnu_one)
               earned_table.push(earned_one.toFixed(2))
-              arpu_table.push(this.list_to_average(arpu_one))
+              //新总的除以总的
+              arpu_table.push((earned_one/dau_one).toFixed(4))
+              //旧  加起来求平均值
+              //arpu_table.push(this.list_to_average(arpu_one))
             }
             //收益表
             this.earned_chart_list.time = time_table

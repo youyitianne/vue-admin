@@ -16,7 +16,7 @@
                  placeholder="请选择应用"
                  value-key="name"
                  multiple
-                 :multiple-limit=5
+                 :multiple-limit=20
                  collapse-tags>
         <el-option
           v-loading.fullscreen.lock="fullscreenLoading"

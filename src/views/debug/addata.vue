@@ -959,20 +959,20 @@
         this.$refs.tree.setCheckedKeys([])
       },//总表下载对话框 还原
       fetchName() {
-        if (!checkPermission(['admin', 'leader', 'operator'])) {
-          let data = {
-            username: this.name
-          }
-          let tothis = this
-          this.listLoading = true
-          getResourceName(data).then(response => {
-            this.names = response.data
-            this.listLoading = false
-          }).catch(function (rs) {
-            tothis.listLoading = false
-            console.error(rs)
-          })
-        } else {
+        // if (!checkPermission(['admin', 'leader', 'operator'])) {
+        //   let data = {
+        //     username: this.name
+        //   }
+        //   let tothis = this
+        //   this.listLoading = true
+        //   getResourceName(data).then(response => {
+        //     this.names = response.data
+        //     this.listLoading = false
+        //   }).catch(function (rs) {
+        //     tothis.listLoading = false
+        //     console.error(rs)
+        //   })
+        // } else {
           let tothis = this
           this.listLoading = true
           getName().then(response => {
@@ -982,7 +982,7 @@
             tothis.listLoading = false
             console.log(rs)
           })
-        }
+       // }
       }//获取应用名
       ,
       handleFilter() {

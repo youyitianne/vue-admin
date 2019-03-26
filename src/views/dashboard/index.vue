@@ -32,10 +32,65 @@
         </el-form>
       </el-tab-pane>
       <el-tab-pane label="联系我">
+        <!--<div style="width:60%;margin-left: 20%;border-top:1px solid rgb(243,74,0);padding-top: 1%">-->
+        <!--<div style="width:30%;float: left;margin-right:2%">-->
+        <!--<div class="">-->
+        <!--<a href="" target="_blank" style="color:#333;text-decoration:none;">-->
+        <!--<span class="" style="font-size: 28px">加入番茄</span>-->
+        <!--<span class="" style="color: rgb(243,74,0);font-size: 16px">WhyChose US</span>-->
+        <!--</a>-->
+        <!--</div>-->
+        <!--<div class=""-->
+        <!--style="padding: 5%;font-size: 10px;color: #333;border-top:1px solid #99a9bf;margin-top: 10px;padding-left: 0px">-->
+        <!--所有一切互联网公司的福利在我们这里都是标配，在对待员工上，番茄互娱从来只有一个标准，用最好的待遇匹配最牛的大神。愿您的加入，能够为我们团队注入更新的活力，带来更多的发展契机。-->
+        <!--<p class="" style="color: rgb(243,74,0);font-size: 12px;margin-top: 0px">HR邮箱：hr@tomatojoy.com</p>-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--<div style="width:30%;float: left;margin-right:2%">-->
+        <!--<div class="">-->
+        <!--<a href="" target="_blank" style="color:#333;text-decoration:none;">-->
+        <!--<span class="" style="font-size: 28px">商务合作</span>-->
+        <!--<span class="" style="color: rgb(243,74,0);font-size: 16px">Cooperation</span>-->
+        <!--</a>-->
+        <!--</div>-->
+        <!--<div class=""-->
+        <!--style="padding: 5%;font-size: 10px;color: #333;border-top:1px solid #99a9bf;margin-top: 10px;padding-left: 0px">-->
+        <!--番茄互娱专注于移动互联网跨平台游戏研发，公司拥有成熟的移动互联网游戏核心开发技术，主要业务集中在移动（手机）设备、电视设备为载体的电子游戏内容的研发和发行。-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--<div style="width:30%;float: left">-->
+        <!--<div class="">-->
+        <!--<a href="" target="_blank" style="color:#333;text-decoration:none;">-->
+        <!--<span class="" style="font-size: 28px">联系我们</span>-->
+        <!--<span class="" style="color: rgb(243,74,0);font-size: 16px">Contact US</span>-->
+        <!--</a>-->
+        <!--</div>-->
+        <!--<div class=""-->
+        <!--style="padding: 5%;font-size: 10px;color: #333;border-top:1px solid #99a9bf;margin-top: 10px;padding-left: 0px">-->
+        <!--<span>人员招聘：hr@tomatojoy.com<br/><br/>-->
+        <!--商务洽谈：lj.jiang@tomatojoy.com<br/><br/>-->
+        <!--&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Jl.wang@tomatojoy.com<br/><br/>-->
+        <!--技术支持：dev@tomatojoy.com</span><br/><br/>-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--</div>-->
+
+
+
+          <div style="margin-left: 40%">
+            <div class="">
+              <span class="" style="font-size: 28px">最新产品</span>
+              <span class="" style="color: rgb(243,74,0);font-size: 16px">New Product</span>
+            </div>
+          </div>
+
+
       </el-tab-pane>
     </el-tabs>
   </div>
 </template>
+
+
 
 <script>
   import {mapGetters} from 'vuex'
@@ -64,7 +119,7 @@
           callback(new Error('请再次输入密码'));
         } else if (value !== this.ruleForm2.pass) {
           callback(new Error('两次输入密码不一致!'));
-        } else if (value.length <5){
+        } else if (value.length < 5) {
           callback(new Error('密码长度需要大于5位!'));
         } else {
           callback();
@@ -113,7 +168,7 @@
         }
       },
       test(formName) {
-        let account=(document.getElementById("account").value)
+        let account = (document.getElementById("account").value)
         let tothis = this
         this.pageLoading = true
         this.$refs[formName].validate((valid) => {
@@ -128,7 +183,7 @@
                 password: tothis.ruleForm2.pass
               }
               tothis.pageLoading = false
-              updatePassword(param).then(response=>{
+              updatePassword(param).then(response => {
                 tothis.$message({
                   message: '修改成功!',
                   type: 'success'
@@ -136,7 +191,7 @@
                 //回到登录页面,登出操作
                 this.logout()
                 tothis.pageLoading = false
-              }).catch(err=>{
+              }).catch(err => {
                 tothis.$message.error('修改失败，请检查网络~');
                 tothis.pageLoading = false
               })
@@ -211,10 +266,10 @@
       },
       logout() {
         this.$store.dispatch('LogOut').then(() => {
-          this.$router.push({ path: '/login' })
+          this.$router.push({path: '/login'})
           location.reload() // 为了重新实例化vue-router对象 避免bug
-        }).catch(err=>{
-          console.log("登出失败："+err)
+        }).catch(err => {
+          console.log("登出失败：" + err)
         })
       }
     }

@@ -115,10 +115,10 @@
             <el-input v-model="domain.sdk_paramter" style="width: 300px;margin-right: 5px" type="textarea"   maxlength="255"
                       placeholder="必填"/>
             <span style="font-weight: 900;font-family:Microsoft YaHei;font: 14px bolder;color: #606266;" >类型：</span>
-            <el-select v-model="domain.sdk_type" style="width: 150px" value=0>
+            <el-select v-model="domain.sdk_type" style="width: 150px" value=0 @change="SelectedChanged(domain,index)">
               <el-option
                 v-for="item in options"
-                :key="item.value"
+                :key="item.label"
                 :label="item.label"
                 :value="item.value">
               </el-option>
@@ -195,6 +195,9 @@
         }, {
           value: '1',
           label: '选择器'
+        }, {
+          value: '2',
+          label: '布尔值'
         }],
         value: '',
         update_flag:true,
@@ -255,6 +258,13 @@
       this.listdata()
     },
     methods: {
+      SelectedChanged(domain,index){
+        console.log(domain)
+        if (domain.sdk_type==='2'){
+          console.log(index)
+          this.sdk.form.domains[index].sdk_paramter='true;false'
+        }
+      },
       validUpdate(param) {
         if (param.sdk_status === '0') {
           this.sdk.id = param.id
@@ -315,6 +325,11 @@
         }
         if (!this.create_flag){
           return
+        }
+        for (let i=0;i<this.sdk.form.domains.length;i++){
+          if (this.sdk.form.domains[i].sdk_type==='2'){
+            this.sdk.form.domains[i].sdk_type='1'
+          }
         }
         this.create_flag=false
         this.$refs['dataForm'].validate((valid) => {
@@ -506,7 +521,12 @@
         if (!this.update_flag){
           return
         }
-        this.update_flag=false
+        for (let i=0;i<this.sdk.form.domains.length;i++){
+          if (this.sdk.form.domains[i].sdk_type==='2'){
+            this.sdk.form.domains[i].sdk_type='1'
+          }
+        }
+         this.update_flag=false
         updateSdk(this.sdk).then(response => {
           this.update_flag=true
           this.listdata()
@@ -527,6 +547,8 @@
             duration: 2000
           })
         })
+
+
       }
     }
   }

@@ -173,7 +173,7 @@
           console.log(rs.toString())
           tothis.downloadLoading = false
           tothis.$notify({
-            title: '下载失败',
+            title: '预览失败',
             message: '刷新试试',
             type: 'error',
             duration: 2000

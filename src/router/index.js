@@ -25,18 +25,18 @@ export const constantRouterMap = [
   {path: '/login', component: () => import('@/views/login/index'), hidden: true},
   {path: '/404', component: () => import('@/views/404'), hidden: true},
 
-  {
-    path: '/',
-    component: Layout,
-    redirect: '/dashboard',
-    // redirect: '/dashboard',
-    name: 'Dashboard',
-    hidden: true,
-    children: [{
-      path: 'dashboard',
-      component: () => import('@/views/dashboard/index'),
-    }]
-  },
+  // {
+  //   path: '/',
+  //   component: Layout,
+  //   redirect: '/dashboard',
+  //   // redirect: '/dashboard',
+  //   name: 'Dashboard',
+  //   //hidden: true,
+  //   children: [{
+  //     path: 'dashboard',
+  //     component: () => import('@/views/dashboard/index'),
+  //   }]
+  // },
   // {
   //   path: '/form',
   //   component: Layout,
@@ -71,6 +71,88 @@ export default new Router({
 //异步挂载的路由
 //动态需要根据权限加载的路由表
 export const asyncRouterMap = [
+  {
+    path: '/homepage',
+    component: Layout,
+    redirect: '/homepage/route',
+    name: 'Data',
+    meta: {
+      title: '主页',
+      icon: 'documentation',
+    },
+    children: [
+      {
+        path: 'route',
+        name: 'route',
+        hidden: true,
+        component: () => import('@/views/table/homePage/route'),
+        meta: {
+          title: 'homepage',
+          icon: 'table',
+        }
+      },
+      {
+        path: 'addata',
+        name: 'Table',
+        component: () => import('@/views/table/homePage/addata/addata'),
+        meta: {
+          title: '广告数据',
+          icon: 'table',
+          roles: ['director','planner','operatorleader','operator']
+        }
+      },
+      {
+        path: 'arpu',
+        name: 'Table1',
+        component: () => import('@/views/table/homePage/arpu/arpu'),
+        meta: {
+          title: 'ARPU',
+          icon: 'table',
+          roles: ['director']
+        }
+      },
+      {
+        path: 'earned',
+        name: 'Table2',
+        component: () => import('@/views/table/homePage/earned/earned'),
+        meta: {
+          title: '收益',
+          icon: 'table',
+          roles: ['director']
+        }
+      },
+      {
+        path: 'ltv',
+        name: 'Table3',
+        component: () => import('@/views/table/homePage/ltv/ltv'),
+        meta: {
+          title: 'ltv',
+          icon: 'table',
+          roles: ['director']
+        }
+      },
+      {
+        path: 'lt',
+        name: 'Table5',
+        component: () => import('@/views/table/homePage/ltv/lt'),
+        meta: {
+          title: 'lt',
+          icon: 'table',
+          roles: ['director','planner','operaterleader','operator','operatorleader']
+        }
+      },
+      {
+        path: 'productdata',
+        name: 'Table4',
+        component: () => import('@/views/table/homePage/productdata/productdata'),
+        meta: {
+          title: '产品数据',
+          icon: 'table',
+          roles: ['director','planner','operaterleader','operator','operatorleader']
+        }
+      },
+    ]
+  },
   {
     path: '/data-summary',
     component: Layout,
@@ -125,7 +207,7 @@ export const asyncRouterMap = [
           title: '移信数据下载',
           noCache: true,
           icon: 'download3',
-          roles: ['director','operatorleader']
+          roles: ['director', 'operatorleader']
         }
       },
       {
@@ -136,7 +218,7 @@ export const asyncRouterMap = [
           title: '友盟数据下载',
           noCache: true,
           icon: 'download3',
-          roles: ['director','operatorleader']
+          roles: ['director', 'operatorleader']
         }
       },
     ]
@@ -149,7 +231,7 @@ export const asyncRouterMap = [
     meta: {
       title: '数据录入',
       icon: 'upload1',
-      roles: ['director','operatorleader']
+      roles: ['director', 'operatorleader']
     },
     children: [
       {
@@ -159,7 +241,7 @@ export const asyncRouterMap = [
         meta: {
           title: '应用列表',
           icon: 'table',
-          roles: ['director', 'operatorleader', 'operator','planner']
+          roles: ['director', 'operatorleader', 'operator', 'planner']
         }
       },
       {
@@ -169,7 +251,7 @@ export const asyncRouterMap = [
         meta: {
           title: '数据录入',
           icon: 'upload1',
-          roles: ['director','operatorleader']
+          roles: ['director', 'operatorleader']
         }
       }]
   },
@@ -181,7 +263,7 @@ export const asyncRouterMap = [
     meta: {
       title: '数据分析',
       icon: 'chart',
-      roles: ['director','operatorleader','operator','planner']
+      roles: ['director', 'operatorleader', 'operator', 'planner']
     },
     children: [
       {
@@ -190,8 +272,8 @@ export const asyncRouterMap = [
         component: () => import('@/views/table/datamanager/showtime_1table'),
         meta: {
           title: '展次表（旧）',
-          icon: 'table',
-          roles: ['director', 'operatorleader', 'operator','planner']
+          icon: 'showtime',
+          roles: ['director', 'operatorleader', 'operator', 'planner']
         }
       },
       {
@@ -200,8 +282,8 @@ export const asyncRouterMap = [
         component: () => import('@/views/table/datamanager/showtime_2table'),
         meta: {
           title: '展次表（新）',
-          icon: 'table',
-          roles: ['director', 'operatorleader', 'operator','planner']
+          icon: 'showtime',
+          roles: ['director', 'operatorleader', 'operator', 'planner']
         }
       },
       {
@@ -210,8 +292,8 @@ export const asyncRouterMap = [
         component: () => import('@/views/table/datamanager/arputable'),
         meta: {
           title: 'ARPU表',
-          icon: 'table',
-          roles: ['director', 'operatorleader', 'operator','planner']
+          icon: 'arpu1',
+          roles: ['director', 'operatorleader', 'operator', 'planner']
         }
       },
       {
@@ -220,7 +302,7 @@ export const asyncRouterMap = [
         component: () => import('@/views/table/datamanager/earnedtable'),
         meta: {
           title: '收益表',
-          icon: 'table',
+          icon: 'earnedlist',
           roles: ['director', 'operatorleader']
         }
       },
@@ -232,7 +314,7 @@ export const asyncRouterMap = [
           title: '友盟留存',
           noCache: true,
           icon: 'retention',
-          roles: ['director', 'operatorleader', 'operator','planner']
+          roles: ['director', 'operatorleader', 'operator', 'planner']
         }
       },
       {
@@ -242,7 +324,7 @@ export const asyncRouterMap = [
         meta: {
           title: '广告数据查重',
           noCache: true,
-          icon: 'table',
+          icon: 'repeat',
           roles: ['director', 'operatorleader']
         }
       },
@@ -266,7 +348,7 @@ export const asyncRouterMap = [
         meta: {
           title: '项目列表',
           noCache: true,
-          icon: 'list',
+          icon: 'project2',
         }
       },
 
@@ -277,8 +359,8 @@ export const asyncRouterMap = [
         meta: {
           title: '渠道列表',
           noCache: true,
-          icon: 'list',
-          roles: ['director','operatorleader'],
+          icon: 'channel',
+          roles: ['director', 'operatorleader'],
         }
       },
       {
@@ -288,8 +370,8 @@ export const asyncRouterMap = [
         meta: {
           title: '广告类型列表',
           noCache: true,
-          icon: 'list',
-          roles: ['director','operatorleader'],
+          icon: 'type',
+          roles: ['director', 'operatorleader'],
         }
       }
     ]
@@ -355,8 +437,8 @@ export const asyncRouterMap = [
         name: 'SDKManager',
         meta: {
           title: 'SDK模版列表',
-          icon:'model4',
-          roles: ['director','sdksuport'],
+          icon: 'model4',
+          roles: ['director', 'sdksuport'],
         }
       },
       {
@@ -365,8 +447,8 @@ export const asyncRouterMap = [
         name: 'ProjectConfigManager',
         meta: {
           title: 'SDK配置表',
-          icon:'sdkset1',
-          roles: ['director','operatorleader'],
+          icon: 'sdkset1',
+          roles: ['director', 'operatorleader','operator'],
         }
       }, {
         path: 'projectconfiglist',
@@ -374,16 +456,16 @@ export const asyncRouterMap = [
         name: 'ProjectConfigList',
         meta: {
           title: '配置表发布记录',
-          icon:'sdkshow',
+          icon: 'sdkshow',
         }
       }, {
         path: 'projectconfigview',
-        hidden:true,
+        hidden: true,
         component: () => import('@/views/table/sdkmanager/projectShow'),
         name: 'ProjectConfigView',
         meta: {
           title: '详细信息',
-          icon:'sdkshow',
+          icon: 'sdkshow',
         }
       }]
   },
@@ -403,8 +485,17 @@ export const asyncRouterMap = [
         name: 'OperationLog',
         meta: {
           title: '操作日志',
-          icon:'log2',
+          icon: 'log2',
           roles: ['director'],
+        }
+      },
+      {
+        path: 'dashboard',
+        component: () => import('@/views/dashboard/index'),
+        name: 'Set',
+        meta: {
+          title: '设置',
+          icon: 'personal',
         }
       },
       {
@@ -413,10 +504,11 @@ export const asyncRouterMap = [
         name: 'Help',
         meta: {
           title: '帮助',
-          icon:'help1',
+          icon: 'help1',
         }
-      }
-      ]
+      },
+
+    ]
   },
   {
     path: '/debug',
@@ -426,7 +518,7 @@ export const asyncRouterMap = [
     meta: {
       title: 'Debug',
       icon: 'documentation',
-      roles: ['director','operatorleader']
+      roles: ['director', 'operatorleader']
     },
     children: [
       {
@@ -435,8 +527,8 @@ export const asyncRouterMap = [
         component: () => import('@/views/debug/addata'),
         meta: {
           title: '广告数据',
-          icon: 'table',
-          roles: ['director','operatorleader']
+          icon: 'addata',
+          roles: ['director', 'operatorleader']
         }
       },
       {
@@ -446,84 +538,11 @@ export const asyncRouterMap = [
         meta: {
           title: '用户数据',
           noCache: true,
-          icon: 'table',
-          roles: ['director','operatorleader']
+          icon: 'userdata',
+          roles: ['director', 'operatorleader']
         }
       },
 
-    ]
-  },
-  {
-    path: '/test',
-    component: Layout,
-    redirect: '/test/addata',
-    name: 'Data',
-    meta: {
-      title: '主页',
-      icon: 'documentation',
-      roles: ['director']
-    },
-    children: [
-      {
-        path: 'addata',
-        name: 'Table',
-        component: () => import('@/views/table/homePage/addata/addata'),
-        meta: {
-          title: '广告数据',
-          icon: 'table',
-          roles: ['director']
-        }
-      },
-      {
-        path: 'arpu',
-        name: 'Table1',
-        component: () => import('@/views/table/homePage/arpu/arpu'),
-        meta: {
-          title: 'ARPU',
-          icon: 'table',
-          roles: ['director']
-        }
-      },
-      {
-        path: 'earned',
-        name: 'Table2',
-        component: () => import('@/views/table/homePage/earned/earned'),
-        meta: {
-          title: '收益',
-          icon: 'table',
-          roles: ['director']
-        }
-      },
-      {
-        path: 'ltv',
-        name: 'Table3',
-        component: () => import('@/views/table/homePage/ltv/ltv'),
-        meta: {
-          title: 'ltv',
-          icon: 'table',
-          roles: ['director']
-        }
-      },
-      {
-        path: 'lt',
-        name: 'Table5',
-        component: () => import('@/views/table/homePage/ltv/lt'),
-        meta: {
-          title: 'lt',
-          icon: 'table',
-          roles: ['director']
-        }
-      },
-      {
-        path: 'productdata',
-        name: 'Table4',
-        component: () => import('@/views/table/homePage/productdata/productdata'),
-        meta: {
-          title: '产品数据',
-          icon: 'table',
-          roles: ['director']
-        }
-      },
     ]
   },
   {path: '*', redirect: '/404'}

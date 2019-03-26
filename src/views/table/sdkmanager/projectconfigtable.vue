@@ -72,6 +72,7 @@
           </el-form>
           <div>
             <el-table
+              v-if="false"
               stripe
               border
               :data="props.row.paramter"
@@ -115,10 +116,13 @@
       </el-table-column>
       <el-table-column label="内部版本-更新" prop="versioncode_update_version">
       </el-table-column>
-      <el-table-column label="操作" align="center" width="150px" class-name="small-padding fixed-width"
+      <el-table-column label="备注" prop="note">
+      </el-table-column>
+      <el-table-column label="操作" align="center" width="300px" class-name="small-padding fixed-width"
                        v-if="checkPermission(['operatorleader','admin','sdksuport','director','operator'])">
         <template slot-scope="scope">
           <el-button type="success" size="mini" @click="handleUpdate(scope.row)">{{ "编辑" }}</el-button>
+          <el-button @click="link_Check(scope.row)" size="mini" type="info">查看配置表发布记录</el-button>
           <!--<el-button type="success" size="mini" @click="publish(scope.row)">发布</el-button>-->
         </template>
       </el-table-column>
@@ -189,6 +193,14 @@
                       prop="versioncode_update_version">
           <el-input v-model="sdk.versioncode_update_version" placeholder="必填~" class="dia-input"/>
         </el-form-item>
+
+        <el-form-item label="备注" :rules="[{ required: true, message: '默认填写暂无'}]"
+                      v-if="this.dialogStatus === 'update'"
+                      prop="note">
+          <el-input v-model="sdk.note" placeholder="必填~" class="dia-input"  type="textarea"
+                    :rows="3"/>
+        </el-form-item>
+
         <br/>
         <!--筛选输入框-->
         <el-input placeholder="SDK模版筛选" v-model="sdk_template_name" v-if="this.dialogStatus === 'update'"
@@ -198,7 +210,7 @@
         <!--多选框 sdk模版控制-->
         <el-checkbox-group v-model="checkedSdkTemplate" style="border-bottom: 15px" size="mini"
                            v-if="this.dialogStatus === 'update'">
-          <el-checkbox v-for="name in sdkTemplate" :label="name.mark" :key="name.mark" @change="findSdkTemplate"
+          <el-checkbox v-for="name in sdkTemplate" :label="name.mark" :key="name.name" @change="findSdkTemplate"
                        :value="name.name" border>
             <div class="grid-content bg-purple-light" style="width: 107px;margin-bottom: 15px">{{name.mark}}</div>
           </el-checkbox>
@@ -206,9 +218,9 @@
         <br/>
         <!--标签页-->
         <el-tabs tab-position="left" style="width: 95%;background-color: #f4f4f5;height: 500px;padding: 1px" id="test1"
-                 v-if="this.dialogStatus === 'update'"
+                 v-if="this.dialogStatus === 'update'" v-model="tabname"
                  @tab-click="findtabname" type="border-card">
-          <el-tab-pane v-for="name in checkedSdkTemplate" :label="name" :key="name"
+          <el-tab-pane v-for="name in checkedSdkTemplate" :label="name" :key="name"  :name="name"
                        style="font-size: 14px;font-family: Microsoft YaHei;width: 100%">
             <div name="pane_form" style="height: 500px;overflow: auto;">
               <!--标签页内多选框-->
@@ -234,13 +246,13 @@
                   </el-select>
                 </div>
               </template>
-
               <!--标签页内表单-->
               <el-form-item v-for="(domain, index) in sdk.form.domains" :key="domain.key+index"
                             v-if="form_item_filter(domain)" style="margin-right: 1px"
                             v-model="page_name">
                 <div style="width: 700px">
-                  <span style="margin-right: 20px;font-size: 14px;font-family: Microsoft YaHei;width:200px;display: inline-block">
+                  <span
+                    style="margin-right: 20px;font-size: 14px;font-family: Microsoft YaHei;width:200px;display: inline-block">
                     {{domain.param_name1}}：
                   </span>
                   <el-input v-model="domain.param" style="width: 300px;margin-right: 25px" placeholder="必填"/>
@@ -288,6 +300,7 @@
     },
     data() {
       return {
+        tabname:'',
         projectlist_select: [],
         secondary_project: '',
         secondary_package: '',
@@ -396,6 +409,13 @@
       this.routeWithParam()//跳转赋值
     },
     methods: {
+      link_Check(val) {
+        let routeData = this.$router.resolve({
+          name: 'ProjectConfigList',
+          query: {package_name: val.package_name, channel: val.channel}
+        });
+        window.open(routeData.href, '_blank');
+      },//跳转方法
       routeWithParam() {
         let name = this.$route.query.package_name
         if (typeof(name) != 'undefined') {
@@ -417,6 +437,7 @@
         //this.publish()
       },//发布按钮处理
       findtabname(tab, event) {
+        console.log(tab.label)
         this.tag_name = tab.label
         this.change_pagename(tab.label)
       },//获取对话框内标签页 名触发事件
@@ -444,6 +465,7 @@
           }
         }
         for (let i = 0; i < second_newdomains.length; i++) {
+
           if (second_newdomains[i].param === '') {
             tothis.$notify({
               title: '发布失败',
@@ -455,6 +477,7 @@
             })
             return
           }
+
         }
         this.sdk.form.domains = second_newdomains
         //end
@@ -627,16 +650,16 @@
       getchannelmarklist() {
         let list = []
         let name = ''
-        if (this.sdk_template_name === 'base') {
-          name = '屏蔽系统bugly统计分享互推广告锁屏广告支付广告'
-        }
+        // if (this.sdk_template_name === 'base') {
+        //   name = '屏蔽系统bugly统计分享互推广告锁屏广告支付广告'
+        // }
         for (let i = 0; i < this.hidsdkTemplate.length; i++) {
           if (name.search(this.hidsdkTemplate[i]) != -1) {
             list.push(this.hidsdkTemplate[i])
           }
         }
         for (let i = 0; i < this.hidsdkTemplate.length; i++) {
-          if (this.hidsdkTemplate[i].name.search(this.sdk_template_name) != -1||this.hidsdkTemplate[i].mark.search(this.sdk_template_name) != -1) {
+          if (this.hidsdkTemplate[i].name.search(this.sdk_template_name) != -1 || this.hidsdkTemplate[i].mark.search(this.sdk_template_name) != -1) {
             list.push(this.hidsdkTemplate[i])
           }
         }
@@ -720,8 +743,8 @@
         }
         this.filter_form_name = this.page_name
         console.log(this.tag_name)
-        if (this.tag_name==='暂无'&&this.checkedSdkTemplate.length>0){
-          this.tag_name=this.checkedSdkTemplate[0]
+        if (this.tag_name === '暂无' && this.checkedSdkTemplate.length > 0) {
+          this.tag_name = this.checkedSdkTemplate[0]
         }
         this.change_pagename(this.tag_name)
       },//sdk模版根据多选框变动
@@ -839,6 +862,7 @@
             this.sdk.timevalue = timestamp
             if (this.create_flag) {
               this.create_flag = false
+              console.log(this.sdk)
               createProjectConfig(this.sdk).then(response => {
                 if (response.data === '成功') {
                   this.create_flag = true
@@ -919,8 +943,8 @@
         })
       }, //创建对话框展示
       handleUpdate(param) {
+        console.log(param)
         this.resetTemp()
-        this.tag_name = ''
         let paramter = param.paramter
         for (let i = 0; i < paramter.length; i++) {
           let sdk_name = paramter[i].mark
@@ -1045,19 +1069,59 @@
         }
         this.dialog_secondary_checked = newchecked2
         //end
+        //当模版勾选未填值时，页面无法渲染的问题 start
+        let nulllist = []
+        for (let i = 0; i < this.checkedSdkTemplate.length; i++) {
+          let flag = true
+          for (let j = 0; j < list.length; j++) {
+            if (list[j].param_name.indexOf(this.checkedSdkTemplate[i]) != -1) {
+              flag = false
+            }
+          }
+          if (flag) {
+            nulllist.push(this.checkedSdkTemplate[i])
+          }
+        }
 
+        for (let i = 0; i < nulllist.length; i++) {
+          for (let j = 0; j < this.sdkTemplatelibrary.length; j++) {
+            if (nulllist[i] === this.sdkTemplatelibrary[j].keymark) {
+              this.sdk.form.domains = this.sdk.form.domains.concat(this.sdkTemplatelibrary[j].keyform)
+            }
+          }
+        }
 
+        //end
         this.rowvalue = param
         this.dialogStatus = 'update'
         //获取row 参数中的checked
-        if (param.checked.split(',').length>0){
-          let data=param.checked.split(',')[0]
+        if (param.checked.split(',').length > 0) {
+          let data = param.checked.split(',')[0]
           this.tag_name = data
           this.change_pagename(data)
         }
 
-        this.dialogFormVisible = true
+        //标签页焦点按钮与实际内容不匹配 start
+        this.tag_name = this.tabname
+        this.change_pagename(this.tag_name)
+        //end
 
+        //当sdk模版删除时，标签页不显示sdk名
+        for (let i=0;i<this.checkedSdkTemplate.length;i++){
+          let flag=true
+          for (let j=0;j<this.sdkTemplate.length;j++){
+            if (this.sdkTemplate[j].mark===this.checkedSdkTemplate[i]){
+              flag=false
+              console.log(this.checkedSdkTemplate[i])
+            }
+          }
+          if(flag){
+            this.checkedSdkTemplate.splice(i,1)
+          }
+        }
+
+
+        this.dialogFormVisible = true
       }, //更新对话框展示
       updateData(val) {
         let tothis = this
@@ -1083,28 +1147,31 @@
           }
         }
         for (let i = 0; i < second_newdomains.length; i++) {
-          if (second_newdomains[i].param === '') {
-            tothis.$notify({
-              title: '发布失败',
-              dangerouslyUseHTMLString: true,
-              message: 'KEY表有参数没填！' + '' +
-                ' <br> -->' + second_newdomains[i].param_name,
-              type: 'error',
-              duration: 4000
-            })
-            return
+          if (!val) {//保存是不判断
+            if (second_newdomains[i].param === '') {
+              tothis.$notify({
+                title: '发布失败',
+                dangerouslyUseHTMLString: true,
+                message: 'KEY表有参数没填！' + '' +
+                  ' <br> -->' + second_newdomains[i].param_name,
+                type: 'error',
+                duration: 4000
+              })
+              return
+            }
           }
+
+
         }
         let submit_object = {
           app_name: this.sdk.app_name,
           channel_mark: this.sdk.channel_mark,
           checked: [],
           form: {
-            select:[],
+            select: [],
             domains: this.sdk.form.domains
           },
           id: this.sdk.id,
-          note: 'note_unused',
           package_name: this.sdk.package_name,
           publish: '0',
           sdk_config: 'config_unused',
@@ -1115,7 +1182,8 @@
           version_online_version: this.sdk.version_online_version,
           version_update_version: this.sdk.version_update_version,
           versioncode_online_version: this.sdk.versioncode_online_version,
-          versioncode_update_version: this.sdk.versioncode_update_version
+          versioncode_update_version: this.sdk.versioncode_update_version,
+          note:this.sdk.note
         };
         //把所有有值的一起提交
         let newdomains = []
@@ -1133,7 +1201,7 @@
         //this.sdk.checked = this.checkedSdkTemplate
         // this.sdk.second_checked = this.dialog_secondary_checked
         submit_object.checked = this.checkedSdkTemplate
-        submit_object.second_checked =  this.dialog_secondary_checked
+        submit_object.second_checked = this.dialog_secondary_checked
 
 
         //选择器提交
@@ -1180,42 +1248,76 @@
         //   })
         //   return
         // }
+
         if (!this.update_flag) {
           return
         }
         this.update_flag = false
-        this.$refs['dataForm'].validate((valid) => {
-          if (valid) {
-            updateProjectConfig(submit_object).then(response => {
-              this.listLoading = true
-              if (this.hidtimevalue != '') {
-                this.timevalue = this.hidtimevalue
-                this.handleFilter();
-              }
-              this.$notify({
-                title: '成功',
-                message: '保存成功',
-                type: 'success',
-                duration: 4000
-              })
-              if (val) {
-                this.handleFilter()
-                this.dialogFormVisible = false
-              } else {
-                this.publish()
-              }
-              this.update_flag = true
-            }).catch(err => {
-              tothis.$notify({
-                title: '失败',
-                message: '请刷新页面后重试',
-                type: 'error',
-                duration: 4000
-              })
+        if (val) {  //保存是不判断
+          updateProjectConfig(submit_object).then(response => {
+            this.listLoading = true
+            if (this.hidtimevalue != '') {
+              this.timevalue = this.hidtimevalue
+              this.handleFilter();
+            }
+            this.$notify({
+              title: '成功',
+              message: '保存成功',
+              type: 'success',
+              duration: 4000
             })
-          }
-          this.update_flag = true
-        })
+            if (val) {
+              this.handleFilter()
+              this.dialogFormVisible = false
+            } else {
+              this.publish()
+            }
+            this.update_flag = true
+          }).catch(err => {
+            console.error(err)
+            tothis.$notify({
+              title: '失败',
+              message: '请刷新页面后重试',
+              type: 'error',
+              duration: 4000
+            })
+          })
+        } else {
+          this.$refs['dataForm'].validate((valid) => {
+            if (valid) {
+              updateProjectConfig(submit_object).then(response => {
+                this.listLoading = true
+                if (this.hidtimevalue != '') {
+                  this.timevalue = this.hidtimevalue
+                  this.handleFilter();
+                }
+                this.$notify({
+                  title: '成功',
+                  message: '保存成功',
+                  type: 'success',
+                  duration: 4000
+                })
+                if (val) {
+                  this.handleFilter()
+                  this.dialogFormVisible = false
+                } else {
+                  this.publish()
+                }
+                this.update_flag = true
+              }).catch(err => {
+                tothis.$notify({
+                  title: '失败',
+                  message: '请刷新页面后重试',
+                  type: 'error',
+                  duration: 4000
+                })
+              })
+            }
+            this.update_flag = true
+          })
+        }
+
+
       }, //更新方法
       getDatawithParam() {
         this.listLoading = true

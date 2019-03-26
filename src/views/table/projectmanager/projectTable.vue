@@ -2,11 +2,10 @@
   <div class="app-container">
     <div class="filter-container" style="margin: 15px;margin-top: -5px">
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit"
-                 v-if="checkPermission(['director','operatorleader'])"
+                 v-if="checkPermission(['director','operatorleader','admin'])"
                  @click="handleCreate">{{addButton}}
       </el-button>
-      <el-input placeholder="根据项目名查找" v-model="inputName" style="width: 200px" class="filter-item" clearable
-                @blur="getDatawithName"/>
+      <el-input placeholder="根据项目名查找" v-model="inputName" style="width: 200px" class="filter-item" clearable/>
     </div>
     <el-table
       height="850"
@@ -27,22 +26,22 @@
               <span>{{ props.row.project_name }}</span>
             </el-form-item>
             <!--<el-form-item label="预热:">-->
-              <!--<span>{{ props.row.preheat }}</span>-->
+            <!--<span>{{ props.row.preheat }}</span>-->
             <!--</el-form-item>-->
             <!--<el-form-item label="排期:">-->
-              <!--<span>{{ props.row.schedule }}</span>-->
+            <!--<span>{{ props.row.schedule }}</span>-->
             <!--</el-form-item>-->
             <!--<el-form-item label="竞品:">-->
-              <!--<span>{{ props.row.compete_good }}</span>-->
+            <!--<span>{{ props.row.compete_good }}</span>-->
             <!--</el-form-item>-->
             <!--<el-form-item label="版本计划:">-->
-              <!--<span>{{ props.row.version_plan }}</span>-->
+            <!--<span>{{ props.row.version_plan }}</span>-->
             <!--</el-form-item>-->
             <el-form-item label="备注:">
               <span>{{ props.row.note }}</span>
             </el-form-item>
             <!--<el-form-item label="应用:" style="width: 50%">-->
-              <!--<span>{{ props.row.names }}</span>-->
+            <!--<span>{{ props.row.names }}</span>-->
             <!--</el-form-item>-->
             <div style="padding-top: 15px">
               <el-table
@@ -65,10 +64,10 @@
                   style="width: 25%">
                   <template slot-scope="scope2">
                     <span>
-                      <el-button @click="link_Check(scope2.row)" type="info">查看key表</el-button>
+                      <el-button @click="link_Check(scope2.row)" type="info">查看配置表发布记录</el-button>
                     </span>
                     <span v-if="checkPermission(['director','operatorleader','admin'])">
-                    <el-button @click="link_Edit(scope2.row)" type="success">编辑key表</el-button>
+                    <el-button @click="link_Edit(scope2.row)" type="success">编辑配置表</el-button>
                     </span>
                   </template>
                 </el-table-column>
@@ -95,12 +94,14 @@
       <el-table-column label="备注" prop="note">
       </el-table-column>
       <el-table-column label="操作" align="center" width="150px" class-name="small-padding fixed-width"
-                       v-if="checkPermission(['director','admin'])">
+                       v-if="checkPermission(['director','admin','operatorleader'])">
         <template slot-scope="scope">
-          <div  v-if="checkPermission(['director','admin'])">
-            <el-button type="success" size="mini" @click="updateHandler(scope.row)">{{ "编辑" }}</el-button>
-            <el-button type="danger" size="mini" @click="handleDelete(scope.row)">{{ "删除" }}</el-button>
-          </div>
+          <el-button type="success" size="mini" @click="updateHandler(scope.row)"
+                     v-if="checkPermission(['director','admin','operatorleader'])">{{ "编辑" }}
+          </el-button>
+          <el-button type="danger" size="mini" @click="handleDelete(scope.row)"
+                     v-if="checkPermission(['director','admin'])">{{ "删除" }}
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -117,16 +118,20 @@
                       prop="project_name">
           <el-input v-model="project.project_name" placeholder="请输入项目名~"/>
         </el-form-item>
-        <el-form-item label="预热" :rules="{required: true, message: '预热名不能为空', trigger: 'blur'}" prop="preheat" v-if="false">
+        <el-form-item label="预热" :rules="{required: true, message: '预热名不能为空', trigger: 'blur'}" prop="preheat"
+                      v-if="false">
           <el-input v-model="project.preheat"/>
         </el-form-item>
-        <el-form-item label="排期" :rules="{required: true, message: '排期名不能为空', trigger: 'blur'}" prop="schedule" v-if="false">
+        <el-form-item label="排期" :rules="{required: true, message: '排期名不能为空', trigger: 'blur'}" prop="schedule"
+                      v-if="false">
           <el-input v-model="project.schedule"/>
         </el-form-item>
-        <el-form-item label="竞品" :rules="{required: true, message: '竞品不能为空', trigger: 'blur'}" prop="compete_good" v-if="false">
+        <el-form-item label="竞品" :rules="{required: true, message: '竞品不能为空', trigger: 'blur'}" prop="compete_good"
+                      v-if="false">
           <el-input v-model="project.compete_good"/>
         </el-form-item>
-        <el-form-item label="版本计划" :rules="{required: true, message: '版本计划不能为空', trigger: 'blur'}" prop="version_plan" v-if="false">
+        <el-form-item label="版本计划" :rules="{required: true, message: '版本计划不能为空', trigger: 'blur'}" prop="version_plan"
+                      v-if="false">
           <el-input v-model="project.version_plan"/>
         </el-form-item>
         <el-form-item label="备注" :rules="{required: true, message: '备注不能为空', trigger: 'blur'}" prop="note">
@@ -141,19 +146,54 @@
           append-to-body>
           <div style="width: 800px;font-weight: bold">
             <div style="margin-bottom: 20px">
-            从已有配置表中添加：
-            <el-select v-model="project_value" placeholder="请选择配置表" style="width: 450px" filterable value-key="name">
-              <el-option
-                v-for="item in project_list"
-                :key="item.key"
-                :label="item.name"
-                :value="item">
-              </el-option>
-            </el-select>
-            <!--<el-button @click="addDomain" type="success">确认添加</el-button>-->
+              从已有配置表中添加：
+              <el-select v-model="project_value" placeholder="请选择配置表" style="width: 450px" filterable value-key="name">
+                <el-option
+                  v-for="item in project_list"
+                  :key="item.key"
+                  :label="item.name"
+                  :value="item">
+                </el-option>
+              </el-select>
+              <!--<el-button @click="addDomain" type="success">确认添加</el-button>-->
             </div>
             <span>
-            <el-button @click="link_Edit"> 未发现关联配置表？&nbsp&nbsp&nbsp点击前往添加配置表</el-button>
+              <el-dialog
+                style="margin-top: 100px"
+                width="40%"
+                title="添加配置"
+                :visible.sync="innerestVisible"
+                append-to-body>
+                      <el-form :model="dialogForm" ref="dynamicValidateForm" label-width="100px"
+                               class="demo-dynamic">
+                        <el-form-item
+                          prop="package_name"
+                          label="包名"
+                          :rules="[{required: true, message: '请输入包名', trigger: 'blur' }]">
+                        <el-input v-model="dialogForm.package_name" style="width:400px"></el-input>
+                      </el-form-item>
+                       <el-form-item
+                         prop="channel_mark"
+                         label="渠道"
+                         :rules="[{required: true, message: '请输入渠道', trigger: 'blur' }]">
+                        <!--<el-input v-model="dialogForm.channel_mark" style="width:200px"></el-input>-->
+                          <el-select v-model="dialogForm.channel_mark" placeholder="请选择" style="width:200px" filterable>
+                            <el-option
+                              v-for="item in channel_list"
+                              :key="item.id"
+                              :label="item.program_mark"
+                              :value="item.program_mark">
+                            </el-option>
+                          </el-select>
+                      </el-form-item>
+
+                 </el-form>
+               <div slot="footer" class="dialog-footer">
+                 <el-button @click="innerestVisible = false">{{ '取消'}}</el-button>
+                 <el-button type="primary" @click="addconfigList">{{ '确认' }}</el-button>
+               </div>
+              </el-dialog>
+            <el-button @click="addconfig"> 未发现关联配置表？&nbsp&nbsp&nbsp点击前往添加配置表</el-button>
             </span>
           </div>
           <div slot="footer" class="dialog-footer">
@@ -184,14 +224,21 @@
 
 <script>
   import checkPermission from '@/utils/permission' // 权限判断函数
-  import {getName, getChannel, getProject, createProject, getProjectConfigPublish, getProjectConfig,
-    updateProject, deleteProject, getResourceName} from '@/api/table/projectmanager/projectTable'
+  import {
+    getName, getChannel, getProject, createProject, getProjectConfigPublish, getProjectConfig,
+    updateProject, deleteProject, getResourceName, createProjectConfig_pro
+  } from '@/api/table/projectmanager/projectTable'
   import waves from '@/directive/waves'
   import {parseTime} from '@/utils'
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
   import store from '@/store'
 
   export default {
+    watch: {
+      inputName: function () {
+        this.getDatawithName()
+      }
+    },
     components: {Pagination},
     directives: {waves},
     filters: {
@@ -206,7 +253,13 @@
     },
     data() {
       return {
-        innerVisible:false,
+        dialogForm: {
+          package_name: '',
+          channel_mark: '',
+          date: 0
+        },
+        innerestVisible: false,
+        innerVisible: false,
         project_value: {},
         project_list: [],
         channel_list: [],
@@ -271,13 +324,75 @@
       this.initProjectList();
     },
     methods: {
+      addconfig(){
+        this.innerestVisible=true
+      },
+      addconfigList() {
+        let tothis = this
+        this.$refs['dynamicValidateForm'].validate((valid) => {
+          if (valid) {
+            this.dialogForm.date = Date.now()
+            createProjectConfig_pro(this.dialogForm).then(response => {
+              if (response.data === '添加失败') {
+                this.$message({
+                  message: '请不要重复添加',
+                  type: 'warning'
+                });
+                return
+              }
+              this.$notify({
+                title: '成功',
+                message: '添加配置表成功',
+                type: 'success',
+                duration: 2000
+              })
+              let app_info = {
+                app_name: '暂无',
+                channel: this.dialogForm.channel_mark,
+                key: this.dialogForm.date,
+                package_name: this.dialogForm.package_name,
+                project: {}
+              }
+              let list = this.project.applist
+              let flag = true
+              for (let i = 0; i < list.length; i++) {
+                if (list[i].package_name === this.project_value.package_name &&
+                  list[i].channel === this.project_value.channel_mark) {
+                  flag = false
+                }
+              }
+              if (flag) {
+                this.project.applist.push(app_info);
+                this.innerVisible = false
+                this.innerestVisible = false
+              } else {
+                this.$message({
+                  message: '请不要重复添加',
+                  type: 'warning'
+                });
+                return
+              }
+            }).catch(error => {
+              console.error(error)
+              tothis.$notify({
+                title: '',
+                message: '添加配置表失败',
+                type: 'error',
+                duration: 2000
+              })
+            })
+          } else {
+            return false;
+          }
+        });
+      },
       link_Edit(val) {
         let routeData = this.$router.resolve({
           name: 'ProjectConfigManager',
           query: {package_name: val.package_name, channel: val.channel}
         });
         window.open(routeData.href, '_blank');
-      },//编辑sdk链接
+      },//编辑sdk配置表
       addDomain() {
         if (typeof (this.project_value.app_name) === "undefined") {
           this.$message({
@@ -286,6 +401,7 @@
           });
           return
         }
+
         let app_info = {
           app_name: this.project_value.app_name,
           channel: this.project_value.channel_mark,
@@ -303,7 +419,7 @@
         }
         if (flag) {
           this.project.applist.push(app_info);
-          this.innerVisible=false
+          this.innerVisible = false
         } else {
           this.$message({
             message: '请不要重复添加',
@@ -311,6 +427,7 @@
           });
           return
         }
+
       },//添加应用
       test() {
         let list = this.project.applist
@@ -374,17 +491,14 @@
         }
       },//ui数据改变
       closedialog() {
-        this.handleFilter();
         this.dialogFormVisible = false
       },//关闭对话框
       fetchchannel() {
-        if (!this.checkPermission(['director', 'admin'])) {
-          return
-        }
         let tothis = this
         this.listLoading = true
         getChannel().then(response => {
           this.channel_list = response.data
+          console.log(this.channel_list)
         }).catch(function (rs) {
           tothis.listLoading = false
           tothis.$notify({
@@ -466,6 +580,7 @@
               }
             }
             if (flag) {
+
               createProject(this.project).then(response => {
                 if (response.data === 'ok') {
                   this.handleFilter();
@@ -587,8 +702,9 @@
         getResourceName(name).then(response => {
           let projectlist = response.data
           getProject().then(response => {
-            if (this.checkPermission(['director']) || this.checkPermission(['admin'])||this.checkPermission(['operatorleader'])) {
+            if (this.checkPermission(['director']) || this.checkPermission(['admin']) || this.checkPermission(['operatorleader'])) {
               this.uichange(response.data)
+
               this.hidlist = response.data
               this.list = response.data
             } else {
@@ -605,12 +721,15 @@
               this.hidlist = newlist
               this.list = newlist
             }
+            this.getDatawithName()
             this.listLoading = false
           }).catch(function (rs) {
+            this.getDatawithName()
             console.error(rs)
             this.listLoading = false
           })
         }).catch(function (rs) {
+          this.getDatawithName()
           console.error(rs)
           this.listLoading = false
         })

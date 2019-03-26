@@ -67,3 +67,12 @@ export function getProjectConfig(param) {
     method: 'get',
   })
 }
+
+
+export function createProjectConfig_pro(param) {
+  return request({
+    url: '/api/projectconfig_pro',
+    method: 'post',
+    data:param
+  })
+}

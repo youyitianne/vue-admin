@@ -211,7 +211,7 @@
                 label: '渠道管理',
                 children: [{
                   id: 'channel-canList',
-                  label: '渠道展示'
+                  label: '渠道展示(统计图表渠道选择时也会用到)'
                 }, {
                   id: 'channel-canCreate',
                   label: '渠道添加'
@@ -412,10 +412,10 @@
           'fileupload-operate','yixindata-operate','sdk-canList','sdk-canCreate','sdk-canEdit']);
       },//设置运营组长权限
       setoperator() {
-        this.$refs.tree.setCheckedKeys(['showtime-table','addata-operate','earned-table','umengretention-table','sdk_pub-canList']);
+        this.$refs.tree.setCheckedKeys(['showtime-table','addata-operate','earned-table','umengretention-table','sdk_pub-canList','channel-canList']);
       },//设置运营专员权限
       setplanner() {
-        this.$refs.tree.setCheckedKeys(['showtime-table','addata-operate','earned-table','umengretention-table','sdk_pub-canList']);
+        this.$refs.tree.setCheckedKeys(['showtime-table','addata-operate','earned-table','umengretention-table','sdk_pub-canList','channel-canList']);
       },//设置策划权限
       setdeveloper() {
         this.$refs.tree.setCheckedKeys(['sdk_pub-canList']);

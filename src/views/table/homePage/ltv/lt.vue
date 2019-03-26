@@ -66,7 +66,7 @@
                      multiple
                      collapse-tags>
             <el-option
-              v-for="item in f"
+              v-for="item in channelList"
               :key="item.id"
               :label="item.channel"
               :value="item">
@@ -122,7 +122,7 @@
         timevalue1: '',
         channel_value1: [],
         select_value1: '',
-        activeName: 'second',
+        activeName: 'first',
         ltList: [],
         channel_value: '',
         channelList: [],

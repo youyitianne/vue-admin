@@ -569,6 +569,7 @@
           label="插屏ECPM">
         </el-table-column>
       </el-table>
+
       <el-pagination
         background
         layout="prev, pager, next"
@@ -578,6 +579,7 @@
         :total="total_page"
         style="margin-left: 15px;margin-top: 10px">
       </el-pagination>
+
     </div>
 
   </div>

@@ -68,7 +68,7 @@
 
         <el-form-item label="项目">
           <!--<el-input v-model="app.project" placeholder="比如别称~"/>-->
-          <el-select v-model="app.project" placeholder="请选择" filterable value-key="project_name">
+          <el-select v-model="app.project" placeholder="请选择" value-key="project_name" filterable>
             <el-option
               v-for="item in projectlist"
               :key="item.project_name"
@@ -301,7 +301,7 @@
           name: '',
           system: '安卓',
           icon: '无',
-          project: '无',
+          project: this.projectlist[0].project_name,
         }
       },
       open3() {

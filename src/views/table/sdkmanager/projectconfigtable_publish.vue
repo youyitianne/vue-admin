@@ -40,86 +40,91 @@
       border
       highlight-current-row
       @expand-change="expandrowhandler">
-      <el-table-column type="expand" label="展开" width="100px">
-        <template slot-scope="props" style="margin: 60px">
-          <el-form label-position="left" inline class="demo-table-expand">
-            <el-form-item label="时间:">
-              <span>{{ props.row.date1}}</span>
-            </el-form-item>
-            <el-form-item label="游戏名:">
-              <span>{{ props.row.app_name }}</span>
-            </el-form-item>
-            <el-form-item label="包名:">
-              <span>{{ props.row.package_name }}</span>
-            </el-form-item>
-            <el-form-item label="渠道标记:">
-              <span>{{ props.row.channel_mark }}</span>
-            </el-form-item>
-            <el-form-item label="外部版本-在线:">
-              <span>{{ props.row.version_online }}</span>
-            </el-form-item>
-            <el-form-item label="内部版本-在线:">
-              <span>{{ props.row.versioncode_online_version }}</span>
-            </el-form-item>
-            <el-form-item label="外部版本-更新:">
-              <span>{{ props.row.version_update }}</span>
-            </el-form-item>
-            <el-form-item label="内部版本_更新:">
-              <span>{{ props.row.versioncode_update_version }}</span>
-            </el-form-item>
-            <!--<el-form-item label="sdk配置:">-->
-            <!--<span>{{ props.row.sdk_config }}</span>-->
+      <!--<el-table-column type="expand" label="展开" width="100px">-->
+        <!--<template slot-scope="props" style="margin: 60px">-->
+          <!--<el-form label-position="left" inline class="demo-table-expand">-->
+            <!--<el-form-item label="时间:">-->
+              <!--<span>{{ props.row.date1}}</span>-->
             <!--</el-form-item>-->
-            <!--<el-form-item label="渠道特别要求:">-->
-            <!--<span>{{ props.row.sdk_require }}</span>-->
+            <!--<el-form-item label="游戏名:">-->
+              <!--<span>{{ props.row.app_name }}</span>-->
+            <!--</el-form-item>-->
+            <!--<el-form-item label="包名:">-->
+              <!--<span>{{ props.row.package_name }}</span>-->
+            <!--</el-form-item>-->
+            <!--<el-form-item label="渠道标记:">-->
+              <!--<span>{{ props.row.channel_mark }}</span>-->
+            <!--</el-form-item>-->
+            <!--<el-form-item label="外部版本-在线:">-->
+              <!--<span>{{ props.row.version_online }}</span>-->
+            <!--</el-form-item>-->
+            <!--<el-form-item label="内部版本-在线:">-->
+              <!--<span>{{ props.row.versioncode_online_version }}</span>-->
+            <!--</el-form-item>-->
+            <!--<el-form-item label="外部版本-更新:">-->
+              <!--<span>{{ props.row.version_update }}</span>-->
+            <!--</el-form-item>-->
+            <!--<el-form-item label="内部版本_更新:">-->
+              <!--<span>{{ props.row.versioncode_update_version }}</span>-->
             <!--</el-form-item>-->
             <!--<el-form-item label="备注:">-->
-            <!--<span>{{ props.row.note }}</span>-->
+              <!--<span>{{ props.row.note }}</span>-->
             <!--</el-form-item>-->
-          </el-form>
-          <div style="margin-bottom: 70px">
-            <el-table
-              stripe
-              border
-              :data="props.row.paramter"
-              style="width: 100%;margin-bottom: 30px;"
-              :span-method="objectSpanMethod">
-              <el-table-column
-                prop="mark"
-                label="模块名"
-                style="width: 15%">
-              </el-table-column>
-              <el-table-column
-                prop="param_name1"
-                label="参数名"
-                style="width: 15%">
-              </el-table-column>
-              <el-table-column
-                prop="param"
-                label="参数"
-                style="width: 25%">
-              </el-table-column>
-            </el-table>
-          </div>
-          <HR style="border:3px double #001528" width="95%" color=#987cb9 SIZE=3></HR>
-        </template>
+            <!--&lt;!&ndash;<el-form-item label="sdk配置:">&ndash;&gt;-->
+            <!--&lt;!&ndash;<span>{{ props.row.sdk_config }}</span>&ndash;&gt;-->
+            <!--&lt;!&ndash;</el-form-item>&ndash;&gt;-->
+            <!--&lt;!&ndash;<el-form-item label="渠道特别要求:">&ndash;&gt;-->
+            <!--&lt;!&ndash;<span>{{ props.row.sdk_require }}</span>&ndash;&gt;-->
+            <!--&lt;!&ndash;</el-form-item>&ndash;&gt;-->
+            <!--&lt;!&ndash;<el-form-item label="备注:">&ndash;&gt;-->
+            <!--&lt;!&ndash;<span>{{ props.row.note }}</span>&ndash;&gt;-->
+            <!--&lt;!&ndash;</el-form-item>&ndash;&gt;-->
+          <!--</el-form>-->
+          <!--<div style="margin-bottom: 70px">-->
+            <!--<el-table-->
+              <!--stripe-->
+              <!--border-->
+              <!--:data="props.row.paramter"-->
+              <!--style="width: 100%;margin-bottom: 30px;"-->
+              <!--:span-method="objectSpanMethod">-->
+              <!--<el-table-column-->
+                <!--prop="mark"-->
+                <!--label="模块名"-->
+                <!--style="width: 15%">-->
+              <!--</el-table-column>-->
+              <!--<el-table-column-->
+                <!--prop="param_name1"-->
+                <!--label="参数名"-->
+                <!--style="width: 15%">-->
+              <!--</el-table-column>-->
+              <!--<el-table-column-->
+                <!--prop="param"-->
+                <!--label="参数"-->
+                <!--style="width: 25%">-->
+              <!--</el-table-column>-->
+            <!--</el-table>-->
+          <!--</div>-->
+          <!--<HR style="border:3px double #001528" width="95%" color=#987cb9 SIZE=3></HR>-->
+        <!--</template>-->
+      <!--</el-table-column>-->
+      <!--<el-table-column label="序号" align="center" width="60">-->
+        <!--<template slot-scope="scope1">-->
+          <!--{{ ++scope1.$index }}-->
+        <!--</template>-->
+      <!--</el-table-column>-->
+      <el-table-column label="发布时间" prop="date1" width="200">
       </el-table-column>
-      <el-table-column label="序号" align="center" width="60">
-        <template slot-scope="scope1">
-          {{ ++scope1.$index }}
-        </template>
+      <el-table-column label="应用名" prop="app_name" width="200">
       </el-table-column>
-      <el-table-column label="发布时间" prop="date1">
+      <el-table-column label="渠道" prop="channel_mark" width="100px">
       </el-table-column>
-      <el-table-column label="应用名" prop="app_name">
+      <el-table-column label="包名" prop="package_name" width="500px">
       </el-table-column>
-      <el-table-column label="渠道" prop="channel_mark">
+      <el-table-column label="外部版本-在线" prop="version_update" width="120px">
       </el-table-column>
-      <el-table-column label="包名" prop="package_name">
+      <el-table-column label="内部版本-更新" prop="versioncode_update_version"  width="120px">
       </el-table-column>
-      <el-table-column label="外部版本-在线" prop="version_update">
-      </el-table-column>
-      <el-table-column label="内部版本-更新" prop="versioncode_update_version">
+      <el-table-column label="备注" prop="note">
       </el-table-column>
       <el-table-column label="操作" align="center" width="150px" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -159,6 +164,9 @@
         <el-form-item label="内部版本_更新:">
           <span>{{ dialogForm.versioncode_update_version }}</span>
         </el-form-item>
+        <el-form-item label="备注:">
+          <span>{{ dialogForm.note }}</span>
+        </el-form-item>
       </el-form>
       <el-table
         stripe
@@ -181,7 +189,11 @@
           label="参数">
         </el-table-column>
       </el-table>
-      <span>链接:{{link}}</span>
+
+      <span>
+          复制Key表链接:&nbsp&nbsp<el-input v-model="link" placeholder="Please input" style="max-width:100%;width: 900px" disabled/>
+        <el-button v-clipboard:copy="link" v-clipboard:success="clipboardSuccess" type="primary" icon="document">复制</el-button>
+      </span>
       <span slot="footer" class="dialog-footer">
     <el-button @click="dialogVisible = false">取 消</el-button>
   </span>
@@ -197,16 +209,16 @@
   import {parseTime} from '@/utils'
   import checkPermission from '@/utils/permission' // 权限判断函数
   //import {getSdkTemplate,getChannel} from '@/api/table/sdkmanager/projectconfigtable'
-  import {
-    updateProjectConfig,
-    getProjectConfigPublish,
-    getResourceName,
-    getProject
-  } from '@/api/table/sdkmanager/projectconfigtable_publish'
+  import {updateProjectConfig,getProjectConfigPublish,getResourceName,getProject} from '@/api/table/sdkmanager/projectconfigtable_publish'
   import store from '@/store'
+
+  import clipboard from '@/directive/clipboard/index' // use clipboard by v-directive
 
 
   export default {
+    directives: {
+      clipboard
+    },
     filters: {
       statusFilter(status) {
         const statusMap = {
@@ -330,8 +342,20 @@
       this.initDate()   //初始化日期查询数据
     },
     methods: {
+      handleCopy(text, event) {
+        clip(text, event)
+      },
+      clipboardSuccess() {
+        this.$message({
+          message: '复制成功',
+          type: 'success',
+          duration: 1500
+        })
+      },
       handleView(value){
-        this.link='http://192.168.1.144:8085/sdkapi?timestamp='+value.timestamp+'&name='+value.app_name+'&channel='+value.channel_mark
+        console.log(value)
+        //this.link='http://192.168.1.144:8085/sdkapi?timestamp='+value.timestamp+'&app='+value.app_name+'&channel='+value.channel_mark
+        this.link='http://192.168.1.144:8085/sdkapi?package_name='+value.package_name+'&channel_mark='+value.channel_mark
         this.dialogForm=value
         this.getSpanArr(value.paramter)
         this.projectObject=value
