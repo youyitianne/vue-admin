@@ -8,7 +8,7 @@
       <el-input placeholder="根据项目名查找" v-model="inputName" style="width: 200px" class="filter-item" clearable/>
     </div>
     <el-table
-      height="850"
+      height="780"
       v-loading="listLoading"
       :data="list"
       element-loading-text="Loading"
@@ -93,7 +93,7 @@
       <!--</el-table-column>-->
       <el-table-column label="备注" prop="note">
       </el-table-column>
-      <el-table-column label="操作" align="center" width="150px" class-name="small-padding fixed-width"
+      <el-table-column label="操作" align="center" width="280px" class-name="small-padding fixed-width"
                        v-if="checkPermission(['director','admin','operatorleader'])">
         <template slot-scope="scope">
           <el-button type="success" size="mini" @click="updateHandler(scope.row)"
@@ -138,6 +138,7 @@
           <el-input v-model="project.note"/>
         </el-form-item>
         <el-button @click="innerVisible = true" type="primary">添加应用</el-button>
+
         <el-dialog
           style="margin-top: 100px"
           width="40%"
@@ -190,7 +191,7 @@
                  </el-form>
                <div slot="footer" class="dialog-footer">
                  <el-button @click="innerestVisible = false">{{ '取消'}}</el-button>
-                 <el-button type="primary" @click="addconfigList">{{ '确认' }}</el-button>
+                 <el-button type="primary" @click="addconfigList">{{ '确认1' }}</el-button>
                </div>
               </el-dialog>
             <el-button @click="addconfig"> 未发现关联配置表？&nbsp&nbsp&nbsp点击前往添加配置表</el-button>
@@ -198,7 +199,7 @@
           </div>
           <div slot="footer" class="dialog-footer">
             <el-button @click="innerVisible = false">{{ '取消'}}</el-button>
-            <el-button type="primary" @click="addDomain">{{ '确认' }}</el-button>
+            <el-button type="primary" @click="addDomain">{{ '确认2' }}</el-button>
           </div>
         </el-dialog>
         <el-form-item
@@ -216,7 +217,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="closedialog()">{{ '取消'}}</el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">{{ '确认' }}</el-button>
+        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">{{ '确认3' }}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -232,6 +233,8 @@
   import {parseTime} from '@/utils'
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
   import store from '@/store'
+  import {getToken} from '@/utils/auth'
+  import {fetchFileInfo, getFile, delFile} from '@/api/fileupload'
 
   export default {
     watch: {
@@ -324,8 +327,10 @@
       this.initProjectList();
     },
     methods: {
-      addconfig(){
-        this.innerestVisible=true
+
+
+      addconfig() {
+        this.innerestVisible = true
       },
       addconfigList() {
         let tothis = this
@@ -340,12 +345,6 @@
                 });
                 return
               }
-              this.$notify({
-                title: '成功',
-                message: '添加配置表成功',
-                type: 'success',
-                duration: 2000
-              })
               let app_info = {
                 app_name: '暂无',
                 channel: this.dialogForm.channel_mark,
@@ -354,11 +353,18 @@
                 project: {}
               }
               let list = this.project.applist
+              console.log(this.project.applist)
+              console.log(app_info)
               let flag = true
               for (let i = 0; i < list.length; i++) {
-                if (list[i].package_name === this.project_value.package_name &&
-                  list[i].channel === this.project_value.channel_mark) {
+                if (list[i].package_name === app_info.package_name &&
+                  list[i].channel === app_info.channel_mark) {
+                  console.log(list[i].package_name)
+                  console.log(this.project_value.package_name)
+                  console.log(list[i].channel)
+                  console.log(this.project_value.channel_mark)
                   flag = false
+                  break;
                 }
               }
               if (flag) {
@@ -366,17 +372,27 @@
                 this.innerVisible = false
                 this.innerestVisible = false
               } else {
+                console.log(2)
                 this.$message({
                   message: '请不要重复添加',
                   type: 'warning'
                 });
                 return
               }
+
+
+              this.$notify({
+                title: '成功',
+                message: '添加配置表成功',
+                type: 'success',
+                duration: 2000
+              })
+
             }).catch(error => {
               console.error(error)
               tothis.$notify({
                 title: '',
-                message: '添加配置表失败',
+                message: '添加配置表失败,请检查是否重复！',
                 type: 'error',
                 duration: 2000
               })
@@ -385,7 +401,7 @@
             return false;
           }
         });
-      },
+      },//添加配置表
       link_Edit(val) {
         let routeData = this.$router.resolve({
           name: 'ProjectConfigManager',
@@ -401,7 +417,6 @@
           });
           return
         }
-
         let app_info = {
           app_name: this.project_value.app_name,
           channel: this.project_value.channel_mark,
@@ -429,16 +444,6 @@
         }
 
       },//添加应用
-      test() {
-        let list = this.project.applist
-        for (let i = 0; i < list.length; i++) {
-          if (typeof (list[i].project.app_name) !== "undefined") {
-            list[i].app_name = list[i].project.app_name
-            list[i].channel = list[i].project.channel_mark
-            list[i].package_name = list[i].project.package_name
-          }
-        }
-      },
       initProjectList() {
         let name = {
           start: '1',
@@ -456,7 +461,7 @@
               }
             }
             if (flag) {
-              data1[i]['name'] = data1[i].channel_mark + '_' + data1[i].app_name + '_' + data1[i].package_name
+              data1[i]['name'] =data1[i].app_name+ '_' + data1[i].channel_mark + '_' +  data1[i].package_name
               data2.push(data1[i])
             }
           }

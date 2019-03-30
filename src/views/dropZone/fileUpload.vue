@@ -1,0 +1,177 @@
+<template>
+  <div class="components-container">
+
+    <el-card shadow="always" v-loading="listLoading">
+      <el-table
+        height="770"
+        border
+        :data="tableData"
+        style="width: 100%">
+        <el-table-column
+          prop="date1"
+          label="日期"
+          width="180">
+        </el-table-column>
+        <el-table-column
+          prop="filename"
+          label="文件名"
+          width="300">
+        </el-table-column>
+        <el-table-column
+          prop="fileguid"
+          label="GUID">
+        </el-table-column>
+        <el-table-column
+          prop="path"
+          label="PATH">
+        </el-table-column>
+        <el-table-column
+          label="操作">
+          <template slot-scope="scope">
+            <el-button @click="handleDelete(scope.row)" type="text" v-loading="downloadLoading">删除</el-button>
+            <el-button @click="handleDownLoad(scope.row)" type="text" v-loading="downloadLoading">下载</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-card>
+
+
+  </div>
+</template>
+
+<script>
+  import Dropzone from '@/components/Dropzone'
+  import {getToken} from '@/utils/auth'
+  import {fetchFileInfo, getFile, delFile} from '@/api/fileupload'
+
+  export default {
+    name: 'DropzoneDemo',
+    components: {Dropzone},
+    data() {
+      return {
+        downloadLoading: false,
+        listLoading: false,
+        tableData: [],
+        hidTableData: [],
+        dialogMessageVisible: false,
+        dataObj: {
+          'Authorization': ''
+        },
+        token: {
+          Authorization: 'Bear ' + getToken()
+        },
+        root: "els",
+        version: "1.0.0",
+        value: "",
+        value1: "",
+      }
+    },
+    mounted() {
+      this.listFileInfo();
+    },
+    methods: {
+      handleDelete(param) {
+        let tothis = this;
+        this.$confirm('是否确定删除?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          delFile(param).then(response => {
+            console.log(response.toString())
+            tothis.downloadLoading = false
+            if (response.repcode === 3000) {
+              tothis.$notify({
+                title: '成功',
+                message: '删除成功',
+                type: 'success',
+                duration: 2000
+              })
+            } else {
+              tothis.$notify({
+                title: '失败',
+                message: response.data,
+                type: 'error',
+                duration: 2000
+              })
+            }
+            this.listFileInfo();
+          }).catch(function (rs) {
+            console.log(rs.toString())
+            tothis.downloadLoading = false
+            tothis.$notify({
+              title: '删除失败',
+              message: '刷新试试',
+              type: 'error',
+              duration: 2000
+            })
+          })
+        });
+      },//删除上传文件
+      handleDownLoad(param) {
+        console.log(param)
+        let tothis = this;
+        getFile(param).then(data => {
+          if (!data) {
+            return
+          }
+          let url = window.URL.createObjectURL(new Blob([data]))
+          let link = document.createElement('a')
+          link.style.display = 'none'
+          link.href = url
+          link.setAttribute('download', param.filename)
+          document.body.appendChild(link)
+          link.click()
+          this.downloadLoading = false
+        }).catch(function (rs) {
+          console.log(rs.toString())
+          tothis.downloadLoading = false
+          tothis.$notify({
+            title: '下载失败',
+            message: '刷新试试',
+            type: 'error',
+            duration: 2000
+          })
+        })
+      },//资源文件列表中下载资源
+      listFileInfo() {
+        let tothis = this;
+        fetchFileInfo().then(response => {
+          if (response.repcode === 0) {
+            this.tableData = response.data
+            this.hidTableData = response.data
+            console.log(this.tableData)
+          }
+          this.listLoading = false
+        }).catch(function (rs) {
+          tothis.listLoading = false
+          console.log(rs)
+        })
+      },//展示上传文件表
+      beforeUpload(file) {
+        this.dataObj.Authorization = 'Bearer ' + getToken()
+      },//上传前事件
+      dropzoneS(response) {
+        console.log(response)
+        let data = response.data;
+        this.value = data + "<br>" + this.value;
+        this.$message({message: data, type: 'success'})
+        this.listFileInfo();
+      },//上传成功时间
+      dropzoneR(response) {
+        this.$message({message: '移除成功~', type: 'success'})
+      },//上传文件资源列表
+
+
+    }
+  }
+</script>
+
+<style rel="stylesheet/scss" lang="scss" scoped>
+  .ts-title {
+    font-size: 15px;
+    font-weight: bolder
+  }
+</style>
+
+

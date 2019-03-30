@@ -98,7 +98,7 @@ export const asyncRouterMap = [
         meta: {
           title: '广告数据',
           icon: 'table',
-          roles: ['director','planner','operatorleader','operator']
+          roles: ['director', 'planner', 'operatorleader', 'operator']
         }
       },
       {
@@ -138,7 +138,7 @@ export const asyncRouterMap = [
         meta: {
           title: 'lt',
           icon: 'table',
-          roles: ['director','planner','operaterleader','operator','operatorleader']
+          roles: ['director', 'planner', 'operaterleader', 'operator']
         }
       },
       {
@@ -148,7 +148,7 @@ export const asyncRouterMap = [
         meta: {
           title: '产品数据',
           icon: 'table',
-          roles: ['director','planner','operaterleader','operator','operatorleader']
+          roles: ['director', 'planner', 'operaterleader', 'operator', 'developer']
         }
       },
     ]
@@ -247,7 +247,7 @@ export const asyncRouterMap = [
       {
         path: 'dropzone',
         component: () => import('@/views/dropZone/dropzone'),
-        name: 'DropzoneDemo',
+        name: 'dropzone',
         meta: {
           title: '数据录入',
           icon: 'upload1',
@@ -448,7 +448,7 @@ export const asyncRouterMap = [
         meta: {
           title: 'SDK配置表',
           icon: 'sdkset1',
-          roles: ['director', 'operatorleader','operator'],
+          roles: ['director', 'operatorleader', 'operator'],
         }
       }, {
         path: 'projectconfiglist',
@@ -467,7 +467,17 @@ export const asyncRouterMap = [
           title: '详细信息',
           icon: 'sdkshow',
         }
-      }]
+      }, {
+        path: 'keyStore',
+        component: () => import('@/views/table/sdkmanager/keystore'),
+        name: 'keyStoreManage',
+        meta: {
+          title: 'KeyStore管理',
+          icon: 'keystore',
+          roles: ['director', 'operatorleader', 'operator'],
+        }
+      },
+    ]
   },
   {
     path: '/system',
@@ -475,10 +485,20 @@ export const asyncRouterMap = [
     redirect: '/system/help',
     name: 'SystemSet',
     meta: {
-      title: '系统设置',
+      title: '系统',
       icon: 'system1',
     },
     children: [
+      {
+        path: 'file',
+        component: () => import('@/views/dropZone/fileUpload.vue'),
+        name: 'file',
+        meta: {
+          title: '上传文件管理',
+          icon: 'uploadfilemanager',
+          roles: ['director', 'admin'],
+        }
+      },
       {
         path: 'operationlog',
         component: () => import('@/views/system/operationLog'),
@@ -511,9 +531,67 @@ export const asyncRouterMap = [
     ]
   },
   {
+    path: '/redSystem',
+    component: Layout,
+    name: 'redSystem',
+    redirect: '/redSystem/testMode',
+    meta: {
+      title: '屏蔽系统',
+      icon: 'redsystem2',
+      roles: ['director', 'admin'],
+    },
+    children: [
+      {
+        path: 'testMode',
+        component: () => import('@/views/table/shieldingsystem/testmode'),
+        name: 'testMode',
+        meta: {
+          title: '测试模式',
+          icon: 'testmode',
+          roles: ['director', 'admin'],
+        }
+      },
+      {
+        path: 'channelPromo',
+        hidden:true,
+        name: 'channelPromo',
+        redirect: '/redSystem/channelPromo/channelPromoEdit',
+        component: () => import('@/views/table/shieldingsystem/channelpromo/redsystem'),
+        meta: {
+          title: '渠道互推',
+          icon: 'channelpromo',
+          roles: ['director', 'admin'],
+        },
+        children: [
+          {
+            path: 'channelPromoEdit',
+            component: () => import('@/views/table/shieldingsystem/channelpromo/channelPromoEdit/channelPromoEdit'),
+            name: 'channelPromoEdit',
+            meta: {
+              title: '互推管理',
+              icon: 'uploadfilemanager',
+              roles: ['director', 'admin'],
+            },
+          },
+          {
+            path: 'channelPromoFodder',
+            component: () => import('@/views/table/shieldingsystem/channelpromo/channelPromoFodder/channelPromoFodder'),
+            name: 'channelPromoFodder',
+            meta: {
+              title: '互推素材',
+              icon: 'channelpromofodder',
+              roles: ['director', 'admin'],
+            },
+          },
+
+        ]
+      },
+    ]
+  },
+  {
     path: '/debug',
     component: Layout,
-    redirect: '/debug/table',
+    redirect: '/debug/adData',
     name: 'Data',
     meta: {
       title: 'Debug',
@@ -522,8 +600,8 @@ export const asyncRouterMap = [
     },
     children: [
       {
-        path: 'cline',
-        name: 'Table',
+        path: 'adData',
+        name: 'adData',
         component: () => import('@/views/debug/addata'),
         meta: {
           title: '广告数据',
@@ -532,9 +610,9 @@ export const asyncRouterMap = [
         }
       },
       {
-        path: 'userdata',
+        path: 'userData',
         component: () => import('@/views/debug/userdata'),
-        name: 'UserdataTable',
+        name: 'userData',
         meta: {
           title: '用户数据',
           noCache: true,

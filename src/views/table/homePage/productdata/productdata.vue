@@ -627,8 +627,6 @@
         getappdata(listParam).then(response => {
           this.original_list = response.data
           this.original_list_app = response.data1
-          console.log(this.original_list)
-          console.log(this.original_list_app)
           this.original_mon = response.mon
           getappdata(listParam1).then(response => {
             this.contrast_list = response.data
@@ -1283,11 +1281,12 @@
             getResourceName(name).then(response => {
               let newlist = []
               let projectlist = response.data
+              console.log(response.data)
               for (let i = 0; i < todolist.length; i++) {
+                console.log(todolist[i].project_name)
                 for (let j = 0; j < projectlist.length; j++) {
                   if (todolist[i].project_name === projectlist[j]) {
                     newlist.push(todolist[i])
-                    break
                   }
                 }
               }
@@ -1299,7 +1298,7 @@
             });
           }
         }).catch(function (rs) {
-          console.log(rs)
+          console.error(rs)
           this.listLoading = false
         })
       },//初始化游戏名

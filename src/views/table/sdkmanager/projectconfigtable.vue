@@ -1,10 +1,8 @@
 <template>
   <div class="app-container">
     <div class="filter-container" style="margin: 15px;margin-top: -5px">
-      <el-button class="filter-item" style="margin-left: 10px;margin-right: 20px" type="primary" icon="el-icon-edit"
-                 v-if="checkPermission(['operatorleader','admin','sdksuport','director','operator'])"
-                 @click="handleCreate">添加配置表
-      </el-button>
+
+
       <!--<span style="margin-left: 15px;margin-right: 5px">游戏:</span>-->
       <!--<el-select v-model="secondary_game" @change="getDatawithParam">-->
       <!--<el-option key="全部" label="全部" value="">-->
@@ -45,80 +43,80 @@
       border
       highlight-current-row
       @expand-change="expandrowhandler">
-      <el-table-column type="expand" label="展开" width="100px">
-        <template slot-scope="props">
-          <el-form label-position="left" inline class="demo-table-expand">
-            <el-form-item label="游戏名:">
-              <span>{{ props.row.app_name }}</span>
-            </el-form-item>
-            <el-form-item label="包名:">
-              <span>{{ props.row.package_name }}</span>
-            </el-form-item>
-            <el-form-item label="渠道标记:">
-              <span>{{ props.row.channel_mark }}</span>
-            </el-form-item>
-            <el-form-item label="外部版本-在线:">
-              <span>{{ props.row.version_online }}</span>
-            </el-form-item>
-            <el-form-item label="内部版本-在线:">
-              <span>{{ props.row.versioncode_online_version }}</span>
-            </el-form-item>
-            <el-form-item label="外部版本-更新:">
-              <span>{{ props.row.version_update }}</span>
-            </el-form-item>
-            <el-form-item label="内部版本_更新:">
-              <span>{{ props.row.versioncode_update_version }}</span>
-            </el-form-item>
-          </el-form>
-          <div>
-            <el-table
-              v-if="false"
-              stripe
-              border
-              :data="props.row.paramter"
-              style="width: 100%;margin-bottom: 30px;"
-              :span-method="objectSpanMethod">
-              <el-table-column
-                prop="mark"
-                label="模块名"
-                style="width: 15%">
-              </el-table-column>
-              <el-table-column
-                prop="param_name1"
-                label="参数名"
-                style="width: 15%">
-              </el-table-column>
-              <el-table-column
-                prop="param"
-                label="参数"
-                style="width: 25%">
-              </el-table-column>
-            </el-table>
-          </div>
-        </template>
+      <!--<el-table-column type="expand" label="展开" width="100px">-->
+      <!--<template slot-scope="props">-->
+      <!--<el-form label-position="left" inline class="demo-table-expand">-->
+      <!--<el-form-item label="游戏名:">-->
+      <!--<span>{{ props.row.app_name }}</span>-->
+      <!--</el-form-item>-->
+      <!--<el-form-item label="包名:">-->
+      <!--<span>{{ props.row.package_name }}</span>-->
+      <!--</el-form-item>-->
+      <!--<el-form-item label="渠道标记:">-->
+      <!--<span>{{ props.row.channel_mark }}</span>-->
+      <!--</el-form-item>-->
+      <!--<el-form-item label="外部版本-在线:">-->
+      <!--<span>{{ props.row.version_online }}</span>-->
+      <!--</el-form-item>-->
+      <!--<el-form-item label="内部版本-在线:">-->
+      <!--<span>{{ props.row.versioncode_online_version }}</span>-->
+      <!--</el-form-item>-->
+      <!--<el-form-item label="外部版本-更新:">-->
+      <!--<span>{{ props.row.version_update }}</span>-->
+      <!--</el-form-item>-->
+      <!--<el-form-item label="内部版本_更新:">-->
+      <!--<span>{{ props.row.versioncode_update_version }}</span>-->
+      <!--</el-form-item>-->
+      <!--</el-form>-->
+      <!--<div>-->
+      <!--<el-table-->
+      <!--v-if="false"-->
+      <!--stripe-->
+      <!--border-->
+      <!--:data="props.row.paramter"-->
+      <!--style="width: 100%;margin-bottom: 30px;"-->
+      <!--:span-method="objectSpanMethod">-->
+      <!--<el-table-column-->
+      <!--prop="mark"-->
+      <!--label="模块名"-->
+      <!--style="width: 15%">-->
+      <!--</el-table-column>-->
+      <!--<el-table-column-->
+      <!--prop="param_name1"-->
+      <!--label="参数名"-->
+      <!--style="width: 15%">-->
+      <!--</el-table-column>-->
+      <!--<el-table-column-->
+      <!--prop="param"-->
+      <!--label="参数"-->
+      <!--style="width: 25%">-->
+      <!--</el-table-column>-->
+      <!--</el-table>-->
+      <!--</div>-->
+      <!--</template>-->
+      <!--</el-table-column>-->
+      <!--<el-table-column align="center" label="序号" width="60">-->
+      <!--<template slot-scope="scope1">-->
+      <!--{{ ++scope1.$index }}-->
+      <!--</template>-->
+      <!--</el-table-column>-->
+      <el-table-column label="包名" prop="package_name" width="300px">
       </el-table-column>
-      <el-table-column align="center" label="序号" width="60">
-        <template slot-scope="scope1">
-          {{ ++scope1.$index }}
-        </template>
+      <el-table-column label="应用名" prop="app_name" width="150">
       </el-table-column>
-      <el-table-column label="包名" prop="package_name" width="400px">
+      <el-table-column label="渠道" prop="channel_mark" width="100">
       </el-table-column>
-      <el-table-column label="应用名" prop="app_name">
+      <!--<el-table-column label="外部版本-在线" prop="version_online">-->
+      <!--</el-table-column>-->
+      <el-table-column label="外部版本-更新" prop="version_update" width="120">
       </el-table-column>
-      <el-table-column label="渠道" prop="channel_mark">
-      </el-table-column>
-      <el-table-column label="外部版本-在线" prop="version_online">
-      </el-table-column>
-      <el-table-column label="外部版本-更新" prop="version_update">
-      </el-table-column>
-      <el-table-column label="内部版本-在线" prop="versioncode_online_version">
-      </el-table-column>
-      <el-table-column label="内部版本-更新" prop="versioncode_update_version">
+      <!--<el-table-column label="内部版本-在线" prop="versioncode_online_version">-->
+      <!--</el-table-column>-->
+      <el-table-column label="内部版本-更新" prop="versioncode_update_version" width="120">
       </el-table-column>
       <el-table-column label="备注" prop="note">
       </el-table-column>
-      <el-table-column label="操作" align="center" width="300px" class-name="small-padding fixed-width"
+      <el-table-column label="操作" align="center" width="250px" class-name="small-padding fixed-width"
                        v-if="checkPermission(['operatorleader','admin','sdksuport','director','operator'])">
         <template slot-scope="scope">
           <el-button type="success" size="mini" @click="handleUpdate(scope.row)">{{ "编辑" }}</el-button>
@@ -135,12 +133,6 @@
           <el-date-picker v-model="sdk.timevalue" type="datetime" :disabled=true>
           </el-date-picker>
         </el-form-item>
-        <div>
-          <el-form-item label="游戏名" :rules="[{ required: true, message: '游戏名不能为空'}]" prop="app_name"
-                        v-if="this.dialogStatus === 'update'">
-            <el-input v-model="sdk.app_name" placeholder="必填~" class="dia-input"/>
-          </el-form-item>
-        </div>
         <el-form-item label="包名" :rules="[{ required: true, message: '包名不能为空'}]" prop="package_name"
                       v-if="this.dialogStatus === 'update'">
           <el-input v-model="sdk.package_name" placeholder="必填~" class="dia-input" disabled/>
@@ -156,6 +148,24 @@
             </el-option>
           </el-select>
         </el-form-item>
+
+        <el-form-item label="游戏名" :rules="[{ required: true, message: '游戏名不能为空'}]" prop="app_name"
+                      v-if="this.dialogStatus === 'update'">
+          <el-input v-model="sdk.app_name" placeholder="必填~" class="dia-input"/>
+        </el-form-item>
+        <el-form-item label="keystore" v-if="this.dialogStatus === 'update'"
+                      prop="keystore">
+          <el-select v-model="sdk.keystore" placeholder="请选择" class="dia-input" filterable value-key="keystoreguid">
+            <el-option
+              v-for="item in keystoreList"
+              :key="item.keystoreguid"
+              :label="item.keystoreName"
+              :value="item">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <div></div>
+
         <el-form-item label="包名" :rules="[{ required: true, message: '包名不能为空'}]" prop="package_name"
                       v-if="this.dialogStatus === 'create'">
           <el-input v-model="sdk.package_name" placeholder="必填~" class="dia-input"/>
@@ -197,10 +207,78 @@
         <el-form-item label="备注" :rules="[{ required: true, message: '默认填写暂无'}]"
                       v-if="this.dialogStatus === 'update'"
                       prop="note">
-          <el-input v-model="sdk.note" placeholder="必填~" class="dia-input"  type="textarea"
+          <el-input v-model="sdk.note" placeholder="必填~" class="dia-input" type="textarea"
                     :rows="3"/>
         </el-form-item>
+        <div></div>
 
+        <!--<el-form-item label="ketstorePWD" :rules="[{ required: true, message: 'ketstorePWD不能为空'}]"-->
+        <!--v-if="this.dialogStatus === 'update'"-->
+        <!--prop="ketstorePWD">-->
+        <!--<el-input v-model="sdk.ketstorePWD" placeholder="必填~" class="dia-input"/>-->
+        <!--</el-form-item>-->
+
+        <!--<el-form-item label="icon"-->
+        <!--v-if="this.dialogStatus === 'update'"-->
+        <!--prop="icon">-->
+        <!--<el-input v-model="sdk.icon" placeholder="必填~" class="dia-input" disabled/>-->
+        <!--</el-form-item>-->
+        <!--<el-form-item label="splash" -->
+        <!--v-if="this.dialogStatus === 'update'"-->
+        <!--prop="splash">-->
+        <!--<el-input v-model="sdk.splash" placeholder="必填~" class="dia-input" disabled/>-->
+        <!--</el-form-item>-->
+        <div style="text-align: center">
+          <el-upload
+            style="margin: 20px;width: 40%;display: inline-block"
+            class="avatar-uploader"
+            action="http://192.168.1.144:8087/file"
+            accept=".png,.jpg"
+            :show-file-list="false"
+            :on-success="uploadSuccess_icon"
+            :before-upload="beforeUpload_icon">
+            <img v-if="imageUrl_icon" :src="imageUrl_icon" class="avatar">
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+            <div slot="tip" class="el-upload__tip">此处上传icon,<a style="text-decoration:underline" :href="this.imageUrl_icon+'&name=icon'"   target="_blank"  title="点击查看大图">点击查看大图</a>
+            </div>
+          </el-upload>
+          <!--<el-upload-->
+          <!--style="margin: 20px;width: 40%;display: inline-block"-->
+          <!--action="http://192.168.1.144:8087/file"-->
+          <!--accept=".png,.jpg"-->
+          <!--:before-upload="beforeUpload_icon"-->
+          <!--:on-success="uploadSuccess_icon"-->
+          <!--:file-list="fileList_icon"-->
+          <!--list-type="picture">-->
+          <!--<el-button size="small" type="primary">上传ICON</el-button>-->
+          <!--<div slot="tip" class="el-upload__tip">只能上传一张jpg/png文件，若无法上传，点击下方图片右上角的X</div>-->
+          <!--</el-upload>-->
+          <el-upload
+            style="margin: 20px;width: 50%;display: inline-block"
+            class="avatar-uploader"
+            action="http://192.168.1.144:8087/file"
+            accept=".png,.jpg"
+            :show-file-list="false"
+            :on-success="uploadSuccess_splash"
+            :before-upload="beforeUpload_splash">
+            <img v-if="imageUrl_splash" :src="imageUrl_splash" class="avatar">
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+            <div slot="tip" class="el-upload__tip">此处上传splash,<a style="text-decoration:underline"  :href="this.imageUrl_splash+'&name=splash'" target="_blank"  title="点击查看大图">点击查看大图</a>
+            </div>
+          </el-upload>
+
+          <!--<el-upload-->
+          <!--style="margin: 20px;width: 40%;display: inline-block;margin-left: 90px"-->
+          <!--action="http://192.168.1.144:8087/file"-->
+          <!--accept=".png,.jpg"-->
+          <!--:before-upload="beforeUpload_splash"-->
+          <!--:on-success="uploadSuccess_splash"-->
+          <!--:file-list="fileList_splash"-->
+          <!--list-type="picture">-->
+          <!--<el-button size="small" type="primary">上传SPLASH</el-button>-->
+          <!--<div slot="tip" class="el-upload__tip">只能上传一张jpg/png文件，若无法上传，点击下方图片右上角的X</div>-->
+          <!--</el-upload>-->
+        </div>
         <br/>
         <!--筛选输入框-->
         <el-input placeholder="SDK模版筛选" v-model="sdk_template_name" v-if="this.dialogStatus === 'update'"
@@ -220,7 +298,7 @@
         <el-tabs tab-position="left" style="width: 95%;background-color: #f4f4f5;height: 500px;padding: 1px" id="test1"
                  v-if="this.dialogStatus === 'update'" v-model="tabname"
                  @tab-click="findtabname" type="border-card">
-          <el-tab-pane v-for="name in checkedSdkTemplate" :label="name" :key="name"  :name="name"
+          <el-tab-pane v-for="name in checkedSdkTemplate" :label="name" :key="name" :name="name"
                        style="font-size: 14px;font-family: Microsoft YaHei;width: 100%">
             <div name="pane_form" style="height: 500px;overflow: auto;">
               <!--标签页内多选框-->
@@ -286,6 +364,8 @@
     getProject
   } from '@/api/table/sdkmanager/projectconfigtable'
   import {getName, getResourceName} from '@/api/table/sdkmanager/projectconfigtable'
+  import {fetchFileInfo, getFile, delFile, fetchKeystoreInfo} from '@/api/fileupload'
+  import {getToken} from '@/utils/auth'
 
   export default {
     filters: {
@@ -300,7 +380,15 @@
     },
     data() {
       return {
-        tabname:'',
+        imageUrl_splash: '',
+        imageUrl_icon: '',
+        keystoreList: [],
+        dataObj: {
+          'Authorization': ''
+        },
+        fileList_icon: [],
+        fileList_splash: [],
+        tabname: '',
         projectlist_select: [],
         secondary_project: '',
         secondary_package: '',
@@ -387,6 +475,10 @@
           sdkstatus: '1',
           sdk_require: '',
           note: '',
+          icon: '',
+          splash: '',
+          keystore: '',
+          ketstorePWD: "",
           publish: '0',
           form: {
             domains: [],
@@ -407,8 +499,46 @@
       this.initTemplate()   //获取sdk模版
       this.initDate()   //初始化日期查询数据
       this.routeWithParam()//跳转赋值
+      this.listKeyStoreInfo()//获取keystore列表
     },
     methods: {
+      listKeyStoreInfo() {
+        let tothis = this;
+        fetchKeystoreInfo().then(response => {
+          if (response.repcode === 0) {
+            this.keystoreList = response.data
+            console.log(this.keystoreList)
+          }
+          this.listLoading = false
+        }).catch(function (rs) {
+          tothis.$notify({
+            title: '失败',
+            message: '获取keystore列表失败',
+            type: 'error',
+            duration: 4000
+          })
+          tothis.listLoading = false
+          console.log(rs)
+        })
+      },//获取keystore列表
+      beforeUpload_icon(file) {
+        this.dataObj.Authorization = 'Bearer ' + getToken()
+      },//icon上传前事件
+      beforeUpload_splash(file) {
+        this.dataObj.Authorization = 'Bearer ' + getToken()
+      },//splash上传前事件
+      uploadSuccess_icon(response) {
+        console.log(response)
+        this.sdk.icon = response.data
+        this.imageUrl_icon = "http://192.168.1.144:8087/getFile?path=" + response.data
+        console.log(response.data)
+      },//icon上传成功事件
+      uploadSuccess_splash(response) {
+        console.log(response)
+        this.sdk.splash = response.data
+        this.imageUrl_splash = "http://192.168.1.144:8087/getFile?path=" + response.data
+        console.log(response.data)
+      },//splash上传成功事件
       link_Check(val) {
         let routeData = this.$router.resolve({
           name: 'ProjectConfigList',
@@ -437,7 +567,6 @@
         //this.publish()
       },//发布按钮处理
       findtabname(tab, event) {
-        console.log(tab.label)
         this.tag_name = tab.label
         this.change_pagename(tab.label)
       },//获取对话框内标签页 名触发事件
@@ -521,6 +650,8 @@
           }
           let timestamp = (new Date()).getTime()
           this.sdk.timevalue = timestamp
+          this.sdk.keystore.filepath = this.sdk.keystore.keystoreguid
+          console.log(this.sdk)
 
           createProjectConfig(this.sdk).then(response => {
             this.create_flag = true
@@ -742,7 +873,6 @@
           }
         }
         this.filter_form_name = this.page_name
-        console.log(this.tag_name)
         if (this.tag_name === '暂无' && this.checkedSdkTemplate.length > 0) {
           this.tag_name = this.checkedSdkTemplate[0]
         }
@@ -862,7 +992,6 @@
             this.sdk.timevalue = timestamp
             if (this.create_flag) {
               this.create_flag = false
-              console.log(this.sdk)
               createProjectConfig(this.sdk).then(response => {
                 if (response.data === '成功') {
                   this.create_flag = true
@@ -908,6 +1037,13 @@
             this.sdkTemplatelibrary[j].keyform[x].param = ''
           }
         }
+        let def_keystore = this.keystoreList[0]
+        for (let i = 0; i < this.keystoreList.length; i++) {
+          if (this.keystoreList[i].keystoreName === 'tomatojoy.keystore') {
+            def_keystore = this.keystoreList[i]
+            break
+          }
+        }
         this.sdk = {
           second_checked: [],
           checked: [],
@@ -924,6 +1060,9 @@
           sdkstatus: '1',
           sdk_require: '',
           note: '',
+          icon: '暂无',
+          splash: '暂无',
+          keystore: def_keystore,
           publish: '0',
           form: {
             domains: [],
@@ -943,7 +1082,6 @@
         })
       }, //创建对话框展示
       handleUpdate(param) {
-        console.log(param)
         this.resetTemp()
         let paramter = param.paramter
         for (let i = 0; i < paramter.length; i++) {
@@ -995,6 +1133,30 @@
         this.sdk.sdk_require = param.sdk_require
         this.sdk.note = param.note
         this.sdk.publish = '0'
+
+        this.sdk.icon = param.icon
+        this.sdk.splash = param.splash
+        for (let i = 0; i < this.keystoreList.length; i++) {
+          if (this.keystoreList[i].keystoreguid === param.keystorePath) {
+            this.sdk.keystore = this.keystoreList[i]
+            console.log('keystore匹配成功')
+            break;
+          }
+        }
+        console.log(param.icon)
+        if (param.icon !== '暂无') {
+          this.imageUrl_icon='http://192.168.1.144:8087/getFile?path=' + param.icon + '&name=icon'
+        } else {
+          this.imageUrl_icon=''
+        }
+        console.log(param.splash)
+        if (param.splash !== '暂无') {
+          this.imageUrl_splash='http://192.168.1.144:8087/getFile?path=' + param.splash + '&name=splash'
+        } else {
+          this.imageUrl_splash=''
+        }
+        console.log(param)
+
         //this.sdk.form.domains = param.paramter
         let marks_list = []
         for (let i = 0; i < param.paramter.length; i++) {
@@ -1107,19 +1269,21 @@
         //end
 
         //当sdk模版删除时，标签页不显示sdk名
-        for (let i=0;i<this.checkedSdkTemplate.length;i++){
-          let flag=true
-          for (let j=0;j<this.sdkTemplate.length;j++){
-            if (this.sdkTemplate[j].mark===this.checkedSdkTemplate[i]){
-              flag=false
-              console.log(this.checkedSdkTemplate[i])
+        for (let i = 0; i < this.checkedSdkTemplate.length; i++) {
+          let flag = true
+          for (let j = 0; j < this.sdkTemplate.length; j++) {
+            if (this.sdkTemplate[j].mark === this.checkedSdkTemplate[i]) {
+              flag = false
             }
           }
-          if(flag){
-            this.checkedSdkTemplate.splice(i,1)
+          if (flag) {
+            this.checkedSdkTemplate.splice(i, 1)
           }
         }
 
+        //筛选条件清空
+        this.sdk_template_name = ''
+        this.getchannelmarklist()
 
         this.dialogFormVisible = true
       }, //更新对话框展示
@@ -1163,6 +1327,7 @@
 
 
         }
+
         let submit_object = {
           app_name: this.sdk.app_name,
           channel_mark: this.sdk.channel_mark,
@@ -1174,6 +1339,14 @@
           id: this.sdk.id,
           package_name: this.sdk.package_name,
           publish: '0',
+          icon: this.sdk.icon,
+          splash: this.sdk.splash,
+          keystore: {
+            filepath: this.sdk.keystore.keystoreguid,
+            keystorePass: this.sdk.keystore.keystorePass,
+            keyaliasName: this.sdk.keystore.keyaliasName,
+            keyaliasPass: this.sdk.keystore.keyaliasPass,
+          },
           sdk_config: 'config_unused',
           sdk_require: 'require_unused',
           sdkstatus: this.sdk.sdkstatus,
@@ -1183,9 +1356,15 @@
           version_update_version: this.sdk.version_update_version,
           versioncode_online_version: this.sdk.versioncode_online_version,
           versioncode_update_version: this.sdk.versioncode_update_version,
-          note:this.sdk.note
+          note: this.sdk.note
         };
         //把所有有值的一起提交
+        if (this.sdk.icon === null) {
+          submit_object.icon = '暂无'
+        }
+        if (this.sdk.splash === null) {
+          submit_object.splash = '暂无'
+        }
         let newdomains = []
         for (let i = 0; i < this.sdkTemplatelibrary.length; i++) {
           for (let j = 0; j < this.sdkTemplatelibrary[i].keyform.length; j++) {
@@ -1254,6 +1433,8 @@
         }
         this.update_flag = false
         if (val) {  //保存是不判断
+          console.log(submit_object)
+
           updateProjectConfig(submit_object).then(response => {
             this.listLoading = true
             if (this.hidtimevalue != '') {
@@ -1282,9 +1463,13 @@
               duration: 4000
             })
           })
+
+
         } else {
+          console.log(123)
           this.$refs['dataForm'].validate((valid) => {
             if (valid) {
+              console.log(submit_object)
               updateProjectConfig(submit_object).then(response => {
                 this.listLoading = true
                 if (this.hidtimevalue != '') {
@@ -1312,6 +1497,8 @@
                   duration: 4000
                 })
               })
+
+
             }
             this.update_flag = true
           })
@@ -1578,6 +1765,32 @@
     width: 180px;
   }
 
+  .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+  }
+
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
+  }
 </style>
 
 

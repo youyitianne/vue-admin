@@ -323,10 +323,10 @@
                 id: 'project-canCreate',
                 label: '项目创建'
               }, {
-                id: 'project-canDelete',
+                id: 'project-canEdit',
                 label: '项目编辑'
               }, {
-                id: 'project-canEdit',
+                id: 'project-canDelete',
                 label: '项目删除'
               }]
             }, {

@@ -78,14 +78,17 @@
       routerHandler() {
         if (this.checkPermission(['planner'])) {
           this.$router.push({path: '/homepage/addata'})
+          return
         } else if (this.checkPermission(['admin', 'director'])) {
           this.$router.push({path: '/homepage/earned'})
-        } else if (this.checkPermission(['operaterleader','operator'])) {
+          return
+        } else if (this.checkPermission(['operaterleader','operator','developer'])) {
           this.$router.push({path: '/homepage/productdata'})
+          return
         } else {
-          this.$router.push({path: '/sdkmanager/projectconfiglist'})
+          this.$router.push({path: '/homepage/productdata'})
+          return
         }
-
       }
     }
   }

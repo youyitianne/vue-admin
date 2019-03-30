@@ -29,7 +29,7 @@
       </el-checkbox>
     </div>
     <el-table
-      height="850"
+      height="780"
       v-loading="listLoading"
       :data="list"
       element-loading-text="Loading"
@@ -114,11 +114,11 @@
       <!--</el-table-column>-->
       <el-table-column label="发布时间" prop="date1" width="200">
       </el-table-column>
-      <el-table-column label="应用名" prop="app_name" width="200">
+      <el-table-column label="应用名" prop="app_name" width="150">
       </el-table-column>
       <el-table-column label="渠道" prop="channel_mark" width="100px">
       </el-table-column>
-      <el-table-column label="包名" prop="package_name" width="500px">
+      <el-table-column label="包名" prop="package_name" width="300px">
       </el-table-column>
       <el-table-column label="外部版本-在线" prop="version_update" width="120px">
       </el-table-column>
@@ -139,7 +139,7 @@
       title="详情"
       :visible.sync="dialogVisible"
       width="70%">
-      <el-form label-position="left" inline class="demo-table-expand" :model="dialogForm" label-width="200px">
+      <el-form label-position="left" inline class="demo-table-expand" :model="dialogForm" label-width="150px">
         <el-form-item label="时间:">
           <span>{{ dialogForm.date1}}</span>
         </el-form-item>
@@ -163,6 +163,24 @@
         </el-form-item>
         <el-form-item label="内部版本_更新:">
           <span>{{ dialogForm.versioncode_update_version }}</span>
+        </el-form-item>
+        <el-form-item label="icon:">
+          <span>{{ dialogForm.icon }}</span>
+        </el-form-item>
+        <el-form-item label="splash:">
+          <span>{{ dialogForm.splash }}</span>
+        </el-form-item>
+        <el-form-item label="keystorePath:">
+          <span>{{ dialogForm.keystorePath }}</span>
+        </el-form-item>
+        <el-form-item label="keystorePass:">
+          <span>{{ dialogForm.keystorePass }}</span>
+        </el-form-item>
+        <el-form-item label="keyaliasName:">
+          <span>{{ dialogForm.keyaliasName }}</span>
+        </el-form-item>
+        <el-form-item label="keyaliasPass:">
+          <span>{{ dialogForm.keyaliasPass }}</span>
         </el-form-item>
         <el-form-item label="备注:">
           <span>{{ dialogForm.note }}</span>
