@@ -143,6 +143,9 @@
         <el-form-item label="时间:">
           <span>{{ dialogForm.date1}}</span>
         </el-form-item>
+        <el-form-item label="出表人">
+          <span>{{ dialogForm.publisher}}</span>
+        </el-form-item>
         <el-form-item label="游戏名:">
           <span>{{ dialogForm.app_name }}</span>
         </el-form-item>
@@ -229,7 +232,6 @@
   //import {getSdkTemplate,getChannel} from '@/api/table/sdkmanager/projectconfigtable'
   import {updateProjectConfig,getProjectConfigPublish,getResourceName,getProject} from '@/api/table/sdkmanager/projectconfigtable_publish'
   import store from '@/store'
-
   import clipboard from '@/directive/clipboard/index' // use clipboard by v-directive
 
 
@@ -372,7 +374,7 @@
       },
       handleView(value){
         console.log(value)
-        //this.link='http://192.168.1.144:8085/sdkapi?timestamp='+value.timestamp+'&app='+value.app_name+'&channel='+value.channel_mark
+          //测试服  8089
         this.link='http://192.168.1.144:8085/sdkapi?package_name='+value.package_name+'&channel_mark='+value.channel_mark
         this.dialogForm=value
         this.getSpanArr(value.paramter)

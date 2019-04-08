@@ -35,27 +35,20 @@
       <el-button v-model="checked1" border style="margin-bottom: 20px" @click="dialogMessageVisible=true" type="info"
                  size="mini">数据上传具体说明
       </el-button>
-      <el-upload action="http://192.168.1.144:8083/fileupload"
-                 accept='.csv,.xls,.xlsx'
-                 :headers="dataObj"
-                 drag
-                 :multiple="true"
-                 :on-success="dropzoneS"
-                 :before-upload="beforeUpload"
-                 style="width:360px">
+      <!--action="http://192.168.1.144:8083/fileupload"-->
+      <el-upload
+        action="http://192.168.1.144:8096/fileupload"
+        accept='.csv,.xls,.xlsx'
+        :headers="dataObj"
+        drag
+        :multiple="true"
+        :on-success="dropzoneS"
+        :before-upload="beforeUpload"
+        style="width:360px">
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">统计数据上传</div>
         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
       </el-upload>
-
-
-      <!--<dropzone id="myVueDropzone"-->
-      <!--defaultMsg="统计数据"-->
-      <!--headers=token-->
-      <!--url="http://192.168.1.144:8083/fileupload"-->
-      <!--@dropzone-removedFile="dropzoneR"-->
-      <!--@dropzone-success="dropzoneS"-->
-      <!--style="margin: 0 auto;margin-top: 30px"/>-->
     </div>
     <div class="uploadresponse" v-html="value"
          style="padding: 30px;font-family: 微软雅黑;line-height: 22px;font-size: 15px"></div>
@@ -75,25 +68,20 @@
         <el-button icon="el-icon-question" style="padding: 0px;border: none;background-color: #FFFF">计费数据上传说明
         </el-button>
       </el-tooltip>
-
-      <el-upload action="http://192.168.1.144:8086/fileupload"
-                 style="width:360px"
-                 accept='.csv,.xls,.xlsx'
-                 :headers="dataObj"
-                 drag
-                 :multiple="true"
-                 :on-success="dropzoneS1"
-                 :before-upload="beforeUpload">
+      <!--action="http://192.168.1.144:8086/fileupload"-->
+      <el-upload
+        action="http://192.168.1.144:8086/fileupload"
+        style="width:360px"
+        accept='.csv,.xls,.xlsx'
+        :headers="dataObj"
+        drag
+        :multiple="true"
+        :on-success="dropzoneS1"
+        :before-upload="beforeUpload">
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">支付数据上传</div>
         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
       </el-upload>
-      <!--<dropzone id="myVueDropzone1"-->
-      <!--defaultMsg="支付数据"-->
-      <!--url="http://192.168.1.144:8086/fileupload"-->
-      <!--@dropzone-removedFile="dropzoneR1"-->
-      <!--@dropzone-success="dropzoneS1"-->
-      <!--style="margin: 0 auto;margin-top: 30px"/>-->
     </div>
     <div class="uploadresponse1" v-html="value1"
          style="padding: 30px;font-family: 微软雅黑;line-height: 22px;font-size: 15px"></div>
@@ -101,7 +89,7 @@
     <el-dialog :visible.sync="dialogMessageVisible" width="60%">
       <h1 style="margin-left:30px ">数据上传具体说明</h1>
       <div style="background-color:#d3dce6;padding: 20px;border-radius: 10px;border-bottom: #001528 solid 1px">
-        <span  style="font-size: x-large">
+        <span style="font-size: x-large">
           1.上传前首先确保上传数据的项目已被创建（否贼上传的数据无法被录入）<br>
           2.该项目各渠道应用名已添加，应用名添加时，选择对应的渠道（否贼上传的数据无法被录入）
         </span><br>

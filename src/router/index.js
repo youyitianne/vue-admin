@@ -138,7 +138,7 @@ export const asyncRouterMap = [
         meta: {
           title: 'lt',
           icon: 'table',
-          roles: ['director', 'planner', 'operaterleader', 'operator']
+          roles: ['director', 'planner', 'operatorleader', 'operator']
         }
       },
       {
@@ -148,7 +148,6 @@ export const asyncRouterMap = [
         meta: {
           title: '产品数据',
           icon: 'table',
-          roles: ['director', 'planner', 'operaterleader', 'operator', 'developer']
         }
       },
     ]
@@ -538,7 +537,6 @@ export const asyncRouterMap = [
     meta: {
       title: '屏蔽系统',
       icon: 'redsystem2',
-      roles: ['director', 'admin'],
     },
     children: [
       {
@@ -548,7 +546,6 @@ export const asyncRouterMap = [
         meta: {
           title: '测试模式',
           icon: 'testmode',
-          roles: ['director', 'admin'],
         }
       },
       {

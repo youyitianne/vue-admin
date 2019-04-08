@@ -8,15 +8,16 @@
     </div>
     <el-dialog :visible.sync="dialogMessageVisible" width="80%" title="上传keystore" append-to-body>
       <div style="margin: auto">
-        <el-upload action="http://192.168.1.144:8087/keystore"
-                   :headers="dataObj"
-                   :data="param"
-                   drag
-                   accept=".keystore"
-                   :multiple="true"
-                   :on-success="dropzoneS"
-                   :before-upload="beforeUpload"
-                   style="width:360px">
+        <el-upload
+          :action="resPath"
+          :headers="dataObj"
+          :data="param"
+          drag
+          accept=".keystore"
+          :multiple="true"
+          :on-success="dropzoneS"
+          :before-upload="beforeUpload"
+          style="width:360px">
           <i class="el-icon-upload"></i>
           <div class="el-upload__text">keystore上传</div>
           <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
@@ -62,7 +63,7 @@
           <template slot-scope="scope">
             <el-button @click="handleEdit(scope.row)" type="text" v-loading="downloadLoading">编辑</el-button>
             <el-button @click="handleDelete(scope.row)" type="text" v-loading="downloadLoading">删除</el-button>
-            <el-button @click="handleDownLoad(scope.row)" type="text" v-loading="downloadLoading">下载</el-button>
+            <!--<el-button @click="handleDownLoad(scope.row)" type="text" v-loading="downloadLoading">下载</el-button>-->
           </template>
         </el-table-column>
       </el-table>
@@ -73,29 +74,32 @@
       width="40%">
       <el-form :model="form" status-icon ref="form" label-width="100px" class="demo-ruleForm" :inline="false">
         <div>
-          <el-form-item label="日期" prop="date1" label-width="200px" >
-            <el-input  v-model="form.date1" style="width: 300px;"  disabled></el-input>
+          <el-form-item label="日期" prop="date1" label-width="200px">
+            <el-input v-model="form.date1" style="width: 300px;" disabled></el-input>
           </el-form-item>
         </div>
         <div>
-          <el-form-item label="文件名" prop="filename" label-width="200px" >
-            <el-input  v-model="form.filename" style="width: 300px;" disabled></el-input>
+          <el-form-item label="文件名" prop="filename" label-width="200px">
+            <el-input v-model="form.filename" style="width: 300px;" disabled></el-input>
           </el-form-item>
         </div>
-      <div>
-        <el-form-item label="keystorePass" prop="keystorePass" :rules="[{ required: true, message: 'keystorePass不能为空'}]" label-width="200px" >
-          <el-input  v-model="form.keystorePass" style="width: 300px;" ></el-input>
-        </el-form-item>
-      </div>
         <div>
-        <el-form-item label="keyaliasName" prop="keyaliasName" :rules="[{ required: true, message: 'keyaliasName不能为空'}]"  label-width="200px" >
-          <el-input v-model="form.keyaliasName" style="width: 300px;"></el-input>
-        </el-form-item>
+          <el-form-item label="keystorePass" prop="keystorePass"
+                        :rules="[{ required: true, message: 'keystorePass不能为空'}]" label-width="200px">
+            <el-input v-model="form.keystorePass" style="width: 300px;"></el-input>
+          </el-form-item>
         </div>
         <div>
-        <el-form-item label="keyaliasPass" prop="keyaliasPass" :rules="[{ required: true, message: 'keyaliasPass不能为空'}]"  label-width="200px" >
-          <el-input  v-model="form.keyaliasPass" style="width: 300px;"></el-input>
-        </el-form-item>
+          <el-form-item label="keyaliasName" prop="keyaliasName"
+                        :rules="[{ required: true, message: 'keyaliasName不能为空'}]" label-width="200px">
+            <el-input v-model="form.keyaliasName" style="width: 300px;"></el-input>
+          </el-form-item>
+        </div>
+        <div>
+          <el-form-item label="keyaliasPass" prop="keyaliasPass"
+                        :rules="[{ required: true, message: 'keyaliasPass不能为空'}]" label-width="200px">
+            <el-input v-model="form.keyaliasPass" style="width: 300px;"></el-input>
+          </el-form-item>
         </div>
         <el-form-item>
           <el-button type="primary" @click="submitForm('form')">提交</el-button>
@@ -111,14 +115,15 @@
 <script>
   import Dropzone from '@/components/Dropzone'
   import {getToken} from '@/utils/auth'
-  import {fetchKeystoreInfo, getFile, delFile,updateKeystore} from '@/api/fileupload'
+  import {fetchKeystoreInfo, getFile, delFile, updateKeystore} from '@/api/fileupload'
 
   export default {
     name: 'DropzoneDemo',
     components: {Dropzone},
     data() {
       return {
-        form:{},
+        resPath: 'http://192.168.1.144:8091/file',
+        form: {},
         EditDialog: false,
         param: {
           'keystore': 'keystore'
@@ -145,7 +150,7 @@
     },
     methods: {
       submitForm(formName) {
-        let tothis=this
+        let tothis = this
         this.$refs[formName].validate((valid) => {
           if (valid) {
             updateKeystore(this.form).then(response => {
@@ -166,7 +171,7 @@
                   duration: 2000
                 })
               }
-              this.EditDialog=false
+              this.EditDialog = false
               this.listFileInfo();
             }).catch(function (rs) {
               console.log(rs.toString())
@@ -185,13 +190,13 @@
       },
       handleEdit(param) {
         this.EditDialog = true
-        this.form={
-          date1:param.date1,
-          filename:param.keystoreName,
-          fileguid:param.keystoreguid,
-          keystorePass:param.keystorePass,
-          keyaliasName:param.keyaliasName,
-          keyaliasPass:param.keyaliasPass,
+        this.form = {
+          date1: param.date1,
+          filename: param.keystoreName,
+          fileguid: param.keystoreguid,
+          keystorePass: param.keystorePass,
+          keyaliasName: param.keyaliasName,
+          keyaliasPass: param.keyaliasPass,
         }
         this.$nextTick(() => {
           this.$refs['form'].clearValidate()

@@ -1,38 +1,71 @@
 <template>
   <div class="components-container">
-
     <el-card shadow="always" v-loading="listLoading">
-      <el-table
-        height="770"
-        border
-        :data="tableData"
-        style="width: 100%">
-        <el-table-column
-          prop="date1"
-          label="日期"
-          width="180">
-        </el-table-column>
-        <el-table-column
-          prop="filename"
-          label="文件名"
-          width="300">
-        </el-table-column>
-        <el-table-column
-          prop="fileguid"
-          label="GUID">
-        </el-table-column>
-        <el-table-column
-          prop="path"
-          label="PATH">
-        </el-table-column>
-        <el-table-column
-          label="操作">
-          <template slot-scope="scope">
-            <el-button @click="handleDelete(scope.row)" type="text" v-loading="downloadLoading">删除</el-button>
-            <el-button @click="handleDownLoad(scope.row)" type="text" v-loading="downloadLoading">下载</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+
+      <table class="gridtable" style="margin-top: 20px">
+        <tr>
+          <td width="">日期
+          </td>
+          <td>文件名
+          </td>
+          <td>GUID
+          </td>
+          <td>预览图
+          </td>
+        </tr>
+        <tr v-for="(outer,index) in tableData">
+          <td width="">{{outer.date1}}
+          </td>
+          <td>{{outer.filename}}
+          </td>
+          <td>{{outer.fileguid}}
+          </td>
+          <td><img :src=outer.path width="80" height="80" @click="bigPicture(outer.path)" />
+          </td>
+        </tr>
+      </table>
+
+
+      <el-dialog
+        title="提示"
+        :visible.sync="dialogVisible">
+        <img :src=picture />
+      </el-dialog>
+
+
+
+      <!--<el-table-->
+        <!--height="770"-->
+        <!--border-->
+        <!--:data="tableData"-->
+        <!--style="width: 100%">-->
+        <!--<el-table-column-->
+          <!--prop="date1"-->
+          <!--label="日期"-->
+          <!--width="180">-->
+        <!--</el-table-column>-->
+        <!--<el-table-column-->
+          <!--prop="filename"-->
+          <!--label="文件名"-->
+          <!--width="300">-->
+        <!--</el-table-column>-->
+        <!--<el-table-column-->
+          <!--prop="fileguid"-->
+          <!--label="GUID">-->
+        <!--</el-table-column>-->
+        <!--<el-table-column-->
+          <!--prop="path"-->
+          <!--label="PATH">-->
+
+          <!--<image definitionURL="http://192.168.1.144:8091/file?path=6fdedf38-1e9b-4fb7-9524-f0475cd94c6b"> </image>-->
+        <!--</el-table-column>-->
+        <!--<el-table-column-->
+          <!--label="操作">-->
+          <!--<template slot-scope="scope">-->
+            <!--<el-button @click="handleDelete(scope.row)" type="text" v-loading="downloadLoading">删除</el-button>-->
+          <!--</template>-->
+        <!--</el-table-column>-->
+      <!--</el-table>-->
     </el-card>
 
 
@@ -49,6 +82,8 @@
     components: {Dropzone},
     data() {
       return {
+        picture:'',
+        dialogVisible:false,
         downloadLoading: false,
         listLoading: false,
         tableData: [],
@@ -70,6 +105,10 @@
       this.listFileInfo();
     },
     methods: {
+      bigPicture(param){
+        this.dialogVisible=true
+        this.picture=param
+      },
       handleDelete(param) {
         let tothis = this;
         this.$confirm('是否确定删除?', '提示', {
@@ -108,32 +147,6 @@
           })
         });
       },//删除上传文件
-      handleDownLoad(param) {
-        console.log(param)
-        let tothis = this;
-        getFile(param).then(data => {
-          if (!data) {
-            return
-          }
-          let url = window.URL.createObjectURL(new Blob([data]))
-          let link = document.createElement('a')
-          link.style.display = 'none'
-          link.href = url
-          link.setAttribute('download', param.filename)
-          document.body.appendChild(link)
-          link.click()
-          this.downloadLoading = false
-        }).catch(function (rs) {
-          console.log(rs.toString())
-          tothis.downloadLoading = false
-          tothis.$notify({
-            title: '下载失败',
-            message: '刷新试试',
-            type: 'error',
-            duration: 2000
-          })
-        })
-      },//资源文件列表中下载资源
       listFileInfo() {
         let tothis = this;
         fetchFileInfo().then(response => {
@@ -171,6 +184,33 @@
   .ts-title {
     font-size: 15px;
     font-weight: bolder
+  }
+</style>
+
+<style type="text/css">
+  .gridtable {
+    font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    font: 14px bolder;
+    border-collapse: collapse;
+  }
+
+  .gridtable tr {
+    border-width: 0px;
+    padding: 0px;
+    border-style: solid;
+    border-color: #99a9bf;
+    background-color: #dedede;
+  }
+
+  .gridtable td {
+    font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
+    color: #666666;
+    margin: 0px;
+    border-width: 1px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #dcdfe6;
+    background-color: #ffffff;
   }
 </style>
 

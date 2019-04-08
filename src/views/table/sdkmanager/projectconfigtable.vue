@@ -1,15 +1,6 @@
 <template>
   <div class="app-container">
     <div class="filter-container" style="margin: 15px;margin-top: -5px">
-
-
-      <!--<span style="margin-left: 15px;margin-right: 5px">游戏:</span>-->
-      <!--<el-select v-model="secondary_game" @change="getDatawithParam">-->
-      <!--<el-option key="全部" label="全部" value="">-->
-      <!--</el-option>-->
-      <!--<el-option v-for="(item,index) in app_name_list" :key="index" :label="item" :value="item">-->
-      <!--</el-option>-->
-      <!--</el-select>-->
       <span style="margin-left: 15px;margin-right: 5px">项目:</span>
       <el-select v-model="secondary_project" @change="getDatawithParam" value-key="project_name" filterable>
         <el-option key="全部" label="全部" value="">
@@ -18,7 +9,7 @@
         </el-option>
       </el-select>
       <span style="margin-left: 15px;margin-right: 5px">渠道:</span>
-      <el-select v-model="secondary_channel" @change="getDatawithParam">
+      <el-select v-model="secondary_channel" @change="getDatawithParam" filterable>
         <el-option key="全部" label="全部" value="">
         </el-option>
         <el-option v-for="(item,index) in channel_mark_list" :key="index" :label="item" :value="item">
@@ -29,6 +20,7 @@
                 @blur="getDatawithParam"/>
       <!--<el-checkbox v-model="checked" border style="margin-left: 15px" @change="getDatawithParam">展示正常</el-checkbox>-->
       <!--<el-checkbox v-model="checked1" border style="margin-left: 15px" @change="getDatawithParam">显示删除状态配置表</el-checkbox>-->
+
     </div>
     <!--<button @click="test">aasdasaaaaa</button>-->
     <el-table
@@ -129,6 +121,10 @@
       :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="80%" :close-on-click-modal=false>
       <el-form ref="dataForm" :model="sdk" label-position="left" label-width="150px" :inline="true"
                style="margin-left:50px;" status-icon id="form-custom">
+        <el-form-item label="编辑：" v-if="this.dialogStatus === 'update'">
+          <el-input disabled :value="name" id="account" class="dia-input"></el-input>
+        </el-form-item>
+        <div/>
         <el-form-item label="时间" class="filter-item" v-if="this.dialogStatus === '1'">
           <el-date-picker v-model="sdk.timevalue" type="datetime" :disabled=true>
           </el-date-picker>
@@ -228,56 +224,42 @@
         <!--prop="splash">-->
         <!--<el-input v-model="sdk.splash" placeholder="必填~" class="dia-input" disabled/>-->
         <!--</el-form-item>-->
+
+
+        <!--action="http://192.168.1.101:8087/file"-->
         <div style="text-align: center">
           <el-upload
             style="margin: 20px;width: 40%;display: inline-block"
             class="avatar-uploader"
-            action="http://192.168.1.144:8087/file"
+            :action="resPath"
             accept=".png,.jpg"
             :show-file-list="false"
             :on-success="uploadSuccess_icon"
             :before-upload="beforeUpload_icon">
             <img v-if="imageUrl_icon" :src="imageUrl_icon" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-            <div slot="tip" class="el-upload__tip">此处上传icon,<a style="text-decoration:underline" :href="this.imageUrl_icon+'&name=icon'"   target="_blank"  title="点击查看大图">点击查看大图</a>
+            <div slot="tip" class="el-upload__tip">此处上传icon,<a style="text-decoration:underline"
+                                                               :href="this.imageUrl_icon" target="_blank"
+                                                               title="点击查看大图">点击查看大图</a>
             </div>
           </el-upload>
-          <!--<el-upload-->
-          <!--style="margin: 20px;width: 40%;display: inline-block"-->
-          <!--action="http://192.168.1.144:8087/file"-->
-          <!--accept=".png,.jpg"-->
-          <!--:before-upload="beforeUpload_icon"-->
-          <!--:on-success="uploadSuccess_icon"-->
-          <!--:file-list="fileList_icon"-->
-          <!--list-type="picture">-->
-          <!--<el-button size="small" type="primary">上传ICON</el-button>-->
-          <!--<div slot="tip" class="el-upload__tip">只能上传一张jpg/png文件，若无法上传，点击下方图片右上角的X</div>-->
-          <!--</el-upload>-->
+
           <el-upload
             style="margin: 20px;width: 50%;display: inline-block"
             class="avatar-uploader"
-            action="http://192.168.1.144:8087/file"
+            :action="resPath"
             accept=".png,.jpg"
             :show-file-list="false"
             :on-success="uploadSuccess_splash"
             :before-upload="beforeUpload_splash">
             <img v-if="imageUrl_splash" :src="imageUrl_splash" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-            <div slot="tip" class="el-upload__tip">此处上传splash,<a style="text-decoration:underline"  :href="this.imageUrl_splash+'&name=splash'" target="_blank"  title="点击查看大图">点击查看大图</a>
+            <div slot="tip" class="el-upload__tip">此处上传splash,<a style="text-decoration:underline"
+                                                                 :href="this.imageUrl_splash"
+                                                                 target="_blank" title="点击查看大图">点击查看大图</a>
             </div>
           </el-upload>
 
-          <!--<el-upload-->
-          <!--style="margin: 20px;width: 40%;display: inline-block;margin-left: 90px"-->
-          <!--action="http://192.168.1.144:8087/file"-->
-          <!--accept=".png,.jpg"-->
-          <!--:before-upload="beforeUpload_splash"-->
-          <!--:on-success="uploadSuccess_splash"-->
-          <!--:file-list="fileList_splash"-->
-          <!--list-type="picture">-->
-          <!--<el-button size="small" type="primary">上传SPLASH</el-button>-->
-          <!--<div slot="tip" class="el-upload__tip">只能上传一张jpg/png文件，若无法上传，点击下方图片右上角的X</div>-->
-          <!--</el-upload>-->
         </div>
         <br/>
         <!--筛选输入框-->
@@ -344,13 +326,15 @@
         <!--<el-button @click="dialogFormVisible = false">{{ '取消'}}</el-button>-->
         <el-button type="primary" @click="createData()" v-if="dialogStatus==='create'">{{ '确认' }}</el-button>
         <el-button type="primary" @click="updateData(true)" v-if="dialogStatus==='update'">{{ '保存' }}</el-button>
-        <el-button type="success" @click="publishHandler()" v-if="dialogStatus==='update'">发布</el-button>
+        <el-button type="success" @click="updateData(false)" v-if="dialogStatus==='update'">发布</el-button>
+        <el-button type="success" @click="resetTemp()" v-if="checkPermission(['admin'])">测试</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
+  import {mapGetters} from 'vuex'
   import waves from '@/directive/waves'
   import {parseTime} from '@/utils'
   import checkPermission from '@/utils/permission' // 权限判断函数
@@ -361,7 +345,8 @@
     updateProjectConfig,
     getSdkTemplate,
     getChannel,
-    getProject
+    getProject,
+    uploadRes
   } from '@/api/table/sdkmanager/projectconfigtable'
   import {getName, getResourceName} from '@/api/table/sdkmanager/projectconfigtable'
   import {fetchFileInfo, getFile, delFile, fetchKeystoreInfo} from '@/api/fileupload'
@@ -378,8 +363,15 @@
         return statusMap[status]
       }
     },
+    computed: {
+      ...mapGetters([
+        'name',
+        'roles'
+      ])
+    },
     data() {
       return {
+        resPath: 'http://192.168.1.144:8087/file',
         imageUrl_splash: '',
         imageUrl_icon: '',
         keystoreList: [],
@@ -528,16 +520,49 @@
         this.dataObj.Authorization = 'Bearer ' + getToken()
       },//splash上传前事件
       uploadSuccess_icon(response) {
-        console.log(response)
-        this.sdk.icon = response.data
-        this.imageUrl_icon = "http://192.168.1.144:8087/getFile?path=" + response.data
+        //icon上传至资源服务器后，返回原文件名和guid 再存储至数据库
         console.log(response.data)
+        this.sdk.icon = response.data.guid
+        this.imageUrl_icon = this.resPath + "?path=" + response.data.guid
+        // let param = {
+        //   file: response.data.file,
+        //   guid: response.data.guid
+        // }
+        // uploadRes(param).then(response => {
+        //   console.log(response)
+        //   if (response.repcode == 3000) {
+        //     this.$message({
+        //       message: '添加成功！',
+        //       type: 'success'
+        //     });
+        //   } else {
+        //     this.$message.error('添加失败，未记录！');
+        //   }
+        // }).catch(err => {
+        //   console.error(err)
+        // })
       },//icon上传成功事件
       uploadSuccess_splash(response) {
-        console.log(response)
-        this.sdk.splash = response.data
-        this.imageUrl_splash = "http://192.168.1.144:8087/getFile?path=" + response.data
         console.log(response.data)
+        this.sdk.splash = response.data.guid
+        this.imageUrl_splash = this.resPath + "?path=" + response.data.guid
+        // let param = {
+        //   file: response.data.file,
+        //   guid: response.data.guid
+        // }
+        // uploadRes(param).then(response => {
+        //   console.log(response)
+        //   if (response.repcode == 3000) {
+        //     this.$message({
+        //       message: '添加成功！',
+        //       type: 'success'
+        //     });
+        //   } else {
+        //     this.$message.error('添加失败，未记录！');
+        //   }
+        // }).catch(err => {
+        //   console.error(err)
+        // })
       },//splash上传成功事件
       link_Check(val) {
         let routeData = this.$router.resolve({
@@ -562,10 +587,6 @@
         }
         return false
       },//验证Name
-      publishHandler() {
-        this.updateData(false)
-        //this.publish()
-      },//发布按钮处理
       findtabname(tab, event) {
         this.tag_name = tab.label
         this.change_pagename(tab.label)
@@ -642,6 +663,12 @@
         this.sdk.form.select = select
         this.sdk.sdkstatus = '1'
         this.sdk.publish = '1'
+
+        let publisher = (document.getElementById("account").value);
+        this.sdk.publisher = publisher
+
+        console.log(this.sdk)
+
         getProjectConfigPublish().then(response => {
           this.publishlist = response.data
           if (!this.valideSdkForm()) {
@@ -651,8 +678,8 @@
           let timestamp = (new Date()).getTime()
           this.sdk.timevalue = timestamp
           this.sdk.keystore.filepath = this.sdk.keystore.keystoreguid
-          console.log(this.sdk)
 
+          console.log(this.sdk)
           createProjectConfig(this.sdk).then(response => {
             this.create_flag = true
             this.initDate()
@@ -1044,6 +1071,7 @@
             break
           }
         }
+
         this.sdk = {
           second_checked: [],
           checked: [],
@@ -1060,6 +1088,7 @@
           sdkstatus: '1',
           sdk_require: '',
           note: '',
+          publisher: '',
           icon: '暂无',
           splash: '暂无',
           keystore: def_keystore,
@@ -1068,6 +1097,7 @@
             domains: [],
           }
         }
+        console.log(this.sdk)
       }, //重置对话框
       handleCreate() {
         this.resetTemp()
@@ -1145,15 +1175,15 @@
         }
         console.log(param.icon)
         if (param.icon !== '暂无') {
-          this.imageUrl_icon='http://192.168.1.144:8087/getFile?path=' + param.icon + '&name=icon'
+          this.imageUrl_icon = this.resPath+'?path=' + param.icon
         } else {
-          this.imageUrl_icon=''
+          this.imageUrl_icon = ''
         }
         console.log(param.splash)
         if (param.splash !== '暂无') {
-          this.imageUrl_splash='http://192.168.1.144:8087/getFile?path=' + param.splash + '&name=splash'
+          this.imageUrl_splash = this.resPath+'?path=' + param.splash
         } else {
-          this.imageUrl_splash=''
+          this.imageUrl_splash = ''
         }
         console.log(param)
 
@@ -1324,8 +1354,6 @@
               return
             }
           }
-
-
         }
 
         let submit_object = {

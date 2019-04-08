@@ -67,3 +67,11 @@ export function getProject() {
     method: 'get',
   })
 }
+
+export function uploadRes(param) {
+  return request({
+    url: '/resFile',
+    method: 'post',
+    data:param
+  })
+}
