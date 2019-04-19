@@ -43,4 +43,12 @@ export function getProject() {
   })
 }
 
+export function getProjectLimitMeth(param) {
+  return request({
+    url: '/app/limit',
+    method: 'get',
+    params:param,
+  })
+}
+
 

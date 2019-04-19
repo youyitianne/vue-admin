@@ -39,4 +39,17 @@ export function updateKeystore(param) {
   })
 }
 
+export function getFileLimitMeth(param) {
+  return request({
+    url: '/fileInfo/limit',
+    method: 'get',
+    params:param
+  })
+}
+
+
+
+
+
+
 

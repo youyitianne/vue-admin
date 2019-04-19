@@ -76,3 +76,11 @@ export function createProjectConfig_pro(param) {
     data:param
   })
 }
+
+export function getProjectLimit(param) {
+  return request({
+    url: '/project/limit',
+    method: 'get',
+    params:param
+  })
+}

@@ -5,10 +5,11 @@
                  v-if="checkPermission(['director','operatorleader','admin'])"
                  @click="handleCreate">{{addButton}}
       </el-button>
-      <el-input placeholder="根据项目名查找" v-model="inputName" style="width: 200px" class="filter-item" clearable/>
+      <el-input placeholder="根据项目名查找" v-model="inputName" style="width: 200px;margin-left: 20px" class="filter-item" clearable/>
+      <el-button @click="searchTable">搜索</el-button>
     </div>
     <el-table
-      height="780"
+      height="740"
       v-loading="listLoading"
       :data="list"
       element-loading-text="Loading"
@@ -105,7 +106,14 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="50%">
+    <el-pagination
+      :page-size="pageSize"
+      layout="prev, pager, next"
+      :total="totalPages"
+      :current-page="currentPage"
+      @current-change="pageChange">
+    </el-pagination>
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="50%" :close-on-click-modal=false>
       <el-form ref="dataForm" :model="project" label-position="left" label-width="90px"
                style="width: 400px; margin-left:50px;">
         <el-form-item label="项目名" :rules="{required: true, message: '项目名不能为空', trigger: 'blur'}"
@@ -188,6 +196,21 @@
                           </el-select>
                       </el-form-item>
 
+
+                        <el-form-item
+                              prop="keystoreguid"
+                              label="公司名称"
+                              :rules="[{required: true, message: '请输入公司名称', trigger: 'blur' }]">
+                          <el-select v-model="dialogForm.keystoreguid" placeholder="请选择" style="width:200px" filterable>
+                            <el-option
+                              v-for="item in companyList"
+                              :key="item.keystoreguid"
+                              :label="item.companyName"
+                              :value="item.keystoreguid">
+                            </el-option>
+                          </el-select>
+                      </el-form-item>
+
                  </el-form>
                <div slot="footer" class="dialog-footer">
                  <el-button @click="innerestVisible = false">{{ '取消'}}</el-button>
@@ -217,7 +240,9 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="closedialog()">{{ '取消'}}</el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">{{ '确认3' }}</el-button>
+        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()"
+                   v-loading.fullscreen.lock="fullscreenLoading">{{ '确认3' }}
+        </el-button>
       </div>
     </el-dialog>
   </div>
@@ -227,7 +252,7 @@
   import checkPermission from '@/utils/permission' // 权限判断函数
   import {
     getName, getChannel, getProject, createProject, getProjectConfigPublish, getProjectConfig,
-    updateProject, deleteProject, getResourceName, createProjectConfig_pro
+    updateProject, deleteProject, getResourceName, createProjectConfig_pro,getProjectLimit
   } from '@/api/table/projectmanager/projectTable'
   import waves from '@/directive/waves'
   import {parseTime} from '@/utils'
@@ -235,13 +260,9 @@
   import store from '@/store'
   import {getToken} from '@/utils/auth'
   import {fetchFileInfo, getFile, delFile} from '@/api/fileupload'
+  import {getcompanyInfoMeth} from '@/api/table/sdkmanager/companyInfo'
 
   export default {
-    watch: {
-      inputName: function () {
-        this.getDatawithName()
-      }
-    },
     components: {Pagination},
     directives: {waves},
     filters: {
@@ -256,6 +277,10 @@
     },
     data() {
       return {
+        pageSize:15,
+        totalPages:0,
+        currentPage:1,
+        fullscreenLoading: false,
         dialogForm: {
           package_name: '',
           channel_mark: '',
@@ -266,33 +291,15 @@
         project_value: {},
         project_list: [],
         channel_list: [],
-        app_name_list: [],
         expands: [],
         getRowKeys(row) {
           return row.id
         },
-        create_flag: true,
-        update_flag: true,
         inputName: '',
         hidlist: [],
-        introduce: '介绍',
-        pickerOptions0: {
-          disabledDate(time) {
-            return time.getTime() > Date.now() - 8.64e6
-          }
-        },
         addButton: '创建项目',
-        directives: {waves},
-        downloadLoading: false,
-        layout: '',
-        timevalue: '',
-        searchName: '搜索',
-        tableKey: 0,
         list: null,
-        total: 0,
         listLoading: false,
-        importanceOptions: [1, 2, 3],
-        sortOptions: [{label: 'ID Ascending', key: '+id'}, {label: 'ID Descending', key: '-id'}],
         dialogStatus: '',
         dialogFormVisible: false,
         project: {
@@ -309,34 +316,96 @@
             project: {}
           }],
         },
+        companyList:[],
         textMap: {
           update: '编辑',
           create: '创建'
         },
-        rules: {
-          title: [{required: true, message: '必须有名字！', trigger: 'blur'}]
-        },
-        pvData: [],
-        sortOptions: [{label: 'ID Ascending', key: '+id'}, {label: 'ID Descending', key: '-id'}],
+        permissionList:[],
       }
     },
     mounted() {
-      this.handleFilter();
-      this.fetchname();
-      this.fetchchannel();
-      this.initProjectList();
+      this.pageChange(1);
+      //this.handleFilter();//
+      this.fetchchannel();//初始化渠道列表
+      this.initProjectList();//初始化项目列表
+      this.listCompanyInfo();//初始化公司信息
     },
     methods: {
-
-
-      addconfig() {
-        this.innerestVisible = true
+      searchTable(){
+        this.pageChange(1);
       },
+      pageChange(page){
+        this.currentPage=page
+        let tothis=this
+        let param={
+          page:page,
+          limit:this.pageSize,
+          projectName:this.inputName,
+        }
+        getProjectLimit(param).then(response=>{
+          this.listLoading=false
+          if(response.repcode===3000){
+            this.list=response.data
+            this.totalPages=response.total
+          }else {
+            tothis.$notify({
+              title: '失败',
+              message: '请刷新页面后重试',
+              type: 'error',
+              duration: 2000
+            })
+          }
+        }).catch(error=>{
+          this.listLoading=false
+          console.error(error)
+          tothis.$notify({
+            title: '失败',
+            message: '请刷新页面后重试',
+            type: 'error',
+            duration: 2000
+          })
+        })
+
+
+      },//分页切换
+      listCompanyInfo() {
+        let tothis = this;
+        getcompanyInfoMeth().then(response => {
+          if (response.repcode === 3000) {
+            this.companyList = response.data
+            console.log(this.companyList)
+          } else {
+            tothis.$notify({
+              title: '初始化公司信息失败',
+              message: '刷新试试',
+              type: 'error',
+              duration: 2000
+            })
+          }
+        }).catch(function (rs) {
+          console.log(rs)
+          tothis.$notify({
+            title: '初始化公司信息失败',
+            message: '刷新试试',
+            type: 'error',
+            duration: 2000
+          })
+        })
+      },//获取公司信息
+      addconfig() {
+        this.dialogForm={}
+        this.$nextTick(() => {
+          this.$refs['dynamicValidateForm'].clearValidate()
+        })
+        this.innerestVisible = true
+      },//添加配置
       addconfigList() {
         let tothis = this
         this.$refs['dynamicValidateForm'].validate((valid) => {
           if (valid) {
             this.dialogForm.date = Date.now()
+            console.log('创建的配置表',this.dialogForm)
             createProjectConfig_pro(this.dialogForm).then(response => {
               if (response.data === '添加失败') {
                 this.$message({
@@ -349,7 +418,7 @@
                 app_name: '暂无',
                 channel: this.dialogForm.channel_mark,
                 key: this.dialogForm.date,
-                package_name: this.dialogForm.package_name,
+                package_name: this.dialogForm.package_name.trim(),
                 project: {}
               }
               let list = this.project.applist
@@ -461,7 +530,7 @@
               }
             }
             if (flag) {
-              data1[i]['name'] =data1[i].app_name+ '_' + data1[i].channel_mark + '_' +  data1[i].package_name
+              data1[i]['name'] = data1[i].app_name + '_' + data1[i].channel_mark + '_' + data1[i].package_name
               data2.push(data1[i])
             }
           }
@@ -514,22 +583,6 @@
           })
         })
       },//获取渠道名列表
-      fetchname() {
-        let tothis = this
-        this.listLoading = true
-        getName().then(response => {
-          this.app_name_list = response.data
-          this.listLoading = false
-        }).catch(function (rs) {
-          tothis.listLoading = false
-          tothis.$notify({
-            title: '',
-            message: '应用列表获取失败',
-            type: 'error',
-            duration: 2000
-          })
-        })
-      },//获取应用名列表
       removeDomain(item) {
         var index = this.project.applist.indexOf(item)
         if (index !== -1) {
@@ -559,31 +612,32 @@
         let index = expandedRows.length - 1
       },//展开行变化时触发
       createData() {
+        this.fullscreenLoading = true
         let tothis = this
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             let flag = true
-            let list = this.project.applist
-            for (let i = 0; i < list.length; i++) {
-              if (list[i].app_name == '') {
-                flag = false
-                tothis.$notify({
-                  title: '警告',
-                  message: '第' + (i + 1) + '个应用的应用名未选择！',
-                  type: 'warning'
-                });
-                return
-              }
-              if (list[i].channel == '') {
-                flag = false
-                tothis.$notify({
-                  title: '警告',
-                  message: '第' + (i + 1) + '个应用的渠道未选择！',
-                  type: 'warning'
-                });
-                return
-              }
-            }
+            // let list = this.project.applist
+            // for (let i = 0; i < list.length; i++) {
+            //   if (list[i].app_name == '') {
+            //     flag = false
+            //     tothis.$notify({
+            //       title: '警告',
+            //       message: '第' + (i + 1) + '个应用的应用名未选择！',
+            //       type: 'warning'
+            //     });
+            //     return
+            //   }
+            //   if (list[i].channel == '') {
+            //     flag = false
+            //     tothis.$notify({
+            //       title: '警告',
+            //       message: '第' + (i + 1) + '个应用的渠道未选择！',
+            //       type: 'warning'
+            //     });
+            //     return
+            //   }
+            // }
             if (flag) {
 
               createProject(this.project).then(response => {
@@ -605,7 +659,9 @@
                     duration: 2000
                   })
                 }
+                this.fullscreenLoading = false
               }).catch(function (rs) {
+                this.fullscreenLoading = false
                 tothis.$notify({
                   title: '失败',
                   message: '请稍后重试',
@@ -623,31 +679,33 @@
         });
       },//创建方法
       updateData() {
+        this.fullscreenLoading = true
         let tothis = this
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             let flag = true
             let list = this.project.applist
-            for (let i = 0; i < list.length; i++) {
-              if (list[i].app_name == '') {
-                flag = false
-                tothis.$notify({
-                  title: '警告',
-                  message: '第' + (i + 1) + '个应用的应用名未选择！',
-                  type: 'warning'
-                });
-                return
-              }
-              if (list[i].channel == '') {
-                flag = false
-                tothis.$notify({
-                  title: '警告',
-                  message: '第' + (i + 1) + '个应用的渠道未选择！',
-                  type: 'warning'
-                });
-                return
-              }
-            }
+            // for (let i = 0; i < list.length; i++) {
+            //   if (list[i].app_name == '') {
+            //     flag = false
+            //     tothis.$notify({
+            //       title: '警告',
+            //       message: '第' + (i + 1) + '个应用的应用名未选择！',
+            //       type: 'warning'
+            //     });
+            //     return
+            //   }
+            //   if (list[i].channel == '') {
+            //     flag = false
+            //     tothis.$notify({
+            //       title: '警告',
+            //       message: '第' + (i + 1) + '个应用的渠道未选择！',
+            //       type: 'warning'
+            //     });
+            //     return
+            //   }
+            // }
+
             if (flag) {
               updateProject(this.project).then(() => {
                 this.handleFilter();
@@ -658,7 +716,9 @@
                   type: 'success',
                   duration: 2000
                 })
+                this.fullscreenLoading = false
               }).catch(function (rs) {
+                this.fullscreenLoading = false
                 tothis.$notify({
                   title: '失败',
                   message: '请稍后重试',
@@ -698,47 +758,51 @@
           })
         });
       },//删除方法
-      handleFilter() {
-        this.listLoading = true
-        let accountName = store.getters && store.getters.name
-        let name = {
-          username: accountName
-        }
-        getResourceName(name).then(response => {
-          let projectlist = response.data
-          getProject().then(response => {
-            if (this.checkPermission(['director']) || this.checkPermission(['admin']) || this.checkPermission(['operatorleader'])) {
-              this.uichange(response.data)
-
-              this.hidlist = response.data
-              this.list = response.data
-            } else {
-              let newlist = []
-              let todolist = response.data
-              for (let i = 0; i < todolist.length; i++) {
-                for (let j = 0; j < projectlist.length; j++) {
-                  if (todolist[i].project_name === projectlist[j]) {
-                    newlist.push(todolist[i])
-                    break
-                  }
-                }
-              }
-              this.hidlist = newlist
-              this.list = newlist
-            }
-            this.getDatawithName()
-            this.listLoading = false
-          }).catch(function (rs) {
-            this.getDatawithName()
-            console.error(rs)
-            this.listLoading = false
-          })
-        }).catch(function (rs) {
-          this.getDatawithName()
-          console.error(rs)
-          this.listLoading = false
-        })
-      },//查询方法
+      // handleFilter() {
+      //   this.listLoading = true
+      //   let accountName = store.getters && store.getters.name
+      //   let name = {
+      //     username: accountName
+      //   }
+      //   getResourceName(name).then(response => {
+      //     this.permissionList=response.data
+      //
+      //     let projectlist = response.data
+      //     getProject().then(response => {
+      //       if (this.checkPermission(['director']) || this.checkPermission(['admin']) || this.checkPermission(['operatorleader'])) {
+      //         this.uichange(response.data)
+      //         this.hidlist = response.data
+      //         this.list = response.data
+      //       } else {
+      //         let newlist = []
+      //         let todolist = response.data
+      //         for (let i = 0; i < todolist.length; i++) {
+      //           for (let j = 0; j < projectlist.length; j++) {
+      //             if (todolist[i].project_name === projectlist[j]) {
+      //               newlist.push(todolist[i])
+      //               break
+      //             }
+      //           }
+      //         }
+      //         this.hidlist = newlist
+      //         this.list = newlist
+      //       }
+      //       this.getDatawithName()
+      //       this.listLoading = false
+      //     }).catch(function (rs) {
+      //       this.getDatawithName()
+      //       console.error(rs)
+      //       this.listLoading = false
+      //     })
+      //
+      //
+      //
+      //   }).catch(function (rs) {
+      //     this.getDatawithName()
+      //     console.error(rs)
+      //     this.listLoading = false
+      //   })
+      // },//查询方法
       updateHandler(val) {
         this.dialogStatus = 'update'
         this.dialogFormVisible = true

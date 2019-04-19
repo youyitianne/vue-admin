@@ -35,9 +35,8 @@
       <el-button v-model="checked1" border style="margin-bottom: 20px" @click="dialogMessageVisible=true" type="info"
                  size="mini">数据上传具体说明
       </el-button>
-      <!--action="http://192.168.1.144:8083/fileupload"-->
       <el-upload
-        action="http://192.168.1.144:8096/fileupload"
+        action="http://192.168.1.101:8083/fileupload"
         accept='.csv,.xls,.xlsx'
         :headers="dataObj"
         drag
@@ -68,9 +67,8 @@
         <el-button icon="el-icon-question" style="padding: 0px;border: none;background-color: #FFFF">计费数据上传说明
         </el-button>
       </el-tooltip>
-      <!--action="http://192.168.1.144:8086/fileupload"-->
       <el-upload
-        action="http://192.168.1.144:8086/fileupload"
+        action="http://192.168.1.101:8086/fileupload"
         style="width:360px"
         accept='.csv,.xls,.xlsx'
         :headers="dataObj"

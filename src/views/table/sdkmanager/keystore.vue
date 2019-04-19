@@ -2,7 +2,7 @@
   <div class="components-container">
 
     <div class="editor-container">
-      <el-button border style="margin: 20px" @click="dialogMessageVisible=true" type="info"
+      <el-button border style="margin: 20px" @click="dialogMessageVisible=true" type="info" v-if="checkPermission(['admin','director'])"
                  size="mini">上传keystore
       </el-button>
     </div>
@@ -44,26 +44,28 @@
           width="300">
         </el-table-column>
         <el-table-column
-          prop="keystorePass"
-          label="keystorePass"
+          prop="MD5"
+          label="MD5"
           width="300">
         </el-table-column>
         <el-table-column
-          prop="keyaliasName"
-          label="keyaliasName"
+          prop="SHA1"
+          label="SHA1"
           width="300">
         </el-table-column>
         <el-table-column
-          prop="keyaliasPass"
-          label="keyaliasPass"
-          width="300">
+          prop="SHA256"
+          label="SHA256">
         </el-table-column>
         <el-table-column
+          v-if="checkPermission(['admin','director'])"
           label="操作">
           <template slot-scope="scope">
+            <span>
             <el-button @click="handleEdit(scope.row)" type="text" v-loading="downloadLoading">编辑</el-button>
             <el-button @click="handleDelete(scope.row)" type="text" v-loading="downloadLoading">删除</el-button>
             <!--<el-button @click="handleDownLoad(scope.row)" type="text" v-loading="downloadLoading">下载</el-button>-->
+            </span>
           </template>
         </el-table-column>
       </el-table>
@@ -101,6 +103,24 @@
             <el-input v-model="form.keyaliasPass" style="width: 300px;"></el-input>
           </el-form-item>
         </div>
+        <div>
+          <el-form-item label="MD5" prop="MD5"
+                        :rules="[{ required: true, message: 'MD5不能为空'}]" label-width="200px">
+            <el-input v-model="form.MD5" style="width: 300px;"></el-input>
+          </el-form-item>
+        </div>
+        <div>
+          <el-form-item label="SHA1" prop="SHA1"
+                        :rules="[{ required: true, message: 'SHA1不能为空'}]" label-width="200px">
+            <el-input v-model="form.SHA1" style="width: 300px;"></el-input>
+          </el-form-item>
+        </div>
+        <div>
+          <el-form-item label="SHA256" prop="SHA256"
+                        :rules="[{ required: true, message: 'SHA256不能为空'}]" label-width="200px">
+            <el-input v-model="form.SHA256" style="width: 300px;"></el-input>
+          </el-form-item>
+        </div>
         <el-form-item>
           <el-button type="primary" @click="submitForm('form')">提交</el-button>
         </el-form-item>
@@ -116,13 +136,14 @@
   import Dropzone from '@/components/Dropzone'
   import {getToken} from '@/utils/auth'
   import {fetchKeystoreInfo, getFile, delFile, updateKeystore} from '@/api/fileupload'
+  import checkPermission from '@/utils/permission' // 权限判断函数
 
   export default {
     name: 'DropzoneDemo',
     components: {Dropzone},
     data() {
       return {
-        resPath: 'http://192.168.1.144:8091/file',
+        resPath: 'http://192.168.1.101:8089/file',
         form: {},
         EditDialog: false,
         param: {
@@ -149,6 +170,7 @@
       this.listFileInfo();
     },
     methods: {
+      checkPermission,
       submitForm(formName) {
         let tothis = this
         this.$refs[formName].validate((valid) => {
@@ -197,6 +219,9 @@
           keystorePass: param.keystorePass,
           keyaliasName: param.keyaliasName,
           keyaliasPass: param.keyaliasPass,
+          MD5: param.MD5,
+          SHA1: param.SHA1,
+          SHA256: param.SHA256,
         }
         this.$nextTick(() => {
           this.$refs['form'].clearValidate()

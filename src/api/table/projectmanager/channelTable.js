@@ -35,4 +35,12 @@ export function deleteChannel(param) {
   })
 }
 
+export function getChannelLimitMeth(param) {
+  return request({
+    url: '/channel/limit',
+    method: 'get',
+    params: param
+  })
+}
+
 

@@ -155,7 +155,7 @@
       arpu_handleDownloadAll() {    //下载收益表
         this.dataList=[]
         let tothis = this
-        let time = 6 * 24 * 60 * 60 * 1000
+        let time = 14 * 24 * 60 * 60 * 1000
         if (this.arpu_download_value === null || this.arpu_download_value[0] === undefined) {
           this.open3()
           return
@@ -214,7 +214,7 @@
       },//日常产品总收益表下载方法
       arpu_handleDownloadAll1() {    //下载收益表
         let tothis = this
-        let time = 6 * 24 * 60 * 60 * 1000
+        let time = 14 * 24 * 60 * 60 * 1000
         if (this.arpu_download_value === null || this.arpu_download_value[0] === undefined) {
           this.open3()
           return

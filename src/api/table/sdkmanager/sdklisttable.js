@@ -22,3 +22,12 @@ export function updateSdk(param) {
     data:param
   })
 }
+
+export function getSdkLimitMeth(param) {
+  return request({
+    url: '/api/sdk/limit',
+    method: 'get',
+    params:param
+  })
+}
+

@@ -2,113 +2,145 @@
   <div class="components-container">
     <el-card shadow="always" v-loading="listLoading">
 
-      <table class="gridtable" style="margin-top: 20px">
-        <tr>
-          <td width="">日期
-          </td>
-          <td>文件名
-          </td>
-          <td>GUID
-          </td>
-          <td>预览图
-          </td>
-        </tr>
-        <tr v-for="(outer,index) in tableData">
-          <td width="">{{outer.date1}}
-          </td>
-          <td>{{outer.filename}}
-          </td>
-          <td>{{outer.fileguid}}
-          </td>
-          <td><img :src=outer.path width="80" height="80" @click="bigPicture(outer.path)" />
-          </td>
-        </tr>
-      </table>
-
-
+      <!--<table class="gridtable" style="margin-top: 20px;height: 80%">-->
+        <!--<tr>-->
+          <!--<td width="">日期-->
+          <!--</td>-->
+          <!--<td>文件名-->
+          <!--</td>-->
+          <!--<td>GUID-->
+          <!--</td>-->
+          <!--<td>预览图-->
+          <!--</td>-->
+        <!--</tr>-->
+        <!--<tr v-for="(outer,index) in tableData">-->
+          <!--<td width="">{{outer.date1}}-->
+          <!--</td>-->
+          <!--<td>{{outer.filename}}-->
+          <!--</td>-->
+          <!--<td>{{outer.fileguid}}-->
+          <!--</td>-->
+          <!--<td><img :src=outer.path width="80" height="80" @click="bigPicture(outer.path)" />-->
+          <!--</td>-->
+        <!--</tr>-->
+      <!--</table>-->
       <el-dialog
-        title="提示"
+        title="大图预览"
         :visible.sync="dialogVisible">
         <img :src=picture />
       </el-dialog>
+      <el-table
+        height="770"
+        border
+        :data="tableData"
+        style="width: 100%">
+        <el-table-column
+          label="序号"
+          type="index"
+          width="50">
+        </el-table-column>
+        <el-table-column
+          prop="date1"
+          label="日期"
+          width="180">
+        </el-table-column>
+        <el-table-column
+          prop="filename"
+          label="文件名"
+          width="300">
+        </el-table-column>
+        <el-table-column
+          prop="fileguid"
+          label="GUID">
+        </el-table-column>
+        <el-table-column
+          prop="path"
+          label="PATH">
+        </el-table-column>
+        <el-table-column
 
-
-
-      <!--<el-table-->
-        <!--height="770"-->
-        <!--border-->
-        <!--:data="tableData"-->
-        <!--style="width: 100%">-->
-        <!--<el-table-column-->
-          <!--prop="date1"-->
-          <!--label="日期"-->
-          <!--width="180">-->
-        <!--</el-table-column>-->
-        <!--<el-table-column-->
-          <!--prop="filename"-->
-          <!--label="文件名"-->
-          <!--width="300">-->
-        <!--</el-table-column>-->
-        <!--<el-table-column-->
-          <!--prop="fileguid"-->
-          <!--label="GUID">-->
-        <!--</el-table-column>-->
-        <!--<el-table-column-->
-          <!--prop="path"-->
-          <!--label="PATH">-->
-
-          <!--<image definitionURL="http://192.168.1.144:8091/file?path=6fdedf38-1e9b-4fb7-9524-f0475cd94c6b"> </image>-->
-        <!--</el-table-column>-->
+          label="预览">
+          <template slot-scope="scope">
+            <span @click="bigPicture(scope.row.path)" style="width: 100%"><img :src="scope.row.path"  min-width="70" height="70" /></span>
+          </template>
+        </el-table-column>
         <!--<el-table-column-->
           <!--label="操作">-->
           <!--<template slot-scope="scope">-->
             <!--<el-button @click="handleDelete(scope.row)" type="text" v-loading="downloadLoading">删除</el-button>-->
           <!--</template>-->
         <!--</el-table-column>-->
-      <!--</el-table>-->
+      </el-table>
+      <el-pagination
+        :page-size="pageSize"
+        layout="prev, pager, next"
+        :total="totalPages"
+        :current-page="currentPage"
+        @current-change="pageChange">
+      </el-pagination>
     </el-card>
-
-
   </div>
 </template>
 
 <script>
   import Dropzone from '@/components/Dropzone'
   import {getToken} from '@/utils/auth'
-  import {fetchFileInfo, getFile, delFile} from '@/api/fileupload'
+  import {fetchFileInfo, getFile, delFile,getFileLimitMeth} from '@/api/fileupload'
 
   export default {
     name: 'DropzoneDemo',
     components: {Dropzone},
     data() {
       return {
+        pageSize:20,
+        totalPages:0,
+        currentPage:1,
         picture:'',
         dialogVisible:false,
         downloadLoading: false,
         listLoading: false,
         tableData: [],
         hidTableData: [],
-        dialogMessageVisible: false,
-        dataObj: {
-          'Authorization': ''
-        },
-        token: {
-          Authorization: 'Bear ' + getToken()
-        },
-        root: "els",
-        version: "1.0.0",
-        value: "",
-        value1: "",
       }
     },
     mounted() {
-      this.listFileInfo();
+      this.pageChange(1)
     },
     methods: {
+      pageChange(page){
+        this.currentPage=page
+        let tothis=this
+        let param={
+          page:page,
+          limit:this.pageSize,
+        }
+        getFileLimitMeth(param).then(response=>{
+          if(response.repcode===3000){
+            this.hidlist=response.data
+            this.tableData=response.data
+            this.totalPages=response.total
+          }else {
+            tothis.$notify({
+              title: '失败',
+              message: '请刷新页面后重试',
+              type: 'error',
+              duration: 2000
+            })
+          }
+        }).catch(error=>{
+          console.error(error)
+          tothis.$notify({
+            title: '失败',
+            message: '请刷新页面后重试',
+            type: 'error',
+            duration: 2000
+          })
+        })
+      },//分页切换
       bigPicture(param){
         this.dialogVisible=true
         this.picture=param
-      },
+      },//大图预览
       handleDelete(param) {
         let tothis = this;
         this.$confirm('是否确定删除?', '提示', {
@@ -153,7 +185,9 @@
           if (response.repcode === 0) {
             this.tableData = response.data
             this.hidTableData = response.data
-            console.log(this.tableData)
+            this.totalPages=response.data.length
+            this.pageChange(1)
+            console.log(response.data)
           }
           this.listLoading = false
         }).catch(function (rs) {
@@ -161,20 +195,6 @@
           console.log(rs)
         })
       },//展示上传文件表
-      beforeUpload(file) {
-        this.dataObj.Authorization = 'Bearer ' + getToken()
-      },//上传前事件
-      dropzoneS(response) {
-        console.log(response)
-        let data = response.data;
-        this.value = data + "<br>" + this.value;
-        this.$message({message: data, type: 'success'})
-        this.listFileInfo();
-      },//上传成功时间
-      dropzoneR(response) {
-        this.$message({message: '移除成功~', type: 'success'})
-      },//上传文件资源列表
-
 
     }
   }

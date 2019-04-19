@@ -75,3 +75,11 @@ export function uploadRes(param) {
     data:param
   })
 }
+
+export function getProjectLimitMeth(param) {
+  return request({
+    url: '/api/projectconfig/limit',
+    method: 'get',
+    params:param,
+  })
+}

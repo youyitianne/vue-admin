@@ -4,10 +4,11 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit"
                  @click="handleCreate">{{addButton}}
       </el-button>
-      <el-input placeholder="根据渠道名称查找" v-model="inputName" style="width: 200px;margin-bottom: 15px" class="filter-item" clearable @blur="getDatawithName"/>
+      <el-input placeholder="根据渠道名称查找" v-model="inputName" style="width: 200px;margin-bottom: 15px;margin-left: 20px" class="filter-item" clearable />
+      <el-button @click="searchTable">搜素</el-button>
     </div>
     <el-table
-      height="850"
+      height="750"
       v-loading="listLoading"
       :data="list"
       element-loading-text="Loading"
@@ -50,7 +51,13 @@
       </el-table-column>
     </el-table>
 
-
+    <el-pagination
+      :page-size="pageSize"
+      layout="prev, pager, next"
+      :total="totalPages"
+      :current-page="currentPage"
+      @current-change="pageChange">
+    </el-pagination>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :model="channel" label-position="left" label-width="90px"
                style="width: 400px; margin-left:50px;">
@@ -75,25 +82,11 @@
         <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">{{ '确认' }}</el-button>
       </div>
     </el-dialog>
-
-    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
-      <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
-        <el-table-column prop="key" label="Channel"/>
-        <el-table-column prop="pv" label="Pv"/>
-      </el-table>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogPvVisible = false">{{ '219' }}</el-button>
-      </span>
-    </el-dialog>
-
-
   </div>
-
-
 </template>
 
 <script>
-  import {getChannel, createChannel, updateChannel, deleteChannel} from '@/api/table/projectmanager/channelTable'
+  import {getChannel, createChannel, updateChannel, deleteChannel,getChannelLimitMeth} from '@/api/table/projectmanager/channelTable'
   import waves from '@/directive/waves'
   import {parseTime} from '@/utils'
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
@@ -113,29 +106,19 @@
     },
     data() {
       return {
+        pageSize:20,
+        totalPages:0,
+        currentPage:1,
         create_flag:true,
         update_flag:true,
         inputName:'',
         hidlist:[],
-        introduce: '介绍',
-        pickerOptions0: {
-          disabledDate(time) {
-            return time.getTime() > Date.now() - 8.64e6
-          }
-        },
         addButton:'添加渠道',
         directives: {waves},
         downloadLoading: false,
         layout: '',
-        timevalue: '',
-        tableKey: 0,
         list: null,
-        total: 0,
         listLoading: false,
-        importanceOptions: [1, 2, 3],
-        names: [],
-        sortOptions: [{label: 'ID Ascending', key: '+id'}, {label: 'ID Descending', key: '-id'}],
-        statusOptions: ['published', 'draft', 'deleted'],
         dialogStatus: '',
         dialogFormVisible: false,
         channel: {
@@ -148,18 +131,46 @@
           update: '编辑',
           create: '创建'
         },
-        rules: {
-          title: [{required: true, message: '必须有名字！', trigger: 'blur'}]
-        },
-        dialogPvVisible: false,
-        pvData: [],
-        sortOptions: [{label: 'ID Ascending', key: '+id'}, {label: 'ID Descending', key: '-id'}],
       }
     },
     mounted() {
       this.handleFilter();
+      this.pageChange(1);
     },
     methods: {
+      pageChange(page){
+        this.currentPage=page
+        let tothis=this
+        let param={
+          page:page,
+          limit:this.pageSize,
+          channelName:this.inputName,
+        }
+        getChannelLimitMeth(param).then(response=>{
+          if(response.repcode===3000){
+            this.list=response.data
+            this.totalPages=response.total
+          }else {
+            tothis.$notify({
+              title: '失败',
+              message: '请刷新页面后重试',
+              type: 'error',
+              duration: 2000
+            })
+          }
+        }).catch(error=>{
+          console.error(error)
+          tothis.$notify({
+            title: '失败',
+            message: '请刷新页面后重试',
+            type: 'error',
+            duration: 2000
+          })
+        })
+      },//分页切换
+      searchTable(){
+        this.pageChange(1);
+      },//搜索渠道
       createData() {
         let tothis=this;
         for (let i=0;i<this.hidlist.length;i++){
@@ -200,8 +211,6 @@
           })
           this.create_flag=true
         })
-
-
       },
       updateData() {
         let tothis=this

@@ -317,7 +317,8 @@ export const asyncRouterMap = [
         }
       },
       {
-        path: 'repeat',
+        path: 'repeat',   //无法适配
+        hidden:true,
         component: () => import('@/views/table/repeat/repeat'),
         name: 'repeatTable',
         meta: {
@@ -328,6 +329,28 @@ export const asyncRouterMap = [
         }
       },
 
+    ]
+  },
+  {
+    path: '/conpany',
+    component: Layout,
+    redirect: '/Company/conpanyInfo',
+    name: 'Company',
+    meta: {
+      title: '发布帐号',
+      roles: ['operatorleader', 'director','operator'],
+    },
+    children: [
+      {
+        path: 'conpanyInfo',
+        component: () => import('@/views/table/sdkmanager/companyinfo'),
+        name: 'conpanyInfoManage',
+        meta: {
+          title: '发布帐号',
+          icon: 'companyinfo',
+          roles: ['operatorleader', 'director','operator'],
+        }
+      }
     ]
   },
   {
@@ -350,7 +373,6 @@ export const asyncRouterMap = [
           icon: 'project2',
         }
       },
-
       {
         path: 'channelTable',
         component: () => import('@/views/table/projectmanager/channelTable'),
@@ -471,11 +493,11 @@ export const asyncRouterMap = [
         component: () => import('@/views/table/sdkmanager/keystore'),
         name: 'keyStoreManage',
         meta: {
+          roles: ['director', 'operatorleader', 'operator'],
           title: 'KeyStore管理',
           icon: 'keystore',
-          roles: ['director', 'operatorleader', 'operator'],
         }
-      },
+      }
     ]
   },
   {
@@ -495,7 +517,7 @@ export const asyncRouterMap = [
         meta: {
           title: '上传文件管理',
           icon: 'uploadfilemanager',
-          roles: ['director', 'admin'],
+          roles: ['director', 'admin','operatorleader'],
         }
       },
       {
@@ -550,14 +572,12 @@ export const asyncRouterMap = [
       },
       {
         path: 'channelPromo',
-        hidden:true,
         name: 'channelPromo',
         redirect: '/redSystem/channelPromo/channelPromoEdit',
         component: () => import('@/views/table/shieldingsystem/channelpromo/redsystem'),
         meta: {
           title: '渠道互推',
           icon: 'channelpromo',
-          roles: ['director', 'admin'],
         },
         children: [
           {
@@ -565,9 +585,8 @@ export const asyncRouterMap = [
             component: () => import('@/views/table/shieldingsystem/channelpromo/channelPromoEdit/channelPromoEdit'),
             name: 'channelPromoEdit',
             meta: {
-              title: '互推管理',
+              title: '应用列表',
               icon: 'uploadfilemanager',
-              roles: ['director', 'admin'],
             },
           },
           {
@@ -575,9 +594,29 @@ export const asyncRouterMap = [
             component: () => import('@/views/table/shieldingsystem/channelpromo/channelPromoFodder/channelPromoFodder'),
             name: 'channelPromoFodder',
             meta: {
-              title: '互推素材',
+              title: '素材管理',
               icon: 'channelpromofodder',
-              roles: ['director', 'admin'],
+              roles: ['operatorleader', 'director','operator'],
+            },
+          },
+          {
+            path: 'promoChannel',
+            component: () => import('@/views/table/shieldingsystem/channelpromo/promoChannel/promoChannel'),
+            name: 'promoChannel',
+            meta: {
+              title: '渠道设置',
+              icon: 'promochannel',
+              roles: ['operatorleader', 'director','operator'],
+            },
+          },
+          {
+            path: 'channelPromoRecord',
+            component: () => import('@/views/table/shieldingsystem/channelpromo/channelPromoRecord/channelPromoRecord'),
+            name: 'channelPromoRecord',
+            meta: {
+              title: '发布记录',
+              icon: 'promorecord',
+              roles: ['operatorleader', 'director','operator'],
             },
           },
 

@@ -25,6 +25,13 @@ export function getapplist(param) {
   })
 }
 
+export function applist() {
+  return request({
+    url: '/api/system/applist',
+    method: 'post',
+  })
+}
+
 export function searchapp(param) {
   return request({
     url: '/api/system/searchapp',

@@ -59,3 +59,12 @@ export function getProject() {
     method: 'get',
   })
 }
+
+export function getProjectPublishLimitMeth(param) {
+  return request({
+    url: '/api/projectconfig_publish/limit',
+    method: 'get',
+    params:param,
+  })
+}
+

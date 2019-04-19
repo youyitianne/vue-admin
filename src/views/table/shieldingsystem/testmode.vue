@@ -10,7 +10,7 @@
           <el-input style="width: 200px" disabled v-model="ipForm.orginalIP"></el-input>
         </el-form-item>
         <el-form-item label="本地IP : ">
-          <el-input style="width: 200px"  v-model="ipForm.loaclIP"></el-input>
+          <el-input style="width: 200px" v-model="ipForm.loaclIP"></el-input>
         </el-form-item>
       </el-form>
       <el-button type="primary" @click="synchro" style="margin-left: 60%">同步</el-button>
@@ -92,7 +92,7 @@
     <el-dialog
       title="测试模式"
       :visible.sync="editDialog"
-      width="30%">
+      width="600px">
       <el-form ref="testModeForm" :model="testModeForm" label-width="200px" v-loading="testModeLoading">
         <el-form-item label="屏蔽key : ">
           <el-input style="width: 200px" disabled v-model="testModeForm.uid"></el-input>
@@ -123,6 +123,9 @@
             active-value="on"
             inactive-value="off">
           </el-switch>
+        </el-form-item>
+        <el-form-item label="商品价格 : ">
+          <el-input v-model="testModeForm.price" style="width: 100px"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -213,7 +216,7 @@
         this.searchAppList(page)
       },//搜索事件分页
       searchData() {
-        this.def_currentpage=1
+        this.def_currentpage = 1
         this.searchAppList(1)
         this.def_paging = false
         this.search_paging = true
@@ -274,6 +277,22 @@
         if (this.testModeLoading == true) {
           return
         }
+        let tablePrice=this.testModeForm.price
+        let price=parseFloat(this.testModeForm.price)
+        let numberflag=false;
+        if (isNaN(tablePrice)){
+          console.log('isNan')
+          numberflag=true
+        }
+        if (numberflag){
+          console.log('不是数字',price)
+          this.$message({
+            message: '商品价格请填写一个数字！',
+            type: 'warning'
+          });
+          return
+        }
+        console.log('数字',price)
         this.testModeLoading = true
         let tothis = this
         let addparamsdata = {
@@ -282,26 +301,34 @@
           status: {
             mode: this.testModeForm.mode,
             ad: this.testModeForm.ad,
+            price:parseFloat(tablePrice)
           }
         }
         console.log(addparamsdata)
         editparams(addparamsdata).then(res => {
+          let flag11=true
           if (res.repcode == 3000) {
-            tothis.$notify({
-              title: '提示',
-              message: '修改测试模式成功',
-              type: 'success'
-            });
-            this.testModeLoading = false
-            this.editDialog = false
-          } else {
+            let json=JSON.parse(res.data)
+            console.log('测试模式修改返回值',json)
+            if (json.code===200){
+              tothis.$notify({
+                title: '提示',
+                message: '修改测试模式成功',
+                type: 'success'
+              });
+              flag11=false
+              this.testModeLoading = false
+              this.editDialog = false
+            }
+          }
+          if (flag11){
             tothis.$notify({
               title: '提示',
               type: 'warning',
               message: '修改测试模式失败',
             });
-            this.testModeLoading = false
           }
+          this.testModeLoading = false
           this.flushList()
         }).catch(err => {
           console.error(err)
@@ -314,11 +341,10 @@
         })
       },//测试模式修改事件
       initTable() {
-        this.def_currentpage=1
+        this.def_currentpage = 1
         this.listapplist(1)
       },//初始化应用列表
       edit(param) {
-
         this.testModeLoading = true
         let tothis = this
         this.testModeForm.mode = 'off'
@@ -333,7 +359,6 @@
         getparams(getparamsdata).then(res => {
           let json = JSON.parse(res.data)
           let list = json.rows
-          console.log(list)
           let testswitch = {}
           let testmodeid = 0;
           let flag = true
@@ -342,49 +367,60 @@
               flag = false
               testswitch = list[i].status
               testmodeid = list[i].id
+              console.log('测试模式',list[i])
               break;
             }
           }
           if (flag) {
-            //没有测试模式
-            //默认添加
-            let addparamsdata = {
-              appId: param.uid,
-              system: 'test',
-              status: {
-                mode: 'off',
-                ad: 'off'
-              }
-            }
-            tothis.$notify({
-              title: '提示',
-              type: 'warning',
-              message: '该应用无测试模式,正在添加默认测试模式-----',
-            });
-            addparams(addparamsdata).then(res => {
-              if (res.repcode == 3000) {
-                tothis.$notify({
-                  title: '提示',
-                  message: '添加默认测试模式成功,请重新编辑测试模式',
-                  type: 'success'
-                });
-                this.edit(param)
-              } else {
+            this.$confirm('添加默认测试模式？')
+              .then(_ => {
+                //没有测试模式
+                //默认添加
+                let addparamsdata = {
+                  appId: param.uid,
+                  system: 'test',
+                  status: {
+                    mode: 'off',
+                    ad: 'off',
+                    price:0.01
+                  }
+                }
                 tothis.$notify({
                   title: '提示',
                   type: 'warning',
-                  message: '添加默认测试模式失败,刷新试试',
+                  message: '正在添加默认测试模式-----',
                 });
-              }
-              this.flushList()
-            }).catch(err => {
-              console.error(err)
-              tothis.$notify({
-                title: '提示',
-                type: 'warning',
-                message: '添加默认测试模式失败,刷新试试',
-              });
-            })
+                addparams(addparamsdata).then(res => {
+                  let flag11=true
+                  if (res.repcode == 3000) {
+                    let json=JSON.parse(res.data)
+                    if (json.code===200){
+                      tothis.$notify({
+                        title: '提示',
+                        message: '添加默认测试模式成功,请重新编辑测试模式',
+                        type: 'success'
+                      });
+                      flag11=false
+                      this.edit(param)
+                    }
+                  }
+                  if (flag11){
+                    tothis.$notify({
+                      title: '提示',
+                      type: 'warning',
+                      message: '添加默认测试模式失败,刷新试试',
+                    });
+                  }
+                  this.flushList()
+                }).catch(err => {
+                  console.error(err)
+                  tothis.$notify({
+                    title: '提示',
+                    type: 'warning',
+                    message: '添加默认测试模式失败,刷新试试',
+                  });
+                })
+              })
           } else {
 
             //有测试模式
@@ -392,6 +428,7 @@
             let json_testswitch = JSON.parse(testswitch)
             this.testModeForm.mode = json_testswitch.mode
             this.testModeForm.ad = json_testswitch.ad
+            this.testModeForm.price = json_testswitch.price
             this.testModeForm.id = testmodeid
             this.testModeLoading = false
             this.editDialog = true
