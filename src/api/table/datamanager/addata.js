@@ -28,7 +28,6 @@ export function getListdata(param) {
       data:param,
       responseType: "blob"
     })
-
 }
 
 export function getResourceName(param) {

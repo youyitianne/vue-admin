@@ -84,3 +84,54 @@ export function getProjectLimit(param) {
     params:param
   })
 }
+
+export function getFileListMeth(param) {
+  return request({
+    url: '/apkFile',
+    method: 'get',
+    params:param
+  })
+}
+
+export function postFileListMeth(param) {
+  return request({
+    url: '/apkFile',
+    method: 'post',
+    data:param
+  })
+}
+
+export function getdownload(param) {
+  return request({
+    url: '/file',
+    method: 'get',
+    params:param,
+    responseType: "blob"
+  })
+}
+
+export function getAPKInfoMeth(param) {
+  return request({
+    url: '/apkInfo',
+    method: 'post',
+    data:param,
+  })
+}
+
+export function delAPKInfoMeth(param) {
+  return request({
+    url: '/apkFile',
+    method: 'delete',
+    params:param,
+  })
+}
+
+export function setOnlineAPKMeth(param) {
+  return request({
+    url: '/onlineAPK',
+    method: 'post',
+    data:param,
+  })
+}
+
+

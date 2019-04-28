@@ -226,8 +226,8 @@
         </el-tabs>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="updateData(true)" v-if="dialogStatus==='update'">{{ '保存' }}</el-button>
-        <el-button type="success" @click="updateData(false)" v-if="dialogStatus==='update'">发布</el-button>
+        <el-button type="primary" @click="updateData(true)" >{{ '保存' }}</el-button>
+        <el-button type="success" @click="updateData(false)">发布</el-button>
       </div>
     </el-dialog>
   </div>
@@ -278,7 +278,7 @@
         totalPages: 0,
         currentPage: 1,
         user: '',
-        resPath: 'http://192.168.1.101:8087/file',
+        resPath: 'http://192.168.1.144:8091/file',
         imageUrl_splash: '',
         imageUrl_icon: '',
         keystoreList: [],
@@ -372,6 +372,7 @@
       this.listKeyStoreInfo()//获取keystore列表
     },
     methods: {
+
       searchTable() {
         this.pageChange(1);
       },//搜索应用
@@ -438,45 +439,11 @@
         console.log(response.data)
         this.sdk.icon = response.data.guid
         this.imageUrl_icon = this.resPath + "?path=" + response.data.guid
-        // let param = {
-        //   file: response.data.file,
-        //   guid: response.data.guid
-        // }
-        // uploadRes(param).then(response => {
-        //   console.log(response)
-        //   if (response.repcode == 3000) {
-        //     this.$message({
-        //       message: '添加成功！',
-        //       type: 'success'
-        //     });
-        //   } else {
-        //     this.$message.error('添加失败，未记录！');
-        //   }
-        // }).catch(err => {
-        //   console.error(err)
-        // })
       },//icon上传成功事件
       uploadSuccess_splash(response) {
         console.log(response.data)
         this.sdk.splash = response.data.guid
         this.imageUrl_splash = this.resPath + "?path=" + response.data.guid
-        // let param = {
-        //   file: response.data.file,
-        //   guid: response.data.guid
-        // }
-        // uploadRes(param).then(response => {
-        //   console.log(response)
-        //   if (response.repcode == 3000) {
-        //     this.$message({
-        //       message: '添加成功！',
-        //       type: 'success'
-        //     });
-        //   } else {
-        //     this.$message.error('添加失败，未记录！');
-        //   }
-        // }).catch(err => {
-        //   console.error(err)
-        // })
       },//splash上传成功事件
       link_Check(val) {
         let routeData = this.$router.resolve({
@@ -528,21 +495,21 @@
             second_newdomains.push(newdomains[i])
           }
         }
-        for (let i = 0; i < second_newdomains.length; i++) {
-
-          if (second_newdomains[i].param === '') {
-            tothis.$notify({
-              title: '发布失败',
-              dangerouslyUseHTMLString: true,
-              message: 'KEY表有参数没填！' + '' +
-                ' <br> -->' + second_newdomains[i].param_name,
-              type: 'error',
-              duration: 4000
-            })
-            return
-          }
-
-        }
+        // for (let i = 0; i < second_newdomains.length; i++) {
+        //
+        //   if (second_newdomains[i].param === '') {
+        //     tothis.$notify({
+        //       title: '发布失败',
+        //       dangerouslyUseHTMLString: true,
+        //       message: 'KEY表有参数没填！' + '' +
+        //         ' <br> -->' + second_newdomains[i].param_name,
+        //       type: 'error',
+        //       duration: 4000
+        //     })
+        //     return
+        //   }
+        //
+        // }
         this.sdk.form.domains = second_newdomains
         //end
         //选择器提交
@@ -578,6 +545,10 @@
         this.sdk.sdkstatus = '1'
         this.sdk.publish = '1'
         this.sdk.publisher = this.user
+
+        this.sdk.checked = this.checkedSdkTemplate
+        this.sdk.second_checked = this.dialog_secondary_checked
+
         console.log('发布对象', this.sdk)
         getProjectConfigPublish().then(response => {
           this.publishlist = response.data
@@ -1060,21 +1031,21 @@
             second_newdomains.push(valid_newdomains[i])
           }
         }
-        for (let i = 0; i < second_newdomains.length; i++) {
-          if (!val) {//保存是不判断
-            if (second_newdomains[i].param === '') {
-              tothis.$notify({
-                title: '发布失败',
-                dangerouslyUseHTMLString: true,
-                message: 'KEY表有参数没填！' + '' +
-                  ' <br> -->' + second_newdomains[i].param_name,
-                type: 'error',
-                duration: 4000
-              })
-              return
-            }
-          }
-        }
+        // for (let i = 0; i < second_newdomains.length; i++) {
+        //   if (!val) {//保存是不判断
+        //     if (second_newdomains[i].param === '') {
+        //       tothis.$notify({
+        //         title: '发布失败',
+        //         dangerouslyUseHTMLString: true,
+        //         message: 'KEY表有参数没填！' + '' +
+        //           ' <br> -->' + second_newdomains[i].param_name,
+        //         type: 'error',
+        //         duration: 4000
+        //       })
+        //       return
+        //     }
+        //   }
+        // }
 
         let submit_object = {
           app_name: this.sdk.app_name,
@@ -1160,29 +1131,8 @@
             }
           }
         }
-        //this.sdk.form.select = []
-        //this.sdk.form.select = select
         submit_object.form.select = select
-
-
-        // console.log(this.sdk)
-        // console.log(submit_object)
-        // return
-
-        // let num = new RegExp('^[0-9]*$')
-        // if (!num.test(this.sdk.versioncode_online_version) && !num.test(this.sdk.versioncode_update_version)) {
-        //   this.$notify({
-        //     title: '警告！',
-        //     dangerouslyUseHTMLString: true,
-        //     message: '内部版本号格式错误,请及时修改！<br>必须为正整数。',
-        //     type: 'warning',
-        //     duration: 4000
-        //   })
-        //   return
-        // }
         console.log('保存对象', submit_object)
-
-
         if (!this.update_flag) {
           return
         }

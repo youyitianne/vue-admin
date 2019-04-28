@@ -64,7 +64,6 @@
             <span>
             <el-button @click="handleEdit(scope.row)" type="text" v-loading="downloadLoading">编辑</el-button>
             <el-button @click="handleDelete(scope.row)" type="text" v-loading="downloadLoading">删除</el-button>
-            <!--<el-button @click="handleDownLoad(scope.row)" type="text" v-loading="downloadLoading">下载</el-button>-->
             </span>
           </template>
         </el-table-column>
@@ -135,7 +134,7 @@
 <script>
   import Dropzone from '@/components/Dropzone'
   import {getToken} from '@/utils/auth'
-  import {fetchKeystoreInfo, getFile, delFile, updateKeystore} from '@/api/fileupload'
+  import {fetchKeystoreInfo, getFile, delFile, updateKeystore,uploadKeystore,delKeystore} from '@/api/table/sdkmanager/keystore'
   import checkPermission from '@/utils/permission' // 权限判断函数
 
   export default {
@@ -143,7 +142,7 @@
     components: {Dropzone},
     data() {
       return {
-        resPath: 'http://192.168.1.101:8089/file',
+        resPath: 'http://192.168.1.144:8091/file',
         form: {},
         EditDialog: false,
         param: {
@@ -211,6 +210,7 @@
         });
       },
       handleEdit(param) {
+
         this.EditDialog = true
         this.form = {
           date1: param.date1,
@@ -228,13 +228,16 @@
         })
       },
       handleDelete(param) {
+        let param1={
+          guid:param.keystoreguid
+        }
         let tothis = this;
         this.$confirm('是否确定删除?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          delFile(param).then(response => {
+          delKeystore(param1).then(response => {
             console.log(response.toString())
             tothis.downloadLoading = false
             if (response.repcode === 3000) {
@@ -265,34 +268,9 @@
           })
         });
       },//删除上传文件
-      handleDownLoad(param) {
-        console.log(param)
-        let tothis = this;
-        getFile(param).then(data => {
-          if (!data) {
-            return
-          }
-          let url = window.URL.createObjectURL(new Blob([data]))
-          let link = document.createElement('a')
-          link.style.display = 'none'
-          link.href = url
-          link.setAttribute('download', param.filename)
-          document.body.appendChild(link)
-          link.click()
-          this.downloadLoading = false
-        }).catch(function (rs) {
-          console.log(rs.toString())
-          tothis.downloadLoading = false
-          tothis.$notify({
-            title: '下载失败',
-            message: '刷新试试',
-            type: 'error',
-            duration: 2000
-          })
-        })
-      },//资源文件列表中下载资源
       listFileInfo() {
         let tothis = this;
+        this.tableData=[]
         fetchKeystoreInfo().then(response => {
           if (response.repcode === 0) {
             this.tableData = response.data
@@ -314,12 +292,33 @@
         this.dataObj.Authorization = 'Bearer ' + getToken()
       },//上传前事件
       dropzoneS(response) {
-        console.log(response)
-        let data = response.data;
-        let message = data.substring(data.indexOf("&name=") + 6)
-        this.value = message + " 上传成功！" + "<br>" + this.value;
-        this.$message({message: message + ' 上传成功！', type: 'success'})
-        this.listFileInfo();
+        let tothis=this
+        console.log(response.data)
+        let param={
+          finalFilename:response.file,
+          guid:response.data.guid
+        }
+        uploadKeystore(param).then(response=>{
+          if (response.repcode===3000){
+            this.$message({message: 'keystore 上传成功！', type: 'success'})
+            this.listFileInfo();
+          } else {
+            tothis.$notify({
+              title: '上传失败',
+              message: '刷新试试',
+              type: 'error',
+              duration: 2000
+            })
+          }
+        }).catch(error=>{
+          console.error(error)
+          tothis.$notify({
+            title: '上传失败',
+            message: '刷新试试',
+            type: 'error',
+            duration: 2000
+          })
+        })
       },//上传成功时间
       dropzoneR(response) {
         this.$message({message: '移除成功~', type: 'success'})

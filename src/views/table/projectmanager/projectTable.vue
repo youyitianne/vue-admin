@@ -5,7 +5,8 @@
                  v-if="checkPermission(['director','operatorleader','admin'])"
                  @click="handleCreate">{{addButton}}
       </el-button>
-      <el-input placeholder="根据项目名查找" v-model="inputName" style="width: 200px;margin-left: 20px" class="filter-item" clearable/>
+      <el-input placeholder="根据项目名查找" v-model="inputName" style="width: 200px;margin-left: 20px" class="filter-item"
+                clearable/>
       <el-button @click="searchTable">搜索</el-button>
     </div>
     <el-table
@@ -26,24 +27,9 @@
             <el-form-item label="项目名:">
               <span>{{ props.row.project_name }}</span>
             </el-form-item>
-            <!--<el-form-item label="预热:">-->
-            <!--<span>{{ props.row.preheat }}</span>-->
-            <!--</el-form-item>-->
-            <!--<el-form-item label="排期:">-->
-            <!--<span>{{ props.row.schedule }}</span>-->
-            <!--</el-form-item>-->
-            <!--<el-form-item label="竞品:">-->
-            <!--<span>{{ props.row.compete_good }}</span>-->
-            <!--</el-form-item>-->
-            <!--<el-form-item label="版本计划:">-->
-            <!--<span>{{ props.row.version_plan }}</span>-->
-            <!--</el-form-item>-->
             <el-form-item label="备注:">
               <span>{{ props.row.note }}</span>
             </el-form-item>
-            <!--<el-form-item label="应用:" style="width: 50%">-->
-            <!--<span>{{ props.row.names }}</span>-->
-            <!--</el-form-item>-->
             <div style="padding-top: 15px">
               <el-table
                 stripe
@@ -52,8 +38,7 @@
                 style="width: 100%;margin-bottom: 30px">
                 <el-table-column
                   prop="package_name"
-                  label="包名"
-                  style="width: 15%">
+                  label="包名">
                 </el-table-column>
                 <el-table-column
                   prop="channel"
@@ -61,8 +46,17 @@
                   style="width: 15%">
                 </el-table-column>
                 <el-table-column
+                  label="文件"
+                  width="150">
+                  <template slot-scope="scope3">
+                    <span>
+                      <el-button type="warning" @click="showFileListVisible(scope3.row)">查看上传文件</el-button>
+                    </span>
+                  </template>
+                </el-table-column>
+                <el-table-column
                   label="链接"
-                  style="width: 25%">
+                  width="350">
                   <template slot-scope="scope2">
                     <span>
                       <el-button @click="link_Check(scope2.row)" type="info">查看配置表发布记录</el-button>
@@ -84,14 +78,6 @@
       </el-table-column>
       <el-table-column label="项目名" prop="project_name">
       </el-table-column>
-      <!--<el-table-column label="预热" prop="preheat">-->
-      <!--</el-table-column>-->
-      <!--<el-table-column label="排期" prop="schedule">-->
-      <!--</el-table-column>-->
-      <!--<el-table-column label="竞品" prop="compete_good">-->
-      <!--</el-table-column>-->
-      <!--<el-table-column label="版本计划" prop="version_plan">-->
-      <!--</el-table-column>-->
       <el-table-column label="备注" prop="note">
       </el-table-column>
       <el-table-column label="操作" align="center" width="280px" class-name="small-padding fixed-width"
@@ -146,7 +132,6 @@
           <el-input v-model="project.note"/>
         </el-form-item>
         <el-button @click="innerVisible = true" type="primary">添加应用</el-button>
-
         <el-dialog
           style="margin-top: 100px"
           width="40%"
@@ -164,7 +149,6 @@
                   :value="item">
                 </el-option>
               </el-select>
-              <!--<el-button @click="addDomain" type="success">确认添加</el-button>-->
             </div>
             <span>
               <el-dialog
@@ -198,9 +182,9 @@
 
 
                         <el-form-item
-                              prop="keystoreguid"
-                              label="公司名称"
-                              :rules="[{required: true, message: '请输入公司名称', trigger: 'blur' }]">
+                          prop="keystoreguid"
+                          label="公司名称"
+                          :rules="[{required: true, message: '请输入公司名称', trigger: 'blur' }]">
                           <el-select v-model="dialogForm.keystoreguid" placeholder="请选择" style="width:200px" filterable>
                             <el-option
                               v-for="item in companyList"
@@ -245,6 +229,156 @@
         </el-button>
       </div>
     </el-dialog>
+    <el-dialog
+      title="文件列表"
+      :visible.sync="fileListVisible"
+      width="80%">
+      <el-upload
+        class="upload-demo"
+        drag
+        :accept="acceptType"
+        :action="uploadPath"
+        :on-success="uploadSuccessMeth"
+        multiple>
+        <i class="el-icon-upload"></i>
+        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+      </el-upload>
+      <el-table
+        :data="hidfileListTableData"
+        border
+        height="500"
+        style="width: 100%;margin-top: 20px">
+        <el-table-column
+          width="90px"
+          label="预览">
+          <template slot-scope="scope">
+            <span @click="bigPicture(scope.row.iconPath)" style="width: 100%"><img
+              :src="scope.row.iconPath" min-width="70" height="70"/></span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="filename"
+          label="文件名">
+        </el-table-column>
+        <el-table-column
+          prop="date"
+          label="时间"
+          width="250">
+        </el-table-column>
+        <el-table-column
+          width="90px"
+          prop="versionCode"
+          label="内版本号">
+        </el-table-column>
+        <el-table-column
+          width="90px"
+          prop="versionName"
+          label="外版本号">
+        </el-table-column>
+        <el-table-column
+          vprop="checkFlag"
+          width="90px"
+          label="APK检查">
+          <template slot-scope="scope">
+            <el-tooltip class="item" effect="dark" content="APK信息验证通过" placement="top">
+              <el-button type="success" v-if="scope.row.checkFlag" circle></el-button>
+            </el-tooltip>
+            <el-tooltip class="item" effect="dark" content="APK信息验证未通过，点击查看详细信息" placement="top">
+              <el-button type="danger" v-if="!scope.row.checkFlag" circle
+                         @click="showapkCheckInfo(scope.row)"></el-button>
+            </el-tooltip>
+          </template>
+        </el-table-column>
+        <el-dialog
+          append-to-body
+          title="APK验证信息"
+          :visible.sync="apkCheckVisible">
+          <h2 v-if="apkcheckForm.flag">未找到对应配置表！</h2>
+          <span class="detail_span"><a
+            class="detail_title">配置表应用名:</a>&nbsp&nbsp&nbsp{{apkcheckForm.publishAPPName}}</span><br><br>
+          <span class="detail_span"><a class="detail_title">配置表包名:</a>&nbsp&nbsp&nbsp{{apkcheckForm.publishPackageName}}</span><br><br>
+          <span class="detail_span"><a class="detail_title">配置表内版本号:</a>&nbsp&nbsp&nbsp{{apkcheckForm.publishVersionCode}}</span><br><br>
+          <span class="detail_span"><a class="detail_title">配置表外版本号:</a>&nbsp&nbsp&nbsp{{apkcheckForm.publishVersionName}}</span><br><br>
+          <br><br><br><br>
+          <span class="detail_span"><a class="detail_title">apk应用名:</a>&nbsp&nbsp&nbsp{{apkcheckForm.apkAPPName}}</span><br><br>
+          <span class="detail_span"><a
+            class="detail_title">apk包名:</a>&nbsp&nbsp&nbsp{{apkcheckForm.apkPackageName}}</span><br><br>
+          <span class="detail_span"><a
+            class="detail_title">apk内版本号:</a>&nbsp&nbsp&nbsp{{apkcheckForm.apkVersionCode}}</span><br><br>
+          <span class="detail_span"><a
+            class="detail_title">apk外版本号:</a>&nbsp&nbsp&nbsp{{apkcheckForm.apkVersionName}}</span><br><br>
+        </el-dialog>
+
+        <!--<el-table-column label="线上包" align="center" class-name="small-padding fixed-width" width="80">-->
+        <!--<template slot-scope="scope">-->
+        <!--<el-tooltip content="设为上线包" placement="top">-->
+        <!--<el-switch-->
+        <!--@change="setOnlinePackage(scope.row)"-->
+        <!--v-model="scope.row.online"-->
+        <!--active-color="#13ce66"-->
+        <!--inactive-color="#ff4949"-->
+        <!--active-value='1'-->
+        <!--inactive-value='0'>-->
+        <!--</el-switch>-->
+        <!--</el-tooltip>-->
+        <!--</template>-->
+        <!--</el-table-column>-->
+
+        <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="280">
+          <template slot-scope="scope">
+            <el-button type="primary" size="mini" @click="checkAPKDetail(scope.row)">{{ "查看详细信息" }}</el-button>
+            <el-button type="success" size="mini" @click="downloadAPK(scope.row)" :disabled="downloadAPKLoading">{{
+              "下载"}}
+            </el-button>
+            <el-button type="danger" size="mini" @click="delAPKInfoMeth(scope.row)"
+                       v-if="checkPermission(['director','admin'])">{{ "删除" }}
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-dialog
+        append-to-body
+        title="APK详细信息"
+        :visible.sync="apkDetailVisible">
+        <span class="detail_span"><a
+          class="detail_title">apkguid:</a>&nbsp&nbsp&nbsp{{apkDetailForm.apkguid}}</span><br><br>
+        <span class="detail_span"><a class="detail_title">applicationLable:</a>&nbsp&nbsp&nbsp{{apkDetailForm.applicationLable}}</span><br><br>
+        <span class="detail_span"><a class="detail_title">basic_packageName:</a>&nbsp&nbsp&nbsp{{apkDetailForm.basic_packageName}}</span><br><br>
+        <span class="detail_span"><a class="detail_title">features:</a>&nbsp&nbsp&nbsp<br><span
+          v-for="label in apkDetailForm.features">{{label}}<br></span></span><br><br>
+        <span class="detail_span"><a
+          class="detail_title">filename:</a>&nbsp&nbsp&nbsp{{apkDetailForm.filename}}</span><br><br>
+        <span class="detail_span"><a class="detail_title">impliedFeatures:</a>&nbsp&nbsp&nbsp<br><span
+          v-for="label in apkDetailForm.impliedFeatures">{{label}}<br></span></span><br/>
+        <span class="detail_span"><a class="detail_title">launchableActivity:</a>&nbsp&nbsp&nbsp{{apkDetailForm.launchableActivity}}</span><br><br>
+        <span class="detail_span"><a class="detail_title">minSdkVersion:</a>&nbsp&nbsp&nbsp{{apkDetailForm.sdkVersion}}</span><br><br>
+        <span class="detail_span"><a class="detail_title">targetSdkVersion:</a>&nbsp&nbsp&nbsp{{apkDetailForm.targetSdkVersion}}</span><br><br>
+        <span class="detail_span"><a class="detail_title">usesPermissions:</a>&nbsp&nbsp&nbsp<br><span
+          v-for="label in apkDetailForm.usesPermissions">{{label}}<br></span></span><br/>
+        <span class="detail_span"><a
+          class="detail_title">versionCode:</a>&nbsp&nbsp&nbsp{{apkDetailForm.versionCode}}</span><br><br>
+        <span class="detail_span"><a
+          class="detail_title">versionName:</a>&nbsp&nbsp&nbsp{{apkDetailForm.versionName}}</span><br><br>
+      </el-dialog>
+      <el-dialog
+        append-to-body
+        title="原图预览"
+        :visible.sync="previewDialogVisible">
+        <img :src=picture
+        />
+      </el-dialog>
+      <el-pagination
+        :page-size="filepageSize"
+        layout="prev, pager, next"
+        :total="filetotalPages"
+        :current-page="filecurrentPage"
+        @current-change="filepageChange">
+      </el-pagination>
+      <span slot="footer" class="dialog-footer">
+    <el-button @click="fileListVisible = false">取 消</el-button>
+    <el-button type="primary" @click="fileListVisible = false">确 定</el-button>
+  </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -252,8 +386,10 @@
   import checkPermission from '@/utils/permission' // 权限判断函数
   import {
     getName, getChannel, getProject, createProject, getProjectConfigPublish, getProjectConfig,
-    updateProject, deleteProject, getResourceName, createProjectConfig_pro,getProjectLimit
+    updateProject, deleteProject, getResourceName, createProjectConfig_pro, getProjectLimit,
+    getFileListMeth, postFileListMeth, getdownload, getAPKInfoMeth, delAPKInfoMeth, setOnlineAPKMeth
   } from '@/api/table/projectmanager/projectTable'
+  import {getProjectPublishLimitMeth} from '@/api/table/sdkmanager/projectconfigtable_publish'
   import waves from '@/directive/waves'
   import {parseTime} from '@/utils'
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
@@ -277,9 +413,27 @@
     },
     data() {
       return {
-        pageSize:15,
-        totalPages:0,
-        currentPage:1,
+        apkcheckForm: {},
+        apkCheckVisible: false,
+        hidfileListTableData: [],
+        acceptType: '.apk',
+        downloadAPKLoading: false,
+        picture: '',
+        apkDetailForm: [],
+        apkDetailVisible: false,
+        previewDialogVisible: false,
+        filepageSize: 10,
+        filetotalPages: 0,
+        filecurrentPage: 1,
+        uploadChannelName: '',
+        uploadPackageName: '',
+        searchguid: '',//点击文件上传，sdkguid保存为此
+        uploadPath: 'http://192.168.1.144:8091/file',
+        fileListTableData: [],
+        fileListVisible: false,
+        pageSize: 15,
+        totalPages: 0,
+        currentPage: 1,
         fullscreenLoading: false,
         dialogForm: {
           package_name: '',
@@ -316,39 +470,81 @@
             project: {}
           }],
         },
-        companyList:[],
+        companyList: [],
         textMap: {
           update: '编辑',
           create: '创建'
         },
-        permissionList:[],
+        permissionList: [],
       }
     },
     mounted() {
       this.pageChange(1);
-      //this.handleFilter();//
       this.fetchchannel();//初始化渠道列表
       this.initProjectList();//初始化项目列表
       this.listCompanyInfo();//初始化公司信息
     },
     methods: {
-      searchTable(){
-        this.pageChange(1);
-      },
-      pageChange(page){
-        this.currentPage=page
-        let tothis=this
-        let param={
-          page:page,
-          limit:this.pageSize,
-          projectName:this.inputName,
+      showapkCheckInfo(param) {
+        this.apkcheckForm = {}
+        this.apkcheckForm.flag = true
+        if (param.checkInfo != null) {
+          this.apkcheckForm.flag = false
+          this.apkcheckForm.publishAPPName = param.checkInfo.app_name
+          this.apkcheckForm.publishPackageName = param.checkInfo.package_name
+          this.apkcheckForm.publishVersionCode = param.checkInfo.versioncode_update_version
+          this.apkcheckForm.publishVersionName = param.checkInfo.version_update
         }
-        getProjectLimit(param).then(response=>{
-          this.listLoading=false
-          if(response.repcode===3000){
-            this.list=response.data
-            this.totalPages=response.total
-          }else {
+        this.apkcheckForm.apkAPPName = param.applicationLable
+        this.apkcheckForm.apkPackageName = param.basic_packageName
+        this.apkcheckForm.apkVersionCode = param.versionCode
+        this.apkcheckForm.apkVersionName = param.versionName
+
+        this.apkCheckVisible = true
+      },//展示apk未检测通过信息
+      getPublish() {
+        let tothis = this
+        let param1 = {
+          page: 1,
+          limit: 999,
+          appName: '',
+          channelName: this.uploadChannelName,
+          packageName: this.uploadPackageName
+        }
+        getProjectPublishLimitMeth(param1).then(response => {
+          if (response.repcode === 3000) {
+            console.log('发布记录\n', response.data)
+            let publishList = response.data
+            //publishList.app_name
+            //publishList.package_name
+            //publishList.versioncode_update_version   1
+            //publishList.version_update      0.0.9
+            console.log('文件信息表\n', this.fileListTableData)
+            //this.fileListTableData.applicationLable
+            //this.fileListTableData.basic_packageName
+            //this.fileListTableData.versionCode    1
+            //this.fileListTableData.versionName    1.0.0
+            for (let i = 0; i < this.fileListTableData.length; i++) {
+              let fileList = this.fileListTableData[i]
+              let flag = false
+              for (let j = 0; j < publishList.length; j++) {
+                if (fileList.applicationLable === publishList[j].app_name &&
+                  fileList.basic_packageName === publishList[j].package_name &&
+                  fileList.versioncode_update_version === publishList[j].versionCode &&
+                  fileList.version_update === publishList[j].versionName) {
+                  flag = true
+                  break
+                }
+              }
+              this.fileListTableData[i].checkFlag = flag
+              if (flag === false) {
+                this.fileListTableData[i].checkInfo = publishList[0]
+              }
+
+            }
+            this.hidfileListTableData = this.fileListTableData
+            console.log(this.hidfileListTableData)
+          } else {
             tothis.$notify({
               title: '失败',
               message: '请刷新页面后重试',
@@ -356,8 +552,269 @@
               duration: 2000
             })
           }
-        }).catch(error=>{
-          this.listLoading=false
+        }).catch(error => {
+          console.error(error)
+          tothis.$notify({
+            title: '失败',
+            message: '请刷新页面后重试',
+            type: 'error',
+            duration: 2000
+          })
+        })
+      },//获取发布配置表对比apk解析信息
+      setOnlinePackage(param) {
+        let tothis = this
+        let param1 = {
+          apkguid: param.apkguid,
+          sdkguid: this.searchguid,
+          online: param.online
+        }
+        console.log(param1)
+        setOnlineAPKMeth(param1).then(response => {
+          if (response.repcode === 3000) {
+            tothis.$notify({
+              title: '成功',
+              message: '设置为线上包成功！',
+              type: 'success',
+              duration: 2000
+            })
+          } else {
+            tothis.$notify({
+              title: '失败',
+              message: '设置为线上包失败！',
+              type: 'error',
+              duration: 2000
+            })
+          }
+          this.filepageChange(this.filecurrentPage)
+        }).catch(error => {
+          console.error(error)
+          tothis.$notify({
+            title: '失败',
+            message: '设置为线上包失败！',
+            type: 'error',
+            duration: 2000
+          })
+        })
+
+      },//设置为上线包
+      delAPKInfoMeth(param) {
+        this.$confirm('确认关闭？')
+          .then(_ => {
+            let tothis = this
+            console.log(param.apkguid)
+            let param1 = {
+              apkguid: param.apkguid
+            }
+            delAPKInfoMeth(param1).then(response => {
+              if (response.repcode === 3000) {
+                this.filepageChange(this.filecurrentPage)
+                tothis.$notify({
+                  title: '成功',
+                  message: '删除APK成功！',
+                  type: 'success',
+                  duration: 2000
+                })
+              } else {
+                tothis.$notify({
+                  title: '失败',
+                  message: '删除APK失败！',
+                  type: 'error',
+                  duration: 2000
+                })
+              }
+            }).catch(error => {
+              console.error(error)
+              tothis.$notify({
+                title: '失败',
+                message: '删除APK失败！',
+                type: 'error',
+                duration: 2000
+              })
+            })
+          })
+          .catch(_ => {
+          });
+      },//删除apk
+      checkAPKDetail(param) {
+        this.apkDetailVisible = true
+        this.apkDetailForm = param
+        this.apkDetailForm.impliedFeatures = JSON.parse(param.impliedFeatures)
+        this.apkDetailForm.usesPermissions = JSON.parse(param.usesPermissions)
+        this.apkDetailForm.features = JSON.parse(param.features)
+        console.log(param)
+      },//查看apk详细信息
+      bigPicture(param) {
+        this.previewDialogVisible = true
+        this.picture = param
+      },//大图预览
+      downloadAPK(param) {
+        this.downloadAPKLoading = true
+        let tothis = this
+        let param1 = {
+          path: param.apkguid
+        }
+        getdownload(param1).then(data => {
+          if (data.size === 0) {
+            tothis.$notify({
+              title: '下载失败',
+              message: '无效地址',
+              type: 'error',
+              duration: 2000
+            })
+            this.downloadAPKLoading = false
+            return
+          }
+          let url = window.URL.createObjectURL(new Blob([data]))
+          let link = document.createElement('a')
+          link.style.display = 'none'
+          link.href = url
+          link.setAttribute('download', param.filename)
+          document.body.appendChild(link)
+          link.click()
+          this.downloadAPKLoading = false
+        }).catch(function (rs) {
+          console.log(rs.toString())
+          tothis.downloadLoading = false
+          tothis.$notify({
+            title: '下载失败',
+            message: '刷新试试',
+            type: 'error',
+            duration: 2000
+          })
+          this.downloadAPKLoading = false
+        });
+      },//下载apk文件
+      filepageChange(param) {
+        this.filecurrentPage = param
+        let tothis = this
+        let param1 = {
+          sdkguid: this.searchguid,
+          limit: this.filepageSize,
+          page: param
+        }
+        this.fileListTableData = []
+        getFileListMeth(param1).then(response => {
+          if (response.repcode === 3000) {
+            this.getPublish();
+            this.fileListTableData = response.data
+
+            this.filetotalPages = response.total
+            console.log(response.data)
+
+          } else {
+            tothis.$notify({
+              title: '失败',
+              message: '获取文件上传记录列表失败',
+              type: 'error',
+              duration: 2000
+            })
+          }
+        }).catch(error => {
+          console.log(error)
+          tothis.$notify({
+            title: '失败',
+            message: '获取文件上传记录列表失败',
+            type: 'error',
+            duration: 2000
+          })
+        })
+      },//查看上传文件分页查找
+      uploadSuccessMeth(response1, file, fileList) {
+        let tothis = this
+        let apiInfoParam = {
+          apkguid: response1.data.guid,
+        }
+        getAPKInfoMeth(apiInfoParam).then(response2 => {
+          if (response2.repcode === 3000) {
+            let param1 = {
+              apkguid: response1.data.guid,
+              sdkguid: this.searchguid,
+              basic: response2.data.basic,
+              localIconPath: response2.data.icon,
+            }
+            console.log(param1)
+            postFileListMeth(param1).then(response3 => {
+              if (response3.repcode === 3000) {
+                this.filepageChange(this.filecurrentPage)
+                tothis.$notify({
+                  title: '成功',
+                  message: '上传成功',
+                  type: 'success',
+                  duration: 2000
+                })
+              } else {
+                console.log(response3)
+                tothis.$notify({
+                  title: '失败',
+                  message: '请刷新页面后重试',
+                  type: 'error',
+                  duration: 2000
+                })
+              }
+            }).catch(error => {
+              console.log(error)
+              tothis.$notify({
+                title: '失败',
+                message: '请刷新页面后重试',
+                type: 'error',
+                duration: 2000
+              })
+            })
+          } else {
+            tothis.$notify({
+              title: '失败',
+              message: '获取基础信息失败！',
+              type: 'error',
+              duration: 2000
+            })
+          }
+        }).catch(error => {
+          console.error(error)
+          tothis.$notify({
+            title: '失败',
+            message: '获取基础信息失败！',
+            type: 'error',
+            duration: 2000
+          })
+        });
+
+
+      },//上传成功时间
+      showFileListVisible(param) {
+        this.fileListVisible = true
+        this.uploadChannelName = param.channel
+        this.uploadPackageName = param.package_name
+        this.searchguid = param.sdkguid
+        this.filepageChange(1)
+        console.log(param)
+      },//展示文件上传列表
+      searchTable() {
+        this.pageChange(1);
+      },//查询按钮时间
+      pageChange(page) {
+        this.currentPage = page
+        let tothis = this
+        let param = {
+          page: page,
+          limit: this.pageSize,
+          projectName: this.inputName,
+        }
+        getProjectLimit(param).then(response => {
+          this.listLoading = false
+          if (response.repcode === 3000) {
+            this.list = response.data
+            this.totalPages = response.total
+          } else {
+            tothis.$notify({
+              title: '失败',
+              message: '请刷新页面后重试',
+              type: 'error',
+              duration: 2000
+            })
+          }
+        }).catch(error => {
+          this.listLoading = false
           console.error(error)
           tothis.$notify({
             title: '失败',
@@ -394,7 +851,7 @@
         })
       },//获取公司信息
       addconfig() {
-        this.dialogForm={}
+        this.dialogForm = {}
         this.$nextTick(() => {
           this.$refs['dynamicValidateForm'].clearValidate()
         })
@@ -404,9 +861,19 @@
         let tothis = this
         this.$refs['dynamicValidateForm'].validate((valid) => {
           if (valid) {
+
             this.dialogForm.date = Date.now()
-            console.log('创建的配置表',this.dialogForm)
-            createProjectConfig_pro(this.dialogForm).then(response => {
+            let guid = this.guid();
+            let createtableParam = {
+              channel_mark: this.dialogForm.channel_mark,
+              date: this.dialogForm.date,
+              keystoreguid: this.dialogForm.keystoreguid,
+              package_name: this.dialogForm.package_name,
+              sdkguid: guid
+            }
+            console.log('创建的配置表', createtableParam)
+
+            createProjectConfig_pro(createtableParam).then(response => {
               if (response.data === '添加失败') {
                 this.$message({
                   message: '请不要重复添加',
@@ -419,6 +886,7 @@
                 channel: this.dialogForm.channel_mark,
                 key: this.dialogForm.date,
                 package_name: this.dialogForm.package_name.trim(),
+                sdkguid: guid,
                 project: {}
               }
               let list = this.project.applist
@@ -471,6 +939,13 @@
           }
         });
       },//添加配置表
+      guid() {
+        function S4() {
+          return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+        }
+
+        return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+      },//生成guid
       link_Edit(val) {
         let routeData = this.$router.resolve({
           name: 'ProjectConfigManager',
@@ -489,6 +964,7 @@
         let app_info = {
           app_name: this.project_value.app_name,
           channel: this.project_value.channel_mark,
+          sdkguid: this.project_value.sdkguid,
           key: Date.now(),
           package_name: this.project_value.package_name,
           project: {}
@@ -537,33 +1013,6 @@
           this.project_list = data2
         })
       },//初始化配置表list
-      uichange(list) {
-        for (let i = 0; i < list.length; i++) {
-          let json = list[i]
-          let names = ''
-          let newapplist = []
-          for (let j = json.applist.length - 1; j >= 0; j--) {
-            if (names.search(json.applist[j].app_name) == -1) {
-              if (names.length !== 0) {
-                names = names + ',' + json.applist[j].app_name
-              } else {
-                names = json.applist[j].app_name
-              }
-            }
-            let flag = true
-            for (let x = 0; x < newapplist.length; x++) {
-              if (json.applist[j].channel === newapplist[x].channel) {
-                flag = false
-              }
-            }
-            if (flag) {
-              newapplist.push(json.applist[j])
-            }
-          }
-          json['applist1'] = newapplist
-          json['names'] = names
-        }
-      },//ui数据改变
       closedialog() {
         this.dialogFormVisible = false
       },//关闭对话框
@@ -617,32 +1066,9 @@
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             let flag = true
-            // let list = this.project.applist
-            // for (let i = 0; i < list.length; i++) {
-            //   if (list[i].app_name == '') {
-            //     flag = false
-            //     tothis.$notify({
-            //       title: '警告',
-            //       message: '第' + (i + 1) + '个应用的应用名未选择！',
-            //       type: 'warning'
-            //     });
-            //     return
-            //   }
-            //   if (list[i].channel == '') {
-            //     flag = false
-            //     tothis.$notify({
-            //       title: '警告',
-            //       message: '第' + (i + 1) + '个应用的渠道未选择！',
-            //       type: 'warning'
-            //     });
-            //     return
-            //   }
-            // }
             if (flag) {
-
               createProject(this.project).then(response => {
                 if (response.data === 'ok') {
-                  this.handleFilter();
                   this.dialogFormVisible = false
                   this.$notify({
                     title: '成功',
@@ -651,7 +1077,6 @@
                     duration: 2000
                   })
                 } else if (response.data === 'repeat') {
-                  this.handleFilter();
                   this.$notify({
                     title: '注意',
                     message: '项目名重复请修改！',
@@ -659,9 +1084,11 @@
                     duration: 2000
                   })
                 }
-                this.fullscreenLoading = false
+                console.log(123)
+                tothis.pageChange(this.currentPage);
+                tothis.fullscreenLoading = false
               }).catch(function (rs) {
-                this.fullscreenLoading = false
+                tothis.fullscreenLoading = false
                 tothis.$notify({
                   title: '失败',
                   message: '请稍后重试',
@@ -685,30 +1112,8 @@
           if (valid) {
             let flag = true
             let list = this.project.applist
-            // for (let i = 0; i < list.length; i++) {
-            //   if (list[i].app_name == '') {
-            //     flag = false
-            //     tothis.$notify({
-            //       title: '警告',
-            //       message: '第' + (i + 1) + '个应用的应用名未选择！',
-            //       type: 'warning'
-            //     });
-            //     return
-            //   }
-            //   if (list[i].channel == '') {
-            //     flag = false
-            //     tothis.$notify({
-            //       title: '警告',
-            //       message: '第' + (i + 1) + '个应用的渠道未选择！',
-            //       type: 'warning'
-            //     });
-            //     return
-            //   }
-            // }
-
             if (flag) {
               updateProject(this.project).then(() => {
-                this.handleFilter();
                 this.dialogFormVisible = false
                 this.$notify({
                   title: '成功',
@@ -716,9 +1121,9 @@
                   type: 'success',
                   duration: 2000
                 })
-                this.fullscreenLoading = false
+                tothis.fullscreenLoading = false
               }).catch(function (rs) {
-                this.fullscreenLoading = false
+                tothis.fullscreenLoading = false
                 tothis.$notify({
                   title: '失败',
                   message: '请稍后重试',
@@ -741,13 +1146,13 @@
           type: 'warning'
         }).then(() => {
           deleteProject(row).then(() => {
-            this.handleFilter();
             this.$notify({
               title: '成功',
               message: '删除成功',
               type: 'success',
               duration: 2000
             })
+            tothis.pageChange(this.currentPage);
           }).catch(function (rs) {
             tothis.$notify({
               title: '失败',
@@ -758,51 +1163,6 @@
           })
         });
       },//删除方法
-      // handleFilter() {
-      //   this.listLoading = true
-      //   let accountName = store.getters && store.getters.name
-      //   let name = {
-      //     username: accountName
-      //   }
-      //   getResourceName(name).then(response => {
-      //     this.permissionList=response.data
-      //
-      //     let projectlist = response.data
-      //     getProject().then(response => {
-      //       if (this.checkPermission(['director']) || this.checkPermission(['admin']) || this.checkPermission(['operatorleader'])) {
-      //         this.uichange(response.data)
-      //         this.hidlist = response.data
-      //         this.list = response.data
-      //       } else {
-      //         let newlist = []
-      //         let todolist = response.data
-      //         for (let i = 0; i < todolist.length; i++) {
-      //           for (let j = 0; j < projectlist.length; j++) {
-      //             if (todolist[i].project_name === projectlist[j]) {
-      //               newlist.push(todolist[i])
-      //               break
-      //             }
-      //           }
-      //         }
-      //         this.hidlist = newlist
-      //         this.list = newlist
-      //       }
-      //       this.getDatawithName()
-      //       this.listLoading = false
-      //     }).catch(function (rs) {
-      //       this.getDatawithName()
-      //       console.error(rs)
-      //       this.listLoading = false
-      //     })
-      //
-      //
-      //
-      //   }).catch(function (rs) {
-      //     this.getDatawithName()
-      //     console.error(rs)
-      //     this.listLoading = false
-      //   })
-      // },//查询方法
       updateHandler(val) {
         this.dialogStatus = 'update'
         this.dialogFormVisible = true
@@ -856,6 +1216,17 @@
 </script>
 
 <style>
+  .detail_title {
+    font-size: large;
+    font-weight: bolder;
+    font-size: 16px;
+  }
+
+  .detail_span {
+    font-size: 14px;
+    font-family: "微软雅黑";
+  }
+
   .demo-table-expand label {
     width: 300px;
     color: #99a9bf;

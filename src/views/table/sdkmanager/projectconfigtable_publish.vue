@@ -192,7 +192,7 @@
     created() {
       this.routeWithParam()  //带参跳转
       //this.initchannel()  //获取渠道
-      this.pageChange(1);
+      this.pageChange(1);//初始化列表
     },
     methods: {
       searchTable(){
