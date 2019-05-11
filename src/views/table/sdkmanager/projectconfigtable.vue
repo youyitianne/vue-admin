@@ -181,11 +181,17 @@
         <br/>
         <!--标签页-->
         <el-tabs tab-position="left" style="width: 95%;background-color: #f4f4f5;height: 500px;padding: 1px" id="test1"
-                 v-if="this.dialogStatus === 'update'" v-model="tabname"
+                 v-model="tabname"
                  @tab-click="findtabname" type="border-card">
           <el-tab-pane v-for="name in checkedSdkTemplate" :label="name" :key="name" :name="name"
                        style="font-size: 14px;font-family: Microsoft YaHei;width: 100%">
             <div name="pane_form" style="height: 500px;overflow: auto;">
+              <a style="font: 20px Extra large;">{{sdkModelListName}}-{{sdkModelListVersion}}</a><br><br><br>
+              <el-divider content-position="right"></el-divider>
+              <a style="font: 14px Extra Small;">参数名</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <a style="font: 14px Extra Small;">参数</a>
+              <br><br>
               <!--标签页内多选框-->
               <el-checkbox-group
                 size="mini"
@@ -273,12 +279,14 @@
     },
     data() {
       return {
+        sdkModelListVersion:'',
+        sdkModelListName:'',
         fullscreenLoading: false,
         pageSize: 30,
         totalPages: 0,
         currentPage: 1,
         user: '',
-        resPath: 'http://192.168.1.144:8091/file',
+        resPath: 'http://filehost.tomatojoy.com:8091/file',
         imageUrl_splash: '',
         imageUrl_icon: '',
         keystoreList: [],
@@ -372,7 +380,6 @@
       this.listKeyStoreInfo()//获取keystore列表
     },
     methods: {
-
       searchTable() {
         this.pageChange(1);
       },//搜索应用
@@ -469,6 +476,7 @@
         return false
       },//验证Name
       findtabname(tab, event) {
+        console.log("编辑配置表-标签页-点击事件",tab)
         this.tag_name = tab.label
         this.change_pagename(tab.label)
       },//获取对话框内标签页 名触发事件
@@ -711,10 +719,20 @@
           this.hidsdkTemplate = response.name_list   //对话框内sdk模版列表
           this.sdkTemplatelibrary = response.list
           this.options = response.select_list
+          console.log('sdk模版列表',this.sdkTemplate)
+          console.log('sdk模版目录',this.sdkTemplatelibrary)
+          console.log('设置目录',this.options)
           this.listLoading = false
         })
       },//获取sdk模版
       change_pagename(name) {
+        this.sdkModelListName=name
+        for (let i=0;i<this.sdkTemplate.length;i++){
+          if (name===this.sdkTemplate[i].mark){
+            this.sdkModelListVersion=this.sdkTemplate[i].sdk_version
+            break;
+          }
+        }
         this.dialog_secondary_visual = false
         this.dialog_secondary_list = []
         let visual;

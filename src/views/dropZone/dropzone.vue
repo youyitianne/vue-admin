@@ -36,7 +36,7 @@
                  size="mini">数据上传具体说明
       </el-button>
       <el-upload
-        action="http://192.168.1.144:8083/fileupload"
+        action="http://192.168.1.187:8083/fileupload"
         accept='.csv,.xls,.xlsx'
         :headers="dataObj"
         drag
@@ -68,7 +68,7 @@
         </el-button>
       </el-tooltip>
       <el-upload
-        action="http://192.168.1.101:8086/fileupload"
+        action="http://192.168.1.187:8086/fileupload"
         style="width:360px"
         accept='.csv,.xls,.xlsx'
         :headers="dataObj"

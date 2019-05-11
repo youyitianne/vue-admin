@@ -91,14 +91,25 @@
           <span>{{ dialogForm.keystorePath }}</span>
         </el-form-item>
         <el-form-item label="keystorePass:">
-          <span>{{ dialogForm.keystorePass }}</span>
-        </el-form-item>
+        <span>{{ dialogForm.keystorePass }}</span>
+      </el-form-item>
         <el-form-item label="keyaliasName:">
           <span>{{ dialogForm.keyaliasName }}</span>
         </el-form-item>
         <el-form-item label="keyaliasPass:">
           <span>{{ dialogForm.keyaliasPass }}</span>
         </el-form-item>
+
+        <el-form-item label="MD5:">
+          <span>{{ dialogForm.MD5 }}</span>
+        </el-form-item>
+        <el-form-item label="SHA1:">
+          <span>{{ dialogForm.SHA1 }}</span>
+        </el-form-item>
+        <el-form-item label="SHA256:">
+          <span>{{ dialogForm.SHA256 }}</span>
+        </el-form-item>
+
         <el-form-item label="备注:">
           <span>{{ dialogForm.note }}</span>
         </el-form-item>
@@ -241,7 +252,7 @@
       handleView(value){
         console.log(value)
           //测试服  8089
-        this.link='http://system.tomatojoy.com:8089/sdkapi?package_name='+value.package_name+'&channel_mark='+value.channel_mark
+        this.link='http://system.tomatojoy.com/sdkapi?package_name='+value.package_name+'&channel_mark='+value.channel_mark
         this.dialogForm=value
         this.getSpanArr(value.paramter)
         this.projectObject=value

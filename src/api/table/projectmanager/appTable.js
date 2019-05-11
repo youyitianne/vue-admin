@@ -12,7 +12,7 @@ export function createApp(param) {
   return request({
     url: '/app',
     method: 'post',
-    params:param
+    data:param
   })
 }
 
@@ -20,12 +20,7 @@ export function updateApp(param) {
   return request({
     url: '/app/'+param.id,
     method: 'patch',
-    data:{
-      name:param.name,
-      system:param.system,
-      icon:param.icon,
-      project:param.project,
-    }
+    data:param
   })
 }
 

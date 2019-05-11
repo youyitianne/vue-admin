@@ -50,6 +50,11 @@
           width="300">
         </el-table-column>
         <el-table-column
+          prop="filemd5"
+          label="文件MD5"
+          width="300">
+        </el-table-column>
+        <el-table-column
           prop="fileguid"
           label="GUID">
         </el-table-column>

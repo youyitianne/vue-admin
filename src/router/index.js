@@ -318,7 +318,7 @@ export const asyncRouterMap = [
       },
       {
         path: 'repeat',   //无法适配
-        hidden:true,
+        hidden: true,
         component: () => import('@/views/table/repeat/repeat'),
         name: 'repeatTable',
         meta: {
@@ -334,21 +334,21 @@ export const asyncRouterMap = [
   {
     path: '/conpany',
     component: Layout,
-    redirect: '/Company/conpanyInfo',
+    redirect: '/Company/companyInfo',
     name: 'Company',
     meta: {
       title: '发布帐号',
-      roles: ['operatorleader', 'director','operator'],
+      roles: ['operatorleader', 'director', 'operator'],
     },
     children: [
       {
-        path: 'conpanyInfo',
+        path: 'companyInfo',
         component: () => import('@/views/table/sdkmanager/companyinfo'),
         name: 'conpanyInfoManage',
         meta: {
           title: '发布帐号',
           icon: 'companyinfo',
-          roles: ['operatorleader', 'director','operator'],
+          roles: ['operatorleader', 'director', 'operator'],
         }
       }
     ]
@@ -501,57 +501,6 @@ export const asyncRouterMap = [
     ]
   },
   {
-    path: '/system',
-    component: Layout,
-    redirect: '/system/help',
-    name: 'SystemSet',
-    meta: {
-      title: '系统',
-      icon: 'system1',
-    },
-    children: [
-      {
-        path: 'file',
-        component: () => import('@/views/dropZone/fileUpload.vue'),
-        name: 'file',
-        meta: {
-          title: '上传文件管理',
-          icon: 'uploadfilemanager',
-          roles: ['director', 'admin','operatorleader'],
-        }
-      },
-      {
-        path: 'operationlog',
-        component: () => import('@/views/system/operationLog'),
-        name: 'OperationLog',
-        meta: {
-          title: '操作日志',
-          icon: 'log2',
-          roles: ['director'],
-        }
-      },
-      {
-        path: 'dashboard',
-        component: () => import('@/views/dashboard/index'),
-        name: 'Set',
-        meta: {
-          title: '设置',
-          icon: 'personal',
-        }
-      },
-      {
-        path: 'help',
-        component: () => import('@/views/system/help'),
-        name: 'Help',
-        meta: {
-          title: '帮助',
-          icon: 'help1',
-        }
-      },
-
-    ]
-  },
-  {
     path: '/redSystem',
     component: Layout,
     name: 'redSystem',
@@ -596,7 +545,7 @@ export const asyncRouterMap = [
             meta: {
               title: '素材管理',
               icon: 'channelpromofodder',
-              roles: ['operatorleader', 'director','operator'],
+              roles: ['operatorleader', 'director', 'operator'],
             },
           },
           {
@@ -606,7 +555,7 @@ export const asyncRouterMap = [
             meta: {
               title: '渠道设置',
               icon: 'promochannel',
-              roles: ['operatorleader', 'director','operator'],
+              roles: ['operatorleader', 'director', 'operator'],
             },
           },
           {
@@ -616,12 +565,134 @@ export const asyncRouterMap = [
             meta: {
               title: '发布记录',
               icon: 'promorecord',
-              roles: ['operatorleader', 'director','operator'],
+              roles: ['operatorleader', 'director', 'operator'],
             },
           },
 
         ]
       },
+    ]
+  },
+  {
+    path: '/cooperation',
+    component: Layout,
+    name: 'cooperation',
+    redirect: '/cooperation/co_companyInfo',
+    meta: {
+      title: '合作信息',
+      icon: '',
+    },
+    children: [
+      {
+        path: 'co_companyInfo',
+        component: () => import('@/views/cooperation/co_companyInfo'),
+        name: 'co_companyInfo',
+        meta: {
+          title: '合作公司',
+          icon: '',
+        }
+      },
+      {
+        path: 'co_appInfo',
+        component: () => import('@/views/cooperation/co_appInfo'),
+        name: 'co_appInfo',
+        meta: {
+          title: '合作应用',
+          icon: '',
+        }
+      },
+      {
+        path: 'co_fileupload',
+        component: () => import('@/views/cooperation/co_fileupload'),
+        name: 'co_fileupload',
+        meta: {
+          title: '信息上传',
+          icon: '',
+        }
+      },
+      {
+        path: 'channelPromo',
+        name: 'channelPromo',
+        redirect: '/redSystem/channelPromo/channelPromoEdit',
+        component: () => import('@/views/table/shieldingsystem/channelpromo/redsystem'),
+        meta: {
+          title: '渠道互推',
+          icon: 'channelpromo',
+        },
+        children: [
+          {
+            path: 'channelPromoEdit',
+            component: () => import('@/views/table/shieldingsystem/channelpromo/channelPromoEdit/channelPromoEdit'),
+            name: 'channelPromoEdit',
+            meta: {
+              title: '应用列表',
+              icon: 'uploadfilemanager',
+            },
+          },
+          {
+            path: 'channelPromoRecord',
+            component: () => import('@/views/table/shieldingsystem/channelpromo/channelPromoRecord/channelPromoRecord'),
+            name: 'channelPromoRecord',
+            meta: {
+              title: '发布记录',
+              icon: 'promorecord',
+              roles: ['operatorleader', 'director', 'operator'],
+            },
+          },
+
+        ]
+      },
+    ]
+  },
+  {
+    path: '/system',
+    component: Layout,
+    redirect: '/system/help',
+    name: 'SystemSet',
+    meta: {
+      title: '系统',
+      icon: 'system1',
+    },
+    children: [
+      {
+        path: 'file',
+        component: () => import('@/views/dropZone/fileUpload.vue'),
+        name: 'file',
+        meta: {
+          title: '上传文件管理',
+          icon: 'uploadfilemanager',
+          roles: ['director', 'admin', 'operatorleader'],
+        }
+      },
+      {
+        path: 'operationlog',
+        component: () => import('@/views/system/operationLog'),
+        name: 'OperationLog',
+        meta: {
+          title: '操作日志',
+          icon: 'log2',
+          roles: ['director'],
+        }
+      },
+      {
+        path: 'dashboard',
+        component: () => import('@/views/dashboard/index'),
+        name: 'Set',
+        meta: {
+          title: '设置',
+          icon: 'personal',
+        }
+      },
+      {
+        path: 'help',
+        component: () => import('@/views/system/help'),
+        name: 'Help',
+        meta: {
+          title: '帮助',
+          icon: 'help1',
+        }
+      },
+
     ]
   },
   {

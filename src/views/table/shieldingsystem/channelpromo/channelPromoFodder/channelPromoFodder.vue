@@ -93,7 +93,7 @@
         totalPages:0,
         currentPage:1,
         dialogVisible: false,
-        uploadQiniuUrl: 'http://192.168.1.101:8091/qiniufile',
+        uploadQiniuUrl: 'http://filehost.tomatojoy.com:8091/qiniufile',
         tableData: [],
         hidtableData: [],
         fodderDialogVisible: false,

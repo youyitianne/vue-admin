@@ -8,6 +8,7 @@
       <el-input placeholder="根据项目名查找" v-model="inputName" style="width: 200px;margin-left: 20px" class="filter-item"
                 clearable/>
       <el-button @click="searchTable">搜索</el-button>
+      <!--<el-button @click="uploadSuccessMeth">123456</el-button>-->
     </div>
     <el-table
       height="740"
@@ -46,11 +47,16 @@
                   style="width: 15%">
                 </el-table-column>
                 <el-table-column
+                  prop="app_name"
+                  label="游戏名"
+                  style="width: 15%">
+                </el-table-column>
+                <el-table-column
                   label="文件"
                   width="150">
                   <template slot-scope="scope3">
                     <span>
-                      <el-button type="warning" @click="showFileListVisible(scope3.row)">查看上传文件</el-button>
+                      <el-button type="warning" @click="showFileListVisible(scope3.row)">上传文件</el-button>
                     </span>
                   </template>
                 </el-table-column>
@@ -71,11 +77,7 @@
           </el-form>
         </template>
       </el-table-column>
-      <el-table-column label="序号" align="center" width="60">
-        <template slot-scope="scope1">
-          {{ ++scope1.$index }}
-        </template>
-      </el-table-column>
+      <el-table-column label="项目ID" prop="pid" width="100"></el-table-column>
       <el-table-column label="项目名" prop="project_name">
       </el-table-column>
       <el-table-column label="备注" prop="note">
@@ -103,12 +105,6 @@
       <el-form ref="dataForm" :model="project" label-position="left" label-width="90px"
                style="width: 400px; margin-left:50px;">
         <el-form-item label="项目名" :rules="{required: true, message: '项目名不能为空', trigger: 'blur'}"
-                      v-if="dialogStatus==='update'"
-                      prop="project_name">
-          <el-input v-model="project.project_name" placeholder="请输入项目名~" disabled/>
-        </el-form-item>
-        <el-form-item label="项目名" :rules="{required: true, message: '项目名不能为空', trigger: 'blur'}"
-                      v-if="dialogStatus==='create'"
                       prop="project_name">
           <el-input v-model="project.project_name" placeholder="请输入项目名~"/>
         </el-form-item>
@@ -133,6 +129,7 @@
         </el-form-item>
         <el-button @click="innerVisible = true" type="primary">添加应用</el-button>
         <el-dialog
+          :close-on-click-modal=false
           style="margin-top: 100px"
           width="40%"
           title="添加应用"
@@ -152,6 +149,7 @@
             </div>
             <span>
               <el-dialog
+                :close-on-click-modal=false
                 style="margin-top: 100px"
                 width="40%"
                 title="添加配置"
@@ -230,6 +228,7 @@
       </div>
     </el-dialog>
     <el-dialog
+      :close-on-click-modal=false
       title="文件列表"
       :visible.sync="fileListVisible"
       width="80%">
@@ -238,6 +237,7 @@
         drag
         :accept="acceptType"
         :action="uploadPath"
+        :before-upload="beforeUpload"
         :on-success="uploadSuccessMeth"
         multiple>
         <i class="el-icon-upload"></i>
@@ -290,6 +290,7 @@
           </template>
         </el-table-column>
         <el-dialog
+          :close-on-click-modal=false
           append-to-body
           title="APK验证信息"
           :visible.sync="apkCheckVisible">
@@ -299,6 +300,10 @@
           <span class="detail_span"><a class="detail_title">配置表包名:</a>&nbsp&nbsp&nbsp{{apkcheckForm.publishPackageName}}</span><br><br>
           <span class="detail_span"><a class="detail_title">配置表内版本号:</a>&nbsp&nbsp&nbsp{{apkcheckForm.publishVersionCode}}</span><br><br>
           <span class="detail_span"><a class="detail_title">配置表外版本号:</a>&nbsp&nbsp&nbsp{{apkcheckForm.publishVersionName}}</span><br><br>
+
+          <span class="detail_span"><a class="detail_title">配置表MD5:</a>&nbsp&nbsp&nbsp{{apkcheckForm.publishMD5}}</span><br><br>
+          <span class="detail_span"><a class="detail_title">配置表SHA1:</a>&nbsp&nbsp&nbsp{{apkcheckForm.publishSHA1}}</span><br><br>
+          <span class="detail_span"><a class="detail_title">配置表SHA256:</a>&nbsp&nbsp&nbsp{{apkcheckForm.publishSHA256}}</span><br><br>
           <br><br><br><br>
           <span class="detail_span"><a class="detail_title">apk应用名:</a>&nbsp&nbsp&nbsp{{apkcheckForm.apkAPPName}}</span><br><br>
           <span class="detail_span"><a
@@ -307,6 +312,14 @@
             class="detail_title">apk内版本号:</a>&nbsp&nbsp&nbsp{{apkcheckForm.apkVersionCode}}</span><br><br>
           <span class="detail_span"><a
             class="detail_title">apk外版本号:</a>&nbsp&nbsp&nbsp{{apkcheckForm.apkVersionName}}</span><br><br>
+
+          <span class="detail_span"><a
+            class="detail_title">apkMD5:</a>&nbsp&nbsp&nbsp{{apkcheckForm.apkMD5}}</span><br><br>
+          <span class="detail_span"><a
+            class="detail_title">apkSHA1:</a>&nbsp&nbsp&nbsp{{apkcheckForm.apkSHA1}}</span><br><br>
+          <span class="detail_span"><a
+            class="detail_title">apkSHA256:</a>&nbsp&nbsp&nbsp{{apkcheckForm.apkSHA256}}</span><br><br>
+
         </el-dialog>
 
         <!--<el-table-column label="线上包" align="center" class-name="small-padding fixed-width" width="80">-->
@@ -337,6 +350,7 @@
         </el-table-column>
       </el-table>
       <el-dialog
+        :close-on-click-modal=false
         append-to-body
         title="APK详细信息"
         :visible.sync="apkDetailVisible">
@@ -353,6 +367,12 @@
         <span class="detail_span"><a class="detail_title">launchableActivity:</a>&nbsp&nbsp&nbsp{{apkDetailForm.launchableActivity}}</span><br><br>
         <span class="detail_span"><a class="detail_title">minSdkVersion:</a>&nbsp&nbsp&nbsp{{apkDetailForm.sdkVersion}}</span><br><br>
         <span class="detail_span"><a class="detail_title">targetSdkVersion:</a>&nbsp&nbsp&nbsp{{apkDetailForm.targetSdkVersion}}</span><br><br>
+
+        <span class="detail_span"><a class="detail_title">MD5:</a>&nbsp&nbsp&nbsp{{apkDetailForm.MD5}}</span><br><br>
+        <span class="detail_span"><a class="detail_title">SHA1:</a>&nbsp&nbsp&nbsp{{apkDetailForm.SHA1}}</span><br><br>
+        <span class="detail_span"><a
+          class="detail_title">SHA256:</a>&nbsp&nbsp&nbsp{{apkDetailForm.SHA256}}</span><br><br>
+
         <span class="detail_span"><a class="detail_title">usesPermissions:</a>&nbsp&nbsp&nbsp<br><span
           v-for="label in apkDetailForm.usesPermissions">{{label}}<br></span></span><br/>
         <span class="detail_span"><a
@@ -361,6 +381,7 @@
           class="detail_title">versionName:</a>&nbsp&nbsp&nbsp{{apkDetailForm.versionName}}</span><br><br>
       </el-dialog>
       <el-dialog
+        :close-on-click-modal=false
         append-to-body
         title="原图预览"
         :visible.sync="previewDialogVisible">
@@ -374,10 +395,6 @@
         :current-page="filecurrentPage"
         @current-change="filepageChange">
       </el-pagination>
-      <span slot="footer" class="dialog-footer">
-    <el-button @click="fileListVisible = false">取 消</el-button>
-    <el-button type="primary" @click="fileListVisible = false">确 定</el-button>
-  </span>
     </el-dialog>
   </div>
 </template>
@@ -428,7 +445,8 @@
         uploadChannelName: '',
         uploadPackageName: '',
         searchguid: '',//点击文件上传，sdkguid保存为此
-        uploadPath: 'http://192.168.1.144:8091/file',
+        uploadPath: 'http://filehost.tomatojoy.com:8091/file',
+        //uploadPath: 'http://192.168.1.1:8091/file',
         fileListTableData: [],
         fileListVisible: false,
         pageSize: 15,
@@ -485,7 +503,22 @@
       this.listCompanyInfo();//初始化公司信息
     },
     methods: {
+      beforeUpload(file){
+        let tothis=this
+        if (file.type==='application/vnd.android.package-archive'){
+          console.log('上传文件类型正确')
+        }else{
+          tothis.$notify({
+            title: '失败',
+            message: '只能上传apk文件',
+            type: 'error',
+            duration: 2000
+          })
+          return false
+        }
+      },
       showapkCheckInfo(param) {
+        console.log("查看检查信息",param)
         this.apkcheckForm = {}
         this.apkcheckForm.flag = true
         if (param.checkInfo != null) {
@@ -494,11 +527,20 @@
           this.apkcheckForm.publishPackageName = param.checkInfo.package_name
           this.apkcheckForm.publishVersionCode = param.checkInfo.versioncode_update_version
           this.apkcheckForm.publishVersionName = param.checkInfo.version_update
+
+          this.apkcheckForm.publishMD5 = param.checkInfo.MD5
+          this.apkcheckForm.publishSHA1 = param.checkInfo.SHA1
+          this.apkcheckForm.publishSHA256 = param.checkInfo.SHA256
+
         }
         this.apkcheckForm.apkAPPName = param.applicationLable
         this.apkcheckForm.apkPackageName = param.basic_packageName
         this.apkcheckForm.apkVersionCode = param.versionCode
         this.apkcheckForm.apkVersionName = param.versionName
+
+        this.apkcheckForm.apkMD5 = param.MD5
+        this.apkcheckForm.apkSHA1 = param.SHA1
+        this.apkcheckForm.apkSHA256 = param.SHA256
 
         this.apkCheckVisible = true
       },//展示apk未检测通过信息
@@ -524,18 +566,23 @@
             //this.fileListTableData.basic_packageName
             //this.fileListTableData.versionCode    1
             //this.fileListTableData.versionName    1.0.0
-            for (let i = 0; i < this.fileListTableData.length; i++) {
+             for (let i = 0; i < this.fileListTableData.length; i++) {
               let fileList = this.fileListTableData[i]
               let flag = false
-              for (let j = 0; j < publishList.length; j++) {
-                if (fileList.applicationLable === publishList[j].app_name &&
-                  fileList.basic_packageName === publishList[j].package_name &&
-                  fileList.versioncode_update_version === publishList[j].versionCode &&
-                  fileList.version_update === publishList[j].versionName) {
+               if(publishList.length>0){
+             // for (let j = 0; j < publishList.length; j++) {
+                if (fileList.applicationLable === publishList[0].app_name &&
+                  fileList.basic_packageName === publishList[0].package_name &&
+                  fileList.versioncode_update_version === publishList[0].versionCode &&
+                  fileList.version_update === publishList[0].versionName&&
+                  fileList.MD5 === publishList[0].MD5 &&
+                  fileList.SHA1 === publishList[0].SHA1 &&
+                  fileList.SHA256 === publishList[0].SHA256) {
+                  console.log(11)
                   flag = true
-                  break
                 }
-              }
+              //  }
+                }
               this.fileListTableData[i].checkFlag = flag
               if (flag === false) {
                 this.fileListTableData[i].checkInfo = publishList[0]
@@ -543,7 +590,6 @@
 
             }
             this.hidfileListTableData = this.fileListTableData
-            console.log(this.hidfileListTableData)
           } else {
             tothis.$notify({
               title: '失败',
@@ -637,6 +683,7 @@
           });
       },//删除apk
       checkAPKDetail(param) {
+        console.log(param)
         this.apkDetailVisible = true
         this.apkDetailForm = param
         this.apkDetailForm.impliedFeatures = JSON.parse(param.impliedFeatures)
@@ -722,9 +769,15 @@
       },//查看上传文件分页查找
       uploadSuccessMeth(response1, file, fileList) {
         let tothis = this
+
         let apiInfoParam = {
           apkguid: response1.data.guid,
         }
+
+        // let apiInfoParam = {
+        //   apkguid: '3c48aebb-dbff-491e-b670-3a22f6062b2a',
+        // }
+
         getAPKInfoMeth(apiInfoParam).then(response2 => {
           if (response2.repcode === 3000) {
             let param1 = {
@@ -778,10 +831,9 @@
             duration: 2000
           })
         });
-
-
-      },//上传成功时间
+      },//上传成功事件
       showFileListVisible(param) {
+        this.hidfileListTableData = []
         this.fileListVisible = true
         this.uploadChannelName = param.channel
         this.uploadPackageName = param.package_name
@@ -804,6 +856,7 @@
           this.listLoading = false
           if (response.repcode === 3000) {
             this.list = response.data
+            console.log("项目列表--------",this.list)
             this.totalPages = response.total
           } else {
             tothis.$notify({
@@ -996,6 +1049,7 @@
         }
         getProjectConfig(name).then(response => {
           let data1 = response.data
+
           let data2 = []
           for (let i = 0; i < data1.length; i++) {
             let flag = true
@@ -1113,6 +1167,7 @@
             let flag = true
             let list = this.project.applist
             if (flag) {
+              console.log('更新项目对象\n', this.project)
               updateProject(this.project).then(() => {
                 this.dialogFormVisible = false
                 this.$notify({

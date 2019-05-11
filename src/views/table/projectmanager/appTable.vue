@@ -34,7 +34,7 @@
       </el-table-column>
       <el-table-column align="center" label="项目" prop="advertising_type" width="250">
         <template slot-scope="scope">
-          <span>{{ scope.row.project }}</span>
+          <span>{{ scope.row.project_name }}</span>
         </template>
       </el-table-column>
       <el-table-column label="平台" width="250  " align="center" prop="app_name">
@@ -72,12 +72,12 @@
         </el-form-item>
         <el-form-item label="项目">
           <!--<el-input v-model="app.project" placeholder="比如别称~"/>-->
-          <el-select v-model="app.project" placeholder="请选择" value-key="project_name" filterable>
+          <el-select v-model="app.project_guid" placeholder="请选择" value-key="project_guid" filterable>
             <el-option
               v-for="item in projectlist"
-              :key="item.project_name"
+              :key="item.project_guid"
               :label="item.project_name"
-              :value="item.project_name">
+              :value="item.project_guid">
             </el-option>
           </el-select>
         </el-form-item>
@@ -193,6 +193,7 @@
       },//分页切换
       initProjectList() {
         getProject().then(response => {
+          console.log('项目列表\n',response.data)
           this.projectlist = response.data
         })
       },//初始化项目列表
@@ -214,7 +215,11 @@
         if (!this.create_flag) {
           return
         }
+        console.log('创建应用对象\n',this.app)
+
+
         this.create_flag = false
+
         createApp(this.app).then(() => {
           this.pageChange(this.currentPage);
           this.list.unshift(this.app)
@@ -244,10 +249,13 @@
           this.open3()
           return
         }
+        console.log('更新应用对象\n',tempData)
+
         if (!this.update_flag) {
           return
         }
         this.update_flag = false
+
         updateApp(tempData).then(() => {
           this.dialogFormVisible = false
           this.pageChange(this.currentPage);
@@ -275,6 +283,7 @@
         this.$nextTick(() => {
           this.$refs['dataForm'].clearValidate()
         })
+        this.app.project_guid=this.projectlist[0].project_guid
       },
       handleUpdate(row) {
         this.app = Object.assign({}, row) // copy obj
@@ -315,7 +324,7 @@
           name: '',
           system: '安卓',
           icon: '无',
-          project: this.projectlist[0].project_name,
+          project_guid: this.projectlist[0].project_guid,
         }
       },
       open3() {

@@ -142,7 +142,7 @@
     components: {Dropzone},
     data() {
       return {
-        resPath: 'http://192.168.1.144:8091/file',
+        resPath: 'http://filehost.tomatojoy.com:8091/file',
         form: {},
         EditDialog: false,
         param: {
@@ -210,7 +210,6 @@
         });
       },
       handleEdit(param) {
-
         this.EditDialog = true
         this.form = {
           date1: param.date1,
