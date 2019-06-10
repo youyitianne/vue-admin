@@ -83,3 +83,12 @@ export function getProjectLimitMeth(param) {
     params:param,
   })
 }
+
+export function addNotRemindAppMeth(param) {
+  return request({
+    url: '/apkInfo/notRemindApp',
+    method: 'post',
+    data:param,
+  })
+}
+

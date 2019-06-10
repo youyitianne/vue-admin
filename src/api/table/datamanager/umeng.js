@@ -15,3 +15,11 @@ export function getumengapp() {
     method: 'get',
   })
 }
+
+export function getgdt(param) {
+  return request({
+    url: '/cooperation/testgdt',
+    method: 'post',
+    data:param,
+  })
+}

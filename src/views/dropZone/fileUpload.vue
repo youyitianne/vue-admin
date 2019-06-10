@@ -63,7 +63,6 @@
           label="PATH">
         </el-table-column>
         <el-table-column
-
           label="预览">
           <template slot-scope="scope">
             <span @click="bigPicture(scope.row.path)" style="width: 100%"><img :src="scope.row.path"  min-width="70" height="70" /></span>
@@ -97,6 +96,7 @@
     components: {Dropzone},
     data() {
       return {
+
         pageSize:20,
         totalPages:0,
         currentPage:1,

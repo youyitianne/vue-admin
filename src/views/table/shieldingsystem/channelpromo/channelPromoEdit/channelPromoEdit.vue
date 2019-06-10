@@ -15,6 +15,9 @@
         <el-form-item label="包名 : ">
           <el-input style="width: 200px" v-model="fetchForm.packageName" clearable></el-input>
         </el-form-item>
+        <el-form-item label="渠道名 : ">
+          <el-input style="width: 200px" v-model="fetchForm.channelName" clearable></el-input>
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
          <el-button type="primary" @click="searchData">搜索</el-button>
@@ -183,6 +186,10 @@
                         label-width="120px">
             <el-input v-model.number="promo.promoValue" placeholder="必填~" class="dia-input" type="number"/>
           </el-form-item>
+          <el-form-item label="推广别名"  prop="promoAlias"
+                        label-width="120px">
+            <el-input v-model.number="promo.promoAlias" placeholder="若不填，默认使用推广应用名~" class="dia-input"/>
+          </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="innerVisible = false">{{ '取消'}}</el-button>
@@ -204,6 +211,11 @@
           prop="promoName"
           label="推广应用名"
           width="120">
+        </el-table-column>
+        <el-table-column
+          prop="promoAlias"
+          label="推广别名"
+          width="200">
         </el-table-column>
         <el-table-column
           prop="channelPackage"
@@ -312,6 +324,11 @@
         <el-table-column
           prop="promoName"
           label="推广应用名"
+          width="180">
+        </el-table-column>
+        <el-table-column
+          prop="promoAlias"
+          label="推广别名"
           width="180">
         </el-table-column>
         <el-table-column
@@ -425,7 +442,8 @@
         fetchForm: {
           appName: '',
           uid: '',
-          packageName: ''
+          packageName: '',
+          channelName:''
         },
         testModeForm: {
           id: 0,
@@ -510,7 +528,7 @@
             for (let i = 0; i < this.EditTable.length; i++) {
               let row = {
                 iconName:this.EditTable[i].iconName,
-                promoName: this.EditTable[i].promoName,
+                promoName: this.EditTable[i].promoAlias===''?this.EditTable[i].promoName:this.EditTable[i].promoAlias,
                 channelPackage: this.EditTable[i].channelPackage,
                 channelRule: this.EditTable[i].channelRule,
                 promoPackageName: this.EditTable[i].promoPackageName,
@@ -590,12 +608,13 @@
             for (let i = 0; i < this.EditTable.length; i++) {
               let row = {
                 iconName:this.EditTable[i].iconName,
-                promoName: this.EditTable[i].promoName,
+                promoName: this.EditTable[i].promoAlias===''?this.EditTable[i].promoName:this.EditTable[i].promoAlias,
                 channelPackage: this.EditTable[i].channelPackage,
                 channelRule: this.EditTable[i].channelRule,
                 promoPackageName: this.EditTable[i].promoPackageName,
                 promoIconUrl: this.EditTable[i].promoIconUrl,
                 promoValue: this.EditTable[i].promoValue,
+                promoAlias: this.EditTable[i].promoAlias,
                 id: idlist[idlist.length - 1 - i].id.toString()
               }
               newtable.push(row)
@@ -637,8 +656,6 @@
                 type: 'warning'
               });
             });
-
-
           }
           if (uploadflag1) {
             tothis.$notify({
@@ -696,7 +713,7 @@
         this.$set(this.promo, 'promoEdit', row.uid);
         this.$set(this.promo, 'promoPackageName', row.promoPackageName);
         this.$set(this.promo, 'promoValue', row.promoValue.toString());
-
+        this.$set(this.promo, 'promoAlias', row.promoAlias);
         console.log(this.promo)
         this.editListState = 'edit'
         this.innerVisible = true
@@ -718,13 +735,15 @@
                 promoIconUrl: this.promo.promoIconUrl,
                 promoName: this.promo.promoName.promoName,
                 promoPackageName: this.promo.promoPackageName,
-                promoValue: this.promo.promoValue.toString()
+                promoValue: this.promo.promoValue.toString(),
+                promoAlias: this.promo.promoAlias+''
               }
               let param = {
                 appid: this.uid,
                 uid: this.promo.promoEdit,
                 puid: this.promo.fodder.qiniu_file_guid,
-                promoValue: this.promo.promoValue.toString()
+                promoValue: this.promo.promoValue.toString(),
+                promoAlias: this.promo.promoAlias+''
               }
               //上传推广列表关联
               addPromoList(param).then(response => {
@@ -767,7 +786,8 @@
               uid: this.promo.promoEdit,
               puid: this.promo.fodder.qiniu_file_guid,
               id: this.promo.id,
-              promoValue: this.promo.promoValue.toString()
+              promoValue: this.promo.promoValue.toString(),
+              promoAlias: this.promo.promoAlias
             }
 
             //上传推广列表关联
@@ -778,6 +798,7 @@
                 this.$set(this.EditTable[this.promoListIndex], 'uid', this.promo.promoEdit);
                 this.$set(this.EditTable[this.promoListIndex], 'puid', this.promo.fodder.qiniu_file_guid);
                 this.$set(this.EditTable[this.promoListIndex], 'promoValue', this.promo.promoValue);
+                this.$set(this.EditTable[this.promoListIndex], 'promoAlias', this.promo.promoAlias);
                 //展示参数
                 this.$set(this.EditTable[this.promoListIndex], 'iconName', this.promo.fodder.qiniu_file_name);
                 this.$set(this.EditTable[this.promoListIndex], 'channelPackage', this.promo.channelPackage === '暂无' ? '' : this.promo.channelPackage);
@@ -1286,7 +1307,7 @@
             for (let i = 0; i < json.rows.length; i++) {
               if (json.rows[i].system === 'channelPromo') {
                 let channelpromo = JSON.parse(json.rows[i].status)
-                console.log('当前配置', json.rows[i])
+                console.log('当前配置', channelpromo)
                 console.log('rowid', json.rows[i].id)
                 this.id = json.rows[i].id
                 this.EditTable = channelpromo
@@ -1337,6 +1358,7 @@
           appName: this.fetchForm.appName,
           appId: this.fetchForm.uid,
           appPackageName: this.fetchForm.packageName,
+          channelName:this.fetchForm.channelName,
           page: page,
           limit: this.pageSize
         }

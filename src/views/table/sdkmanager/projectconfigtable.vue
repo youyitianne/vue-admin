@@ -9,6 +9,7 @@
       <el-input v-model="secondary_package" style="width: 200px" class="filter-item" clearable/>
       <el-button style="margin-left: 20px" @click="searchTable" v-loading.fullscreen.lock="fullscreenLoading">搜索
       </el-button>
+
     </div>
     <el-table
       height="760"
@@ -20,23 +21,30 @@
       stripe
       border
       highlight-current-row>
-      <el-table-column label="包名" prop="package_name" width="300px">
+      <el-table-column label="图标" width="150">
+        <template slot-scope="scope">
+          <span @click="bigPicture(scope.row.path)" style="width: 100%" v-if="scope.row.icon!=='暂无'"><img
+            :src="iconPath+scope.row.icon" min-width="70" height="70"/></span>
+          <span @click="bigPicture(scope.row.path)" style="width: 100%" v-if="scope.row.icon==='暂无'">暂无</span>
+        </template>
       </el-table-column>
-      <el-table-column label="应用名" prop="app_name" width="150">
+      <el-table-column label="应用名" prop="app_name" width="450">
       </el-table-column>
       <el-table-column label="渠道" prop="channel_mark" width="100">
       </el-table-column>
-      <el-table-column label="外部版本-更新" prop="version_update" width="120">
+      <el-table-column label="包名" prop="package_name">
       </el-table-column>
-      <el-table-column label="内部版本-更新" prop="versioncode_update_version" width="120">
+      <el-table-column label="版本" prop="version_update" width="120">
       </el-table-column>
-      <el-table-column label="备注" prop="note">
+      <el-table-column label="版本code" prop="versioncode_update_version" width="120">
       </el-table-column>
-      <el-table-column label="操作" align="center" width="250px" class-name="small-padding fixed-width"
-                       v-if="checkPermission(['operatorleader','admin','sdksuport','director','operator'])">
+      <el-table-column label="操作" align="center" width="350px" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button type="success" size="mini" @click="handleUpdate(scope.row)">{{ "编辑" }}</el-button>
-          <el-button @click="link_Check(scope.row)" size="mini" type="info">查看配置表发布记录</el-button>
+          <el-button type="primary" size="mini" @click="handleUpdate(scope.row)"
+                     v-if="checkPermission(['admin','director', 'operatorleader', 'operator'])">{{ "编辑" }}
+          </el-button>
+          <el-button @click="link_Check(scope.row)" size="mini" type="primary">配置记录</el-button>
+          <el-button type="primary" size="mini" @click="showFileListVisible(scope.row)">{{ "APK管理" }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -47,7 +55,6 @@
       :current-page="currentPage"
       @current-change="pageChange">
     </el-pagination>
-
     <el-dialog
       :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="80%" :close-on-click-modal=false>
       <el-form ref="dataForm" :model="sdk" label-position="left" label-width="150px" :inline="true"
@@ -232,16 +239,201 @@
         </el-tabs>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="updateData(true)" >{{ '保存' }}</el-button>
+        <el-button type="primary" @click="updateData(true)">{{ '保存' }}</el-button>
         <el-button type="success" @click="updateData(false)">发布</el-button>
       </div>
+    </el-dialog>
+    <el-dialog
+      :close-on-click-modal=false
+      title="APK列表"
+      :visible.sync="fileListVisible"
+      width="80%">
+      <el-upload
+        class="upload-demo"
+        drag
+        :headers="dataObj"
+        :accept="acceptType"
+        :action="uploadPath"
+        :before-upload="beforeUpload"
+        :on-success="uploadSuccessMeth"
+        multiple>
+        <i class="el-icon-upload"></i>
+        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+      </el-upload>
+      <el-table
+        v-loading="fileTableLoading"
+        :data="hidfileListTableData"
+        border
+        height="500"
+        style="width: 100%;margin-top: 20px">
+        <el-table-column
+          width="90px"
+          label="预览">
+          <template slot-scope="scope">
+            <span @click="bigPicture(scope.row.iconPath)" style="width: 100%"><img
+              :src="scope.row.iconPath" min-width="70" height="70"/></span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="filename"
+          label="文件名">
+        </el-table-column>
+        <!--<el-table-column-->
+        <!--prop="apkguid"-->
+        <!--label="GUID">-->
+        <!--</el-table-column>-->
+        <el-table-column
+          prop="date"
+          label="时间"
+          width="250">
+        </el-table-column>
+        <el-table-column
+          width="90px"
+          prop="versionCode"
+          label="内版本号">
+        </el-table-column>
+        <el-table-column
+          width="90px"
+          prop="versionName"
+          label="外版本号">
+        </el-table-column>
+        <el-table-column
+          vprop="checkFlag"
+          width="90px"
+          label="APK检查">
+          <template slot-scope="scope">
+            <el-tooltip class="item" effect="dark" content="APK信息验证通过" placement="top">
+              <el-button type="success" v-if="scope.row.checkFlag" circle></el-button>
+            </el-tooltip>
+            <el-tooltip class="item" effect="dark" content="APK信息验证未通过，点击查看详细信息" placement="top">
+              <el-button type="danger" v-if="!scope.row.checkFlag" circle
+                         @click="showapkCheckInfo(scope.row)"></el-button>
+            </el-tooltip>
+          </template>
+        </el-table-column>
+        <el-dialog
+          :close-on-click-modal=false
+          append-to-body
+          title="APK验证信息"
+          :visible.sync="apkCheckVisible">
+          <h2 v-if="apkcheckForm.flag">未找到对应配置表！</h2>
+          <span class="detail_span"><a
+            class="detail_title">配置表应用名:</a>&nbsp&nbsp&nbsp{{apkcheckForm.publishAPPName}}</span><br><br>
+          <span class="detail_span"><a class="detail_title">配置表包名:</a>&nbsp&nbsp&nbsp{{apkcheckForm.publishPackageName}}</span><br><br>
+          <span class="detail_span"><a class="detail_title">配置表内版本号:</a>&nbsp&nbsp&nbsp{{apkcheckForm.publishVersionCode}}</span><br><br>
+          <span class="detail_span"><a class="detail_title">配置表外版本号:</a>&nbsp&nbsp&nbsp{{apkcheckForm.publishVersionName}}</span><br><br>
+
+          <span class="detail_span"><a class="detail_title">配置表MD5:</a>&nbsp&nbsp&nbsp{{apkcheckForm.publishMD5}}</span><br><br>
+          <span class="detail_span"><a
+            class="detail_title">配置表SHA1:</a>&nbsp&nbsp&nbsp{{apkcheckForm.publishSHA1}}</span><br><br>
+          <span class="detail_span"><a class="detail_title">配置表SHA256:</a>&nbsp&nbsp&nbsp{{apkcheckForm.publishSHA256}}</span><br><br>
+          <br><br><br><br>
+          <span class="detail_span"><a class="detail_title">apk应用名:</a>&nbsp&nbsp&nbsp{{apkcheckForm.apkAPPName}}</span><br><br>
+          <span class="detail_span"><a
+            class="detail_title">apk包名:</a>&nbsp&nbsp&nbsp{{apkcheckForm.apkPackageName}}</span><br><br>
+          <span class="detail_span"><a
+            class="detail_title">apk内版本号:</a>&nbsp&nbsp&nbsp{{apkcheckForm.apkVersionCode}}</span><br><br>
+          <span class="detail_span"><a
+            class="detail_title">apk外版本号:</a>&nbsp&nbsp&nbsp{{apkcheckForm.apkVersionName}}</span><br><br>
+
+          <span class="detail_span"><a
+            class="detail_title">apkMD5:</a>&nbsp&nbsp&nbsp{{apkcheckForm.apkMD5}}</span><br><br>
+          <span class="detail_span"><a
+            class="detail_title">apkSHA1:</a>&nbsp&nbsp&nbsp{{apkcheckForm.apkSHA1}}</span><br><br>
+          <span class="detail_span"><a
+            class="detail_title">apkSHA256:</a>&nbsp&nbsp&nbsp{{apkcheckForm.apkSHA256}}</span><br><br>
+
+        </el-dialog>
+
+        <!--<el-table-column label="线上包" align="center" class-name="small-padding fixed-width" width="80">-->
+        <!--<template slot-scope="scope">-->
+        <!--<el-tooltip content="设为上线包" placement="top">-->
+        <!--<el-switch-->
+        <!--@change="setOnlinePackage(scope.row)"-->
+        <!--v-model="scope.row.online"-->
+        <!--active-color="#13ce66"-->
+        <!--inactive-color="#ff4949"-->
+        <!--active-value='1'-->
+        <!--inactive-value='0'>-->
+        <!--</el-switch>-->
+        <!--</el-tooltip>-->
+        <!--</template>-->
+        <!--</el-table-column>-->
+
+        <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="380">
+          <template slot-scope="scope">
+            <el-button type="primary" @click="checkAPKDetail(scope.row)" style="margin-right: 10px">{{ "详细信息" }}
+            </el-button>
+
+            <div
+              style="margin-top: 1px;border: #DCDFE6 0px solid;width: 70px;height: 40px;text-align: center;top:50%;border-radius: 5px;display: inline-block">
+              <a style="color: #0000CC;font-size: 14px;margin-top: 14%;display: inline-block;text-decoration:underline"
+                 :download=scope.row.filename
+                 :href=downloadPath+scope.row.filename+downloadPath1+scope.row.apkguid
+                 target="_blank" >下载</a>
+            </div>
+
+            <!--<el-button type="success" size="mini" @click="downloadAPK(scope.row)" :disabled="downloadAPKLoading">{{-->
+            <!--"下载"}}-->
+            <!--</el-button>-->
+
+
+            <el-button style="margin-left: 10px" type="danger" size="" @click="delAPKInfoMeth(scope.row)"
+                       v-if="checkPermission(['director','admin'])">{{ "删除" }}
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-dialog
+        :close-on-click-modal=false
+        append-to-body
+        title="APK详细信息"
+        :visible.sync="apkDetailVisible">
+        <span class="detail_span"><a
+          class="detail_title">apkguid:</a>&nbsp&nbsp&nbsp{{apkDetailForm.apkguid}}</span><br><br>
+        <span class="detail_span"><a
+          class="detail_title">filename:</a>&nbsp&nbsp&nbsp{{apkDetailForm.filename}}</span><br><br>
+        <span class="detail_span"><a class="detail_title">applicationLable:</a>&nbsp&nbsp&nbsp{{apkDetailForm.applicationLable}}</span><br><br>
+        <span class="detail_span"><a class="detail_title">packageName:</a>&nbsp&nbsp&nbsp{{apkDetailForm.basic_packageName}}</span><br><br>
+        <span class="detail_span"><a
+          class="detail_title">versionName:</a>&nbsp&nbsp&nbsp{{apkDetailForm.versionName}}</span><br><br>
+        <span class="detail_span"><a
+          class="detail_title">versionCode:</a>&nbsp&nbsp&nbsp{{apkDetailForm.versionCode}}</span><br><br>
+        <span class="detail_span"><a class="detail_title">launchableActivity:</a>&nbsp&nbsp&nbsp{{apkDetailForm.launchableActivity}}</span><br><br>
+        <span class="detail_span"><a class="detail_title">minSdkVersion:</a>&nbsp&nbsp&nbsp{{apkDetailForm.sdkVersion}}</span><br><br>
+        <span class="detail_span"><a class="detail_title">targetSdkVersion:</a>&nbsp&nbsp&nbsp{{apkDetailForm.targetSdkVersion}}</span><br><br>
+        <span class="detail_span"><a class="detail_title">MD5:</a>&nbsp&nbsp&nbsp{{apkDetailForm.MD5}}</span><br><br>
+        <span class="detail_span"><a class="detail_title">SHA1:</a>&nbsp&nbsp&nbsp{{apkDetailForm.SHA1}}</span><br><br>
+        <span class="detail_span"><a
+          class="detail_title">SHA256:</a>&nbsp&nbsp&nbsp{{apkDetailForm.SHA256}}</span><br><br>
+        <span class="detail_span"><a class="detail_title">usesPermissions:</a>&nbsp&nbsp&nbsp<br><span
+          v-for="label in apkDetailForm.usesPermissions">{{label}}<br></span></span><br/>
+        <span class="detail_span"><a class="detail_title">features:</a>&nbsp&nbsp&nbsp<br><span
+          v-for="label in apkDetailForm.features">{{label}}<br></span></span><br><br>
+        <span class="detail_span"><a class="detail_title">impliedFeatures:</a>&nbsp&nbsp&nbsp<br><span
+          v-for="label in apkDetailForm.impliedFeatures">{{label}}<br></span></span><br/>
+      </el-dialog>
+      <el-dialog
+        :close-on-click-modal=false
+        append-to-body
+        title="原图预览"
+        :visible.sync="previewDialogVisible">
+        <img :src=picture
+        />
+      </el-dialog>
+      <el-pagination
+        :page-size="filepageSize"
+        layout="prev, pager, next"
+        :total="filetotalPages"
+        :current-page="filecurrentPage"
+        @current-change="filepageChange">
+      </el-pagination>
     </el-dialog>
   </div>
 </template>
 
 <script>
   import {mapGetters} from 'vuex'
-  import waves from '@/directive/waves'
   import {parseTime} from '@/utils'
   import checkPermission from '@/utils/permission' // 权限判断函数
   import {
@@ -253,12 +445,22 @@
     getChannel,
     getProject,
     uploadRes,
-    getProjectLimitMeth
+    getProjectLimitMeth,
+    addNotRemindAppMeth
   } from '@/api/table/sdkmanager/projectconfigtable'
   import {getName, getResourceName} from '@/api/table/sdkmanager/projectconfigtable'
   import {fetchFileInfo, getFile, delFile, fetchKeystoreInfo} from '@/api/fileupload'
   import {getToken} from '@/utils/auth'
   import {getcompanyInfoMeth} from '@/api/table/sdkmanager/companyInfo'
+  import {getProjectPublishLimitMeth} from '@/api/table/sdkmanager/projectconfigtable_publish'
+  import {
+    getAPKInfoMeth,
+    delAPKInfoMeth,
+    setOnlineAPKMeth,
+    getFileListMeth,
+    getdownload,
+    postFileListMeth,
+  } from '@/api/table/projectmanager/projectTable'
 
   export default {
     filters: {
@@ -279,8 +481,26 @@
     },
     data() {
       return {
-        sdkModelListVersion:'',
-        sdkModelListName:'',
+        dataObj: {'Content-Type': 'multipart/form-data'},
+        fileTableLoading: false,
+        downloadAPKLoading: false,
+        picture: '',
+        filepageSize: 10,
+        filetotalPages: 0,
+        filecurrentPage: 1,
+        previewDialogVisible: false,
+        apkDetailForm: [],
+        apkDetailVisible: false,
+        apkcheckForm: {},
+        apkCheckVisible: false,
+        //downloadPath: 'http://filehost.tomatojoy.com:8091/getapkfile/',
+        downloadPath: 'http://filehost.tomatojoy.com:8091/getapkfile/',
+        downloadPath1: '?path=',
+        uploadPath: 'http://filehost.tomatojoy.com:8091/file',
+        acceptType: '.apk',
+        iconPath: 'http://filehost.tomatojoy.com/file?path=',
+        sdkModelListVersion: '',
+        sdkModelListName: '',
         fullscreenLoading: false,
         pageSize: 30,
         totalPages: 0,
@@ -324,7 +544,6 @@
         },
         secondary_channel: '',
         secondary_game: '',
-        listLoading: true,
         names: [],
         layout: '',
         timevalue: '',
@@ -370,6 +589,11 @@
         getRowKeys(row) {
           return row.id
         },
+        hidfileListTableData: [],
+        fileListVisible: false,
+        uploadChannelName: '',
+        uploadPackageName: '',
+        searchguid: '',
       }
     },
     created() {
@@ -380,6 +604,456 @@
       this.listKeyStoreInfo()//获取keystore列表
     },
     methods: {
+      showapkCheckInfo(param) {
+        console.log("查看检查信息", param)
+        this.apkcheckForm = {}
+        this.apkcheckForm.flag = true
+        if (param.checkInfo != null) {
+          this.apkcheckForm.flag = false
+          this.apkcheckForm.publishAPPName = param.checkInfo.app_name
+          this.apkcheckForm.publishPackageName = param.checkInfo.package_name
+          this.apkcheckForm.publishVersionCode = param.checkInfo.versioncode_update_version
+          this.apkcheckForm.publishVersionName = param.checkInfo.version_update
+
+          this.apkcheckForm.publishMD5 = param.checkInfo.MD5
+          this.apkcheckForm.publishSHA1 = param.checkInfo.SHA1
+          this.apkcheckForm.publishSHA256 = param.checkInfo.SHA256
+        }
+        this.apkcheckForm.apkAPPName = param.applicationLable
+        this.apkcheckForm.apkPackageName = param.basic_packageName
+        this.apkcheckForm.apkVersionCode = param.versionCode
+        this.apkcheckForm.apkVersionName = param.versionName
+        this.apkcheckForm.apkMD5 = param.MD5
+        this.apkcheckForm.apkSHA1 = param.SHA1
+        this.apkcheckForm.apkSHA256 = param.SHA256
+        this.apkCheckVisible = true
+      },//展示apk未检测通过信息
+      downloadAPK(param) {
+        this.downloadAPKLoading = true
+        let tothis = this
+        let param1 = {
+          path: param.apkguid
+        }
+        getdownload(param1).then(data => {
+          if (data.size === 0) {
+            tothis.$notify({
+              title: '下载失败',
+              message: '无效地址',
+              type: 'error',
+              duration: 2000
+            })
+            this.downloadAPKLoading = false
+            return
+          }
+          let url = window.URL.createObjectURL(new Blob([data]))
+          let link = document.createElement('a')
+          link.style.display = 'none'
+          link.href = url
+          link.setAttribute('download', param.filename)
+          document.body.appendChild(link)
+          link.click()
+          this.downloadAPKLoading = false
+        }).catch(function (rs) {
+          console.log(rs.toString())
+          tothis.downloadLoading = false
+          tothis.$notify({
+            title: '下载失败',
+            message: '刷新试试',
+            type: 'error',
+            duration: 2000
+          })
+          this.downloadAPKLoading = false
+        });
+      },//下载apk文件
+      getPublish() {
+        let tothis = this
+        let param1 = {
+          page: 1,
+          limit: 999,
+          appName: '',
+          channelName: this.uploadChannelName,
+          packageName: this.uploadPackageName
+        }
+        console.log("发布记录参数",param1)
+        getProjectPublishLimitMeth(param1).then(response => {
+          if (response.repcode === 3000) {
+            let cacheList = response.data
+            let publishList = []
+            for (let i = 0; i < cacheList.length; i++) {
+              if (cacheList[i].package_name === this.uploadPackageName) {
+                publishList.push(cacheList[i])
+              }
+            }
+            console.log('发布记录\n', publishList)
+            console.log('文件信息表\n', this.fileListTableData)
+            for (let i = 0; i < this.fileListTableData.length; i++) {
+              let fileList = this.fileListTableData[i]
+              let flag = false
+              if (publishList.length > 0) {
+                // console.log('++++++++++++++++++++++++')
+                // console.log('fileList.applicationLable  '+fileList.applicationLable)
+                // console.log('fileList.basic_packageName  '+fileList.basic_packageName)
+                // console.log('fileList.versionCode  '+fileList.versionCode)
+                // console.log('fileList.versionName  '+fileList.versionName)
+                // console.log('fileList.MD5  '+fileList.MD5)
+                // console.log('fileList.SHA1  '+fileList.SHA1)
+                // console.log('fileList.SHA256  '+fileList.SHA256)
+                //
+                // console.log('publishList[0].app_name  '+publishList[0].app_name)
+                // console.log('publishList[0].package_name  '+publishList[0].package_name)
+                // console.log('publishList[0].versioncode_update_version  '+publishList[0].versioncode_update_version)
+                // console.log('publishList[0].version_update  '+publishList[0].version_update)
+                // console.log('publishList[0].MD5  '+publishList[0].MD5)
+                // console.log('publishList[0].SHA1  '+publishList[0].SHA1)
+                // console.log('publishList[0].SHA256  '+publishList[0].SHA256)
+                // console.log('++++++++++++++++++++++++')
+                if (
+                  fileList.applicationLable === publishList[0].app_name.trim()&&
+                  fileList.basic_packageName === publishList[0].package_name.trim() &&
+                  fileList.versionCode === publishList[0].versioncode_update_version.trim() &&
+                  fileList.versionName === publishList[0].version_update.trim()&&
+                  fileList.MD5 === publishList[0].MD5.trim() &&
+                  fileList.SHA1 === publishList[0].SHA1.trim() &&
+                  fileList.SHA256 === publishList[0].SHA256.trim()) {
+                  console.log(11)
+                  flag = true
+                }
+              }
+              this.fileListTableData[i].checkFlag = flag
+              if (flag === false) {
+                this.fileListTableData[i].checkInfo = publishList[0]
+              }
+
+            }
+            this.hidfileListTableData = this.fileListTableData
+          } else {
+            tothis.$notify({
+              title: '失败',
+              message: '请刷新页面后重试',
+              type: 'error',
+              duration: 2000
+            })
+          }
+        }).catch(error => {
+          console.error(error)
+          tothis.$notify({
+            title: '失败',
+            message: '请刷新页面后重试',
+            type: 'error',
+            duration: 2000
+          })
+        })
+      },//获取发布配置表对比apk解析信息
+      contrastApk(param) {
+        let tothis = this
+        let param1 = {
+          page: 1,
+          limit: 999,
+          appName: '',
+          channelName: this.uploadChannelName,
+          packageName: this.uploadPackageName
+        }
+        getProjectPublishLimitMeth(param1).then(response => {
+          if (response.repcode === 3000) {
+            let cacheList = response.data
+            let publishList = []
+            for (let i = 0; i < cacheList.length; i++) {
+              if (cacheList[i].package_name === this.uploadPackageName) {
+                publishList.push(cacheList[i])
+              }
+            }
+            console.log('发布记录\n', publishList)
+            console.log('文件信息表\n', this.fileListTableData)
+
+            let fileList = param.basic
+            let flag = false
+            if (publishList.length > 0) {
+              console.log('最新key表', publishList[0])
+              console.log('app信息', fileList)
+              console.log('++++++++++++++++++++++++')
+              console.log('fileList.applicationLable  '+fileList.applicationLable)
+              console.log('fileList.basic_packageName  '+fileList.basic_packageName)
+              console.log('fileList.versionCode  '+fileList.versionCode)
+              console.log('fileList.versionName  '+fileList.versionName)
+              console.log('fileList.MD5  '+fileList.MD5)
+              console.log('fileList.SHA1  '+fileList.SHA1)
+              console.log('fileList.SHA256  '+fileList.SHA256)
+
+              console.log('publishList[0].app_name  '+publishList[0].app_name)
+              console.log('publishList[0].package_name  '+publishList[0].package_name)
+              console.log('publishList[0].versioncode_update_version  '+publishList[0].versioncode_update_version)
+              console.log('publishList[0].version_update  '+publishList[0].version_update)
+              console.log('publishList[0].MD5  '+publishList[0].MD5)
+              console.log('publishList[0].SHA1  '+publishList[0].SHA1)
+              console.log('publishList[0].SHA256  '+publishList[0].SHA256)
+              console.log('++++++++++++++++++++++++')
+              if (fileList.applicationLable === publishList[0].app_name.trim() &&
+                fileList.packageName === publishList[0].package_name.trim() &&
+                fileList.versionCode === publishList[0].versioncode_update_version.trim() &&
+                fileList.versionName === publishList[0].version_update.trim() &&
+                fileList.md5 === publishList[0].MD5.trim() &&
+                fileList.sha1 === publishList[0].SHA1.trim() &&
+                fileList.sha256 === publishList[0].SHA256.trim()) {
+                console.log('上传的包信息校验成功')
+                let keyList= publishList[0].paramter
+                let appKey='';
+                for (let i=0;i<keyList.length;i++){
+                  if (keyList[i].param_name==='友盟统计-AppKey'){
+                    appKey=keyList[i].param;
+                    break
+                  }
+                }
+                if (appKey===''){
+                  tothis.$notify({
+                    title: '',
+                    message: '该应用未填写友盟统计key,无法添加到待提醒列表',
+                    duration: 2000
+                  })
+                  console.log('该应用未填写友盟统计key,无法添加到待提醒列表')
+                  return
+                }
+                let remindParam = {
+                  configguid:this.searchguid,//配置表的guid
+                  sdkguid:publishList[0].sdkguid,//发布记录的guid
+                  icon: publishList[0].icon,
+                  appName:  publishList[0].app_name,
+                  channelName:  publishList[0].channel_mark,
+                  versionCode:  publishList[0].version_update,
+                  packageName:  publishList[0].package_name,
+                  appKey: appKey,
+                }
+                tothis.$notify({
+                  title: '成功',
+                  message: '验证成功，正在添加应用到待提醒列表',
+                  duration: 2000
+                })
+                console.log(remindParam)
+                addNotRemindAppMeth(remindParam).then(response=>{
+                  if(response.repcode===3000){
+                    tothis.$notify({
+                      title: '成功',
+                      message: '添加应用到待提醒列表成功',
+                      type: 'success',
+                      duration: 2000
+                    })
+                  }else{
+                    console.log(repcode)
+                  }
+                }).catch(error=>{
+                  console.log(error)
+                  tothis.$notify({
+                    title: '失败',
+                    message: '添加应用到待提醒列表失败',
+                    type: 'error',
+                    duration: 2000
+                  })
+                });
+              } else {
+                console.log('上传的包校验失败')
+              }
+            } else {
+              console.log('未找到对应的key表')
+            }
+            this.hidfileListTableData = this.fileListTableData
+          } else {
+            console.log(response)
+            tothis.$notify({
+              title: '失败',
+              message: '未获取到发布记录',
+              type: 'error',
+              duration: 2000
+            })
+          }
+        }).catch(error => {
+          console.error(error)
+          tothis.$notify({
+            title: '失败',
+            message: '请刷新页面后重试',
+            type: 'error',
+            duration: 2000
+          })
+        })
+      },//获取发布配置表对比apk解析信息
+      uploadSuccessMeth(response1, file, fileList) {
+        let tothis = this
+        let apiInfoParam = {
+          apkguid: response1.data.guid,
+        }
+        getAPKInfoMeth(apiInfoParam).then(response2 => {
+          if (response2.repcode === 3000) {
+            let param1 = {
+              apkguid: response1.data.guid,
+              sdkguid: this.searchguid,
+              basic: response2.data.basic,
+              localIconPath: response2.data.icon,
+            }
+            console.log(param1)
+            this.contrastApk(param1)  //上传成功后校验apk信息，正确则添加到待提醒列表
+            postFileListMeth(param1).then(response3 => {
+              if (response3.repcode === 3000) {
+                this.filepageChange(this.filecurrentPage)
+                tothis.$notify({
+                  title: '成功',
+                  message: '上传成功',
+                  type: 'success',
+                  duration: 2000
+                })
+              } else {
+                console.log(response3)
+              }
+            }).catch(error => {
+              console.log(error)
+              tothis.$notify({
+                title: '失败',
+                message: '请刷新页面后重试',
+                type: 'error',
+                duration: 2000
+              })
+            })
+          } else {
+            console.error(response2)
+          }
+        }).catch(error => {
+          console.error(error)
+          tothis.$notify({
+            title: '失败',
+            message: '获取基础信息失败！',
+            type: 'error',
+            duration: 2000
+          })
+        });
+      },//上传成功事件
+      beforeUpload(file) {
+        let tothis = this
+        console.log(file)
+        if (file.type != '') {
+          console.log('文件信息正常')
+          if (file.type === 'application/vnd.android.package-archive') {
+            console.log('上传文件类型正确')
+          } else {
+            tothis.$notify({
+              title: '失败',
+              message: '只能上传apk文件',
+              type: 'error',
+              duration: 2000
+            })
+            return false
+          }
+        } else {
+          console.log('文件类型为空，判断文件后缀')
+          try {
+            if (file.name.substring(file.name.indexOf('.') + 1) != 'apk') {
+              console.log(1)
+              tothis.$notify({
+                title: '失败',
+                message: '只能上传apk文件',
+                type: 'error',
+                duration: 2000
+              })
+              return false
+            }
+          } catch (e) {
+            console.log(2)
+            tothis.$notify({
+              title: '失败',
+              message: '只能上传apk文件',
+              type: 'error',
+              duration: 2000
+            })
+            return false
+          }
+        }
+        console.log(3)
+      },//上传前事件
+      filepageChange(param) {
+        this.fileTableLoading = true
+        this.filecurrentPage = param
+        let tothis = this
+        let param1 = {
+          sdkguid: this.searchguid,
+          limit: this.filepageSize,
+          page: param
+        }
+        this.fileListTableData = []
+        getFileListMeth(param1).then(response => {
+          if (response.repcode === 3000) {
+            this.getPublish();
+            this.fileListTableData = response.data
+            this.filetotalPages = response.total
+            console.log(response.data)
+          } else {
+            console.error(response)
+          }
+          tothis.fileTableLoading = false
+        }).catch(error => {
+          console.log(error)
+          tothis.$notify({
+            title: '失败',
+            message: '获取文件上传记录列表失败',
+            type: 'error',
+            duration: 2000
+          })
+          tothis.fileTableLoading = false
+        })
+      },//查看上传文件分页查找
+      delAPKInfoMeth(param) {
+        this.$confirm('确认删除？')
+          .then(_ => {
+            let tothis = this
+            console.log(param.apkguid)
+            let param1 = {
+              apkguid: param.apkguid
+            }
+            delAPKInfoMeth(param1).then(response => {
+              if (response.repcode === 3000) {
+                this.filepageChange(this.filecurrentPage)
+                tothis.$notify({
+                  title: '成功',
+                  message: '删除APK成功！',
+                  type: 'success',
+                  duration: 2000
+                })
+              } else {
+                tothis.$notify({
+                  title: '失败',
+                  message: '删除APK失败！',
+                  type: 'error',
+                  duration: 2000
+                })
+              }
+            }).catch(error => {
+              console.error(error)
+              tothis.$notify({
+                title: '失败',
+                message: '删除APK失败！',
+                type: 'error',
+                duration: 2000
+              })
+            })
+          })
+          .catch(_ => {
+          });
+      },//删除apk
+      checkAPKDetail(param) {
+        console.log(param)
+        this.apkDetailVisible = true
+        this.apkDetailForm = param
+        this.apkDetailForm.impliedFeatures = JSON.parse(param.impliedFeatures)
+        this.apkDetailForm.usesPermissions = JSON.parse(param.usesPermissions)
+        this.apkDetailForm.features = JSON.parse(param.features)
+        console.log(param)
+      },//查看apk详细信息
+      showFileListVisible(param) {
+        console.log(param)
+        this.hidfileListTableData = []
+        this.fileListVisible = true
+        this.uploadChannelName = param.channel_mark
+        this.uploadPackageName = param.package_name
+        this.searchguid = param.sdkguid
+        console.log('该应用的guid',this.searchguid)
+        this.filepageChange(1)
+        console.log(param)
+      },//展示文件上传列表
       searchTable() {
         this.pageChange(1);
       },//搜索应用
@@ -476,7 +1150,7 @@
         return false
       },//验证Name
       findtabname(tab, event) {
-        console.log("编辑配置表-标签页-点击事件",tab)
+        console.log("编辑配置表-标签页-点击事件", tab)
         this.tag_name = tab.label
         this.change_pagename(tab.label)
       },//获取对话框内标签页 名触发事件
@@ -562,7 +1236,7 @@
           this.publishlist = response.data
           if (!this.valideSdkForm()) {
             //this.dialogFormVisible = false
-            this.fullscreenLoading=false
+            this.fullscreenLoading = false
             return
           }
           let timestamp = (new Date()).getTime()
@@ -719,17 +1393,17 @@
           this.hidsdkTemplate = response.name_list   //对话框内sdk模版列表
           this.sdkTemplatelibrary = response.list
           this.options = response.select_list
-          console.log('sdk模版列表',this.sdkTemplate)
-          console.log('sdk模版目录',this.sdkTemplatelibrary)
-          console.log('设置目录',this.options)
+          console.log('sdk模版列表', this.sdkTemplate)
+          console.log('sdk模版目录', this.sdkTemplatelibrary)
+          console.log('设置目录', this.options)
           this.listLoading = false
         })
       },//获取sdk模版
       change_pagename(name) {
-        this.sdkModelListName=name
-        for (let i=0;i<this.sdkTemplate.length;i++){
-          if (name===this.sdkTemplate[i].mark){
-            this.sdkModelListVersion=this.sdkTemplate[i].sdk_version
+        this.sdkModelListName = name
+        for (let i = 0; i < this.sdkTemplate.length; i++) {
+          if (name === this.sdkTemplate[i].mark) {
+            this.sdkModelListVersion = this.sdkTemplate[i].sdk_version
             break;
           }
         }

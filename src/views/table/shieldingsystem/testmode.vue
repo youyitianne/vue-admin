@@ -30,6 +30,9 @@
         <el-form-item label="包名 : ">
           <el-input style="width: 200px" v-model="fetchForm.packageName" clearable></el-input>
         </el-form-item>
+        <el-form-item label="渠道名 : ">
+          <el-input style="width: 200px" v-model="fetchForm.channelName" clearable></el-input>
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
          <el-button type="primary" @click="searchData">搜索</el-button>
@@ -168,7 +171,8 @@
         fetchForm: {
           appName: '',
           uid: '',
-          packageName: ''
+          packageName: '',
+          channelName:''
         },
         ipForm: {
           orginalIP: '',
@@ -193,12 +197,14 @@
     methods: {
       searchAppList(page) {
         let param = {
+          channelName:this.fetchForm.channelName,
           appName: this.fetchForm.appName,
           appId: this.fetchForm.uid,
           appPackageName: this.fetchForm.packageName,
           page: page,
           limit: this.pageSize
         }
+        console.log('搜索应用参数',param)
         searchapp(param).then(res => {
           let json = JSON.parse(res.data)
           console.log(json)

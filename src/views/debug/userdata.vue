@@ -110,23 +110,12 @@
         layout:'',
         timevalue: '',
         searchName:'搜索',
-        tableKey: 0,
         list: null,
-        total: 0,
         listLoading: false,
-        listQuery: {
-          importance: undefined,
-          title: undefined,
-          type: undefined,
-        },
         listParam:{
           start:'',
           end:''
         },
-        importanceOptions: [1, 2, 3],
-        names:[],
-        sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
-        statusOptions: ['published', 'draft', 'deleted'],
       }
     },
     methods: {

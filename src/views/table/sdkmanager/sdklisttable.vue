@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div class="filter-container" style="margin: 15px;margin-top: -5px">
-      <el-button class="filter-item" style="margin-left: 10px;margin-right: 20px" type="primary" icon="el-icon-edit"
+      <el-button class="filter-item" style="margin-left: 10px;margin-right: 20px" type="primary" icon="el-icon-edit" v-if="checkPermission(['admin','director'])"
                  @click="handleCreate">添加SDK
       </el-button>
       <el-input placeholder="根据SDK标记二次筛选" v-model="secondary_sdk_name"
@@ -72,7 +72,7 @@
           <el-button size="mini" type="danger" v-if=" scope.row.sdk_status==='0'">删除</el-button>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width" v-if="checkPermission(['admin','director'])">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ "编辑" }}</el-button>
           <!--<el-button size="mini" type="success" @click="validUpdate(scope.row)">还原</el-button>-->
@@ -243,6 +243,7 @@
       this.pageChange(1)
     },
     methods: {
+      checkPermission,
       pageChange(page){
         this.currentPage=page
         let tothis=this

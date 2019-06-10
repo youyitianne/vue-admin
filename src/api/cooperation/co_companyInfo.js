@@ -23,3 +23,11 @@ export function delCompanyMeth(param) {
     data:param,
   })
 }
+export function editCompanyMeth(param) {
+  return request({
+    url: '/cooperation/editCompany',
+    method: 'patch',
+    data:param,
+  })
+}
+

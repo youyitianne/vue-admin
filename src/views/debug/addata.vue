@@ -38,128 +38,6 @@
                 style="width: 200px;margin-bottom: 10px;margin-top: -10px" class="filter-item" clearable
                 @blur="getDatawithName"/>
     </div>
-
-    <!--<div class="filter-container"-->
-         <!--style="margin: 15px;margin-top: -5px"-->
-         <!--v-if="checkPermission(['admin','operator','leader'])">-->
-      <!--<el-date-picker-->
-        <!--v-model="download_value"-->
-        <!--type="daterange"-->
-        <!--range-separator="-"-->
-        <!--start-placeholder="开始日期"-->
-        <!--end-placeholder="结束日期"-->
-        <!--value-format="yyyy-MM-dd"-->
-        <!--:picker-options="pickerOptions0">>-->
-      <!--</el-date-picker>-->
-
-      <!--&lt;!&ndash;<el-select v-model="chooseNamed" :placeholder="'选择游戏'" style="width: 140px" class="filter-item" filterable>&ndash;&gt;-->
-      <!--&lt;!&ndash;<el-option v-for="item in names" :key="item" :label="item" :value="item"/>&ndash;&gt;-->
-      <!--&lt;!&ndash;</el-select>&ndash;&gt;-->
-
-      <!--<el-select v-model="secondary_project" style="margin-right: 20px" @change="" value-key="project_name"-->
-                 <!--:placeholder="'选择项目'" filterable>-->
-        <!--<el-option v-for="item in app_name_list" :key="item.project_name" :label="item.project_name" :value="item">-->
-        <!--</el-option>-->
-      <!--</el-select>-->
-
-
-      <!--<el-button v-waves :loading="downloadLoading" type="primary" icon="el-icon-download" @click="handleDownloadAll">-->
-        <!--{{'下载总表'}}-->
-      <!--</el-button>-->
-      <!--<br>-->
-    <!--</div>-->
-
-    <!--<div class="filter-container"-->
-         <!--style="margin: 15px;margin-top: -5px"-->
-         <!--v-if="checkPermission(['admin','operator','leader'])">-->
-      <!--<el-date-picker-->
-        <!--v-model="arpu_download_value"-->
-        <!--type="daterange"-->
-        <!--range-separator="-"-->
-        <!--start-placeholder="开始日期"-->
-        <!--end-placeholder="结束日期"-->
-        <!--value-format="timestamp"-->
-        <!--:picker-options="pickerOptions0">>-->
-      <!--</el-date-picker>-->
-      <!--&lt;!&ndash;value-format="yyyy-MM-dd"&ndash;&gt;-->
-      <!--<el-select v-model="aupu_chooseNamed" style="margin-right: 20px" @change="" value-key="project_name"-->
-                 <!--:placeholder="'选择项目'" filterable>-->
-        <!--<el-option v-for="item in app_name_list" :key="item.project_name" :label="item.project_name" :value="item">-->
-        <!--</el-option>-->
-      <!--</el-select>-->
-      <!--<el-button v-waves :loading="downloadLoading" type="primary" icon="el-icon-download"-->
-                 <!--@click="arpu_handleDownloadAll">-->
-        <!--{{'下载收益表'}}-->
-      <!--</el-button>-->
-      <!--<br>-->
-    <!--</div>-->
-
-    <!--<div class="filter-container"-->
-         <!--style="margin: 15px;margin-top: -5px"-->
-         <!--v-if="checkPermission(['admin','operator','leader'])">-->
-      <!--<el-date-picker-->
-        <!--v-model="daily_download_value"-->
-        <!--type="daterange"-->
-        <!--range-separator="-"-->
-        <!--start-placeholder="开始日期"-->
-        <!--end-placeholder="结束日期"-->
-        <!--value-format="yyyy-MM-dd"-->
-        <!--:picker-options="pickerOptions0">>-->
-      <!--</el-date-picker>-->
-
-      <!--<el-button v-waves :loading="downloadLoading" type="primary" icon="el-icon-download"-->
-                 <!--@click="daily_download">-->
-        <!--{{'下载产品日常信息表'}}-->
-      <!--</el-button>-->
-      <!--<br>-->
-    <!--</div>-->
-
-    <!--<div class="filter-container"-->
-         <!--style="margin: 15px;margin-top: -5px"-->
-         <!--v-if="checkPermission(['admin','operator','leader'])">-->
-      <!--<el-date-picker-->
-        <!--v-model="daily_adtype_download_value"-->
-        <!--type="daterange"-->
-        <!--range-separator="-"-->
-        <!--start-placeholder="开始日期"-->
-        <!--end-placeholder="结束日期"-->
-        <!--value-format="yyyy-MM-dd"-->
-        <!--:picker-options="pickerOptions0">>-->
-      <!--</el-date-picker>-->
-
-      <!--<el-select v-model="daily_adtype_chooseNamed" style="margin-right: 20px" @change="" value-key="project_name"-->
-                 <!--:placeholder="'选择项目'" filterable>-->
-        <!--<el-option v-for="item in app_name_list" :key="item.project_name" :label="item.project_name" :value="item">-->
-        <!--</el-option>-->
-      <!--</el-select>-->
-
-      <!--<el-button v-waves :loading="downloadLoading" type="primary" icon="el-icon-download"-->
-                 <!--@click="daily_adtype_download">-->
-        <!--{{'下载广告形式细分展次表'}}-->
-      <!--</el-button>-->
-      <!--<br>-->
-    <!--</div>-->
-
-
-    <el-dialog
-      title="选择需要去除的部分"
-      :visible.sync="hackReset"
-      width="40%">
-      <el-button @click="chooseyixin()">模板一</el-button>
-      <el-button @click="rechoose()">还原</el-button>
-      <el-tree
-        ref="tree"
-        :data="data2"
-        node-key="id"
-        show-checkbox
-        highlight-current>
-      </el-tree>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="hackReset=false">{{ '取消'}}</el-button>
-        <el-button type="primary" @click="getnumlist">{{ '确认' }}</el-button>
-      </div>
-    </el-dialog>
-
     <el-table
       height="850"
       stripe
@@ -175,11 +53,6 @@
           {{ ++scope.$index }}
         </template>
       </el-table-column>
-      <!--<el-table-column label="id" width="110" style="display: none">-->
-      <!--<template slot-scope="scope">-->
-      <!--{{ scope.row.id }}-->
-      <!--</template>-->
-      <!--</el-table-column>-->
       <el-table-column label="时间" width="110" align="center" prop="date">
         <template slot-scope="scope">
           <span>{{ scope.row.date }}</span>
@@ -196,7 +69,6 @@
           <span>{{ scope.row.channel }}</span>
         </template>
       </el-table-column>
-
       <el-table-column align="center" label="广告类型" prop="advertising_type">
         <template slot-scope="scope">
           <span>{{ scope.row.advertising_type }}</span>

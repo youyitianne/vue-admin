@@ -220,6 +220,51 @@ export const asyncRouterMap = [
           roles: ['director', 'operatorleader']
         }
       },
+      {
+        path: 'yonghusju',
+        component: () => import('@/views/table/datamanager/newDataManager/userData'),
+        name: 'yonghusju',
+        meta: {
+          title: '用户数据',
+          icon:'userData1',
+          noCache: true,
+          roles: ['director', 'operatorleader']
+        }
+      },
+      {
+        path: 'liucunshuju',
+        component: () => import('@/views/table/datamanager/newDataManager/retentionData'),
+        name: 'liucunshuju',
+        meta: {
+          title: '留存数据',
+          icon:'retention2',
+          noCache: true,
+          roles: ['director', 'operatorleader']
+        }
+      },
+      {
+        path: 'guanggaoshuju',
+        component: () => import('@/views/table/datamanager/newDataManager/advertiseData'),
+        name: 'guanggaoshuju',
+        meta: {
+          title: '广告数据',
+          icon:'ad1',
+          noCache: true,
+          roles: ['director', 'operatorleader']
+        }
+      },
+      {
+        path: 'guanggaoweishuju',
+        component: () => import('@/views/table/datamanager/newDataManager/placementData'),
+        name: 'guanggaoweishuju',
+        meta: {
+          title: '广告位数据',
+          icon:'placement1',
+          noCache: true,
+          roles: ['director', 'operatorleader']
+        }
+      },
+
     ]
   },
   {
@@ -241,6 +286,18 @@ export const asyncRouterMap = [
           title: '应用列表',
           icon: 'table',
           roles: ['director', 'operatorleader', 'operator', 'planner']
+        }
+      },
+
+      {
+        path: 'adTypeTable',
+        component: () => import('@/views/table/projectmanager/adTypeTable'),
+        name: 'AdTypeTable',
+        meta: {
+          title: '广告类型列表',
+          noCache: true,
+          icon: 'type',
+          roles: ['director', 'operatorleader'],
         }
       },
       {
@@ -332,72 +389,6 @@ export const asyncRouterMap = [
     ]
   },
   {
-    path: '/conpany',
-    component: Layout,
-    redirect: '/Company/companyInfo',
-    name: 'Company',
-    meta: {
-      title: '发布帐号',
-      roles: ['operatorleader', 'director', 'operator'],
-    },
-    children: [
-      {
-        path: 'companyInfo',
-        component: () => import('@/views/table/sdkmanager/companyinfo'),
-        name: 'conpanyInfoManage',
-        meta: {
-          title: '发布帐号',
-          icon: 'companyinfo',
-          roles: ['operatorleader', 'director', 'operator'],
-        }
-      }
-    ]
-  },
-  {
-    path: '/appmanager',
-    component: Layout,
-    redirect: '/appmanager/projectTable',
-    name: 'Example',
-    meta: {
-      title: '项目管理',
-      icon: 'list4',
-    },
-    children: [
-      {
-        path: 'projectTable',
-        component: () => import('@/views/table/projectmanager/projectTable'),
-        name: 'ProjectTable',
-        meta: {
-          title: '项目列表',
-          noCache: true,
-          icon: 'project2',
-        }
-      },
-      {
-        path: 'channelTable',
-        component: () => import('@/views/table/projectmanager/channelTable'),
-        name: 'ChannelTable',
-        meta: {
-          title: '渠道列表',
-          noCache: true,
-          icon: 'channel',
-          roles: ['director', 'operatorleader'],
-        }
-      },
-      {
-        path: 'adTypeTable',
-        component: () => import('@/views/table/projectmanager/adTypeTable'),
-        name: 'AdTypeTable',
-        meta: {
-          title: '广告类型列表',
-          noCache: true,
-          icon: 'type',
-          roles: ['director', 'operatorleader'],
-        }
-      }
-    ]
-  },
-  {
     path: '/accountmanager',
     component: Layout,
     redirect: '/accountmanager/accountTable',
@@ -443,13 +434,86 @@ export const asyncRouterMap = [
     ]
   },
   {
+    path: '/appmanager',
+    component: Layout,
+    redirect: '/appmanager/projectTable',
+    name: 'Example',
+    meta: {
+      title: '项目管理',
+      icon: 'list4',
+    },
+    children: [
+      {
+        path: 'projectTable',
+        component: () => import('@/views/table/projectmanager/projectTable'),
+        name: 'ProjectTable',
+        meta: {
+          title: '项目列表',
+          noCache: true,
+          icon: 'project2',
+        }
+      },
+
+    ]
+  },
+  {
+    path: '/AppManager',
+    component: Layout,
+    redirect: '/AppManager/ProjectConfigList',
+    name: 'Component',
+    meta: {
+      title: '应用管理',
+      icon: 'excel',
+    },
+    children: [
+      {
+        path: 'projectconfig',
+        component: () => import('@/views/table/sdkmanager/projectconfigtable'),
+        name: 'ProjectConfigManager',
+        meta: {
+          title: '应用列表',
+          icon: 'sdkset1',
+        }
+      }, {
+        path: 'projectconfiglist',
+        component: () => import('@/views/table/sdkmanager/projectconfigtable_publish'),
+        name: 'ProjectConfigList',
+        meta: {
+          title: '应用配置记录',
+          icon: 'sdkshow',
+        }
+      },
+      {
+        path: 'notRemindApp',
+        component: () => import('@/views/table/sdkmanager/notRemindApp'),
+        name: 'NotRemindApp',
+        meta: {
+          title: '待提醒应用',
+          icon: 'remind',
+        }
+      },
+      {
+        path: 'remindedApp',
+        component: () => import('@/views/table/sdkmanager/remindedApp'),
+        name: 'RemindedApp',
+        meta: {
+          title: '已提醒应用',
+          icon: 'reminded',
+        }
+      },
+
+
+    ]
+  },
+  {
     path: '/sdkmanager',
     component: Layout,
-    redirect: '/sdkmanager/projectconfiglist',
+    redirect: '/sdkmanager/sdklist',
     name: 'Component',
     meta: {
       title: 'SDK管理',
       icon: 'excel',
+      roles: ['operatorleader', 'director', 'operator','admin'],
     },
     children: [
       {
@@ -457,43 +521,48 @@ export const asyncRouterMap = [
         component: () => import('@/views/table/sdkmanager/sdklisttable'),
         name: 'SDKManager',
         meta: {
-          title: 'SDK模版列表',
+          title: 'SDK类型',
           icon: 'model4',
-          roles: ['director', 'sdksuport'],
+        }
+      },
+    ]
+  },
+  {
+    path: '/publishManager',
+    component: Layout,
+    redirect: '/publishManager/companyInfo',
+    name: 'Component',
+    meta: {
+      title: '发行管理',
+      icon: 'excel',
+    },
+    children: [
+      {
+        path: 'companyInfo',
+        component: () => import('@/views/table/sdkmanager/companyinfo'),
+        name: 'conpanyInfoManage',
+        meta: {
+          title: '发布帐号',
+          icon: 'companyinfo',
+          roles: ['director', 'operatorleader', 'operator'],
         }
       },
       {
-        path: 'projectconfig',
-        component: () => import('@/views/table/sdkmanager/projectconfigtable'),
-        name: 'ProjectConfigManager',
+        path: 'channelTable',
+        component: () => import('@/views/table/projectmanager/channelTable'),
+        name: 'ChannelTable',
         meta: {
-          title: 'SDK配置表',
-          icon: 'sdkset1',
+          title: '渠道列表',
+          noCache: true,
+          icon: 'channel',
           roles: ['director', 'operatorleader', 'operator'],
         }
-      }, {
-        path: 'projectconfiglist',
-        component: () => import('@/views/table/sdkmanager/projectconfigtable_publish'),
-        name: 'ProjectConfigList',
-        meta: {
-          title: '配置表发布记录',
-          icon: 'sdkshow',
-        }
-      }, {
-        path: 'projectconfigview',
-        hidden: true,
-        component: () => import('@/views/table/sdkmanager/projectShow'),
-        name: 'ProjectConfigView',
-        meta: {
-          title: '详细信息',
-          icon: 'sdkshow',
-        }
-      }, {
+      },
+     {
         path: 'keyStore',
         component: () => import('@/views/table/sdkmanager/keystore'),
         name: 'keyStoreManage',
         meta: {
-          roles: ['director', 'operatorleader', 'operator'],
           title: 'KeyStore管理',
           icon: 'keystore',
         }
@@ -581,11 +650,12 @@ export const asyncRouterMap = [
     meta: {
       title: '合作信息',
       icon: '',
+      roles: ['admin']
     },
     children: [
       {
         path: 'co_companyInfo',
-        component: () => import('@/views/cooperation/co_companyInfo'),
+        component: () => import('@/views/cooperation/co_companyInfo1'),
         name: 'co_companyInfo',
         meta: {
           title: '合作公司',
@@ -593,51 +663,59 @@ export const asyncRouterMap = [
         }
       },
       {
-        path: 'co_appInfo',
-        component: () => import('@/views/cooperation/co_appInfo'),
-        name: 'co_appInfo',
+        path: 'co_advertising',
+        component: () => import('@/views/cooperation/co_advertising'),
+        name: 'co_advertising',
         meta: {
-          title: '合作应用',
+          title: '合作广告位',
           icon: '',
         }
       },
       {
-        path: 'co_fileupload',
-        component: () => import('@/views/cooperation/co_fileupload'),
-        name: 'co_fileupload',
+        path: 'co_dataSync',
+        component: () => import('@/views/cooperation/co_dataSync'),
+        name: 'co_dataSync',
         meta: {
-          title: '信息上传',
+          title: '数据同步',
           icon: '',
         }
       },
       {
-        path: 'channelPromo',
-        name: 'channelPromo',
-        redirect: '/redSystem/channelPromo/channelPromoEdit',
-        component: () => import('@/views/table/shieldingsystem/channelpromo/redsystem'),
+        path: 'co_data',
+        name: 'co_data',
+        redirect: '/cooperation/co_data/co_fileupload',
+        component: () => import('@/views/cooperation/co_data/co_data'),
         meta: {
-          title: '渠道互推',
-          icon: 'channelpromo',
+          title: '数据管理',
+          icon: '',
         },
         children: [
           {
-            path: 'channelPromoEdit',
-            component: () => import('@/views/table/shieldingsystem/channelpromo/channelPromoEdit/channelPromoEdit'),
-            name: 'channelPromoEdit',
+            path: 'co_fileupload',
+            component: () => import('@/views/cooperation/co_data/co_fileupload/co_fileupload'),
+            name: 'co_fileupload',
             meta: {
-              title: '应用列表',
-              icon: 'uploadfilemanager',
-            },
+              title: '信息上传',
+              icon: '',
+            }
           },
           {
-            path: 'channelPromoRecord',
-            component: () => import('@/views/table/shieldingsystem/channelpromo/channelPromoRecord/channelPromoRecord'),
-            name: 'channelPromoRecord',
+            path: 'co_appInfo',
+            component: () => import('@/views/cooperation/co_data/co_appInfo/co_appInfo'),
+            name: 'co_appInfo',
             meta: {
-              title: '发布记录',
-              icon: 'promorecord',
-              roles: ['operatorleader', 'director', 'operator'],
-            },
+              title: '合作应用',
+              icon: '',
+            }
+          },
+          {
+            path: 'co_channelInfo',
+            component: () => import('@/views/cooperation/co_data/co_channelInfo/co_channelInfo'),
+            name: 'co_channelInfo',
+            meta: {
+              title: '合作渠道',
+              icon: '',
+            }
           },
 
         ]

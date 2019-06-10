@@ -25,12 +25,12 @@
       <el-table-column type="expand" label="展开" width="100px">
         <template slot-scope="props">
           <el-form label-position="left" inline class="demo-table-expand">
-            <el-form-item label="项目名:">
-              <span>{{ props.row.project_name }}</span>
-            </el-form-item>
-            <el-form-item label="备注:">
-              <span>{{ props.row.note }}</span>
-            </el-form-item>
+            <!--<el-form-item label="项目名:">-->
+              <!--<span>{{ props.row.project_name }}</span>-->
+            <!--</el-form-item>-->
+            <!--<el-form-item label="备注:">-->
+              <!--<span>{{ props.row.note }}</span>-->
+            <!--</el-form-item>-->
             <div style="padding-top: 15px">
               <el-table
                 stripe
@@ -38,8 +38,16 @@
                 :data="props.row.applist"
                 style="width: 100%;margin-bottom: 30px">
                 <el-table-column
-                  prop="package_name"
-                  label="包名">
+                  label="图标">
+                  <template slot-scope="scope">
+                    <span @click="bigPicture(scope.row.path)" style="width: 100%" v-if="scope.row.icon!=='暂无'"><img :src="iconPath+scope.row.icon"  min-width="70" height="70" /></span>
+                    <span @click="bigPicture(scope.row.path)" style="width: 100%" v-if="scope.row.icon==='暂无'">暂无</span>
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  prop="app_name"
+                  label="应用名"
+                  style="width: 15%">
                 </el-table-column>
                 <el-table-column
                   prop="channel"
@@ -47,28 +55,28 @@
                   style="width: 15%">
                 </el-table-column>
                 <el-table-column
-                  prop="app_name"
-                  label="游戏名"
-                  style="width: 15%">
+                  width="350"
+                  prop="package_name"
+                  label="包名">
                 </el-table-column>
-                <el-table-column
-                  label="文件"
-                  width="150">
-                  <template slot-scope="scope3">
-                    <span>
-                      <el-button type="warning" @click="showFileListVisible(scope3.row)">上传文件</el-button>
-                    </span>
-                  </template>
-                </el-table-column>
+                <!--<el-table-column-->
+                  <!--label="文件"-->
+                  <!--width="150">-->
+                  <!--<template slot-scope="scope3">-->
+                    <!--<span>-->
+                      <!--<el-button type="warning" @click="showFileListVisible(scope3.row)">上传APK</el-button>-->
+                    <!--</span>-->
+                  <!--</template>-->
+                <!--</el-table-column>-->
                 <el-table-column
                   label="链接"
                   width="350">
                   <template slot-scope="scope2">
+                    <!--<span>-->
+                      <!--<el-button @click="link_Check(scope2.row)" type="info">查看配置表发布记录</el-button>-->
+                    <!--</span>-->
                     <span>
-                      <el-button @click="link_Check(scope2.row)" type="info">查看配置表发布记录</el-button>
-                    </span>
-                    <span v-if="checkPermission(['director','operatorleader','admin'])">
-                    <el-button @click="link_Edit(scope2.row)" type="success">编辑配置表</el-button>
+                    <el-button @click="link_Edit(scope2.row)" type="success">详情</el-button>
                     </span>
                   </template>
                 </el-table-column>
@@ -208,17 +216,17 @@
           </div>
         </el-dialog>
         <el-form-item
-          style="margin-top: 15px;width: 400px"
-          v-for="(domain, index) in project.applist"
-          :key="domain.key">
-          <div style="width: 1300px;margin-left: -100px">
-            <span style="font-weight: bolder">渠道：</span>
-            <el-input v-model="domain.channel" placeholder="请填写" style="width: 200px" disabled/>
-            <span style="font-weight: bolder">包名：</span>
-            <el-input v-model="domain.package_name" placeholder="请填写" style="width: 400px" disabled/>
-            <el-button @click.prevent="removeDomain(domain)">删除</el-button>
-          </div>
-        </el-form-item>
+        style="margin-top: 15px;width: 400px"
+        v-for="(domain, index) in project.applist"
+        :key="domain.key">
+        <div style="width: 1300px;margin-left: -100px">
+          <span style="font-weight: bolder">渠道：</span>
+          <el-input v-model="domain.channel" placeholder="请填写" style="width: 200px" disabled/>
+          <span style="font-weight: bolder">包名：</span>
+          <el-input v-model="domain.package_name" placeholder="请填写" style="width: 400px" disabled/>
+          <el-button @click.prevent="removeDomain(domain)">删除</el-button>
+        </div>
+      </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="closedialog()">{{ '取消'}}</el-button>
@@ -229,7 +237,7 @@
     </el-dialog>
     <el-dialog
       :close-on-click-modal=false
-      title="文件列表"
+      title="APK列表"
       :visible.sync="fileListVisible"
       width="80%">
       <el-upload
@@ -430,6 +438,7 @@
     },
     data() {
       return {
+        iconPath:'http://filehost.tomatojoy.com/file?path=',
         apkcheckForm: {},
         apkCheckVisible: false,
         hidfileListTableData: [],
@@ -748,14 +757,8 @@
 
             this.filetotalPages = response.total
             console.log(response.data)
-
           } else {
-            tothis.$notify({
-              title: '失败',
-              message: '获取文件上传记录列表失败',
-              type: 'error',
-              duration: 2000
-            })
+            console.error(response)
           }
         }).catch(error => {
           console.log(error)
@@ -798,12 +801,7 @@
                 })
               } else {
                 console.log(response3)
-                tothis.$notify({
-                  title: '失败',
-                  message: '请刷新页面后重试',
-                  type: 'error',
-                  duration: 2000
-                })
+
               }
             }).catch(error => {
               console.log(error)
@@ -815,12 +813,7 @@
               })
             })
           } else {
-            tothis.$notify({
-              title: '失败',
-              message: '获取基础信息失败！',
-              type: 'error',
-              duration: 2000
-            })
+            console.error(response2)
           }
         }).catch(error => {
           console.error(error)
@@ -876,8 +869,6 @@
             duration: 2000
           })
         })
-
-
       },//分页切换
       listCompanyInfo() {
         let tothis = this;
@@ -1087,12 +1078,15 @@
         })
       },//获取渠道名列表
       removeDomain(item) {
-        var index = this.project.applist.indexOf(item)
+        let index = this.project.applist.indexOf(item)
         if (index !== -1) {
           this.project.applist.splice(index, 1)
         }
       },//删除应用
       link_Check(val) {
+        console.log(val)
+        return
+
         let routeData = this.$router.resolve({
           name: 'ProjectConfigList',
           query: {package_name: val.package_name, channel: val.channel}
@@ -1112,7 +1106,6 @@
         if (expandedRows.length < 1) {
           return
         }
-        let index = expandedRows.length - 1
       },//展开行变化时触发
       createData() {
         this.fullscreenLoading = true

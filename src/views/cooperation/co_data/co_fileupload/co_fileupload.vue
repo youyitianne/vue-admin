@@ -10,7 +10,7 @@
                   background-color: white;border: 1px white">
           上传格式说明：<br/>
           1.头条内的代码位名称中的所有Banner手动替换为横幅<br/>
-          2.广点通需要另存为成.csv格式再上传，如果第三列为（媒体）则全部删除
+          2.渠道数据只能上传oppo和vivo
         </div>
         <el-button icon="el-icon-question" style="padding: 0px;border: none;background-color: #FFFF;margin-top: 20px">
           广告与用户数据上传说明
