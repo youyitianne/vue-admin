@@ -28,21 +28,22 @@
           v-for="item in platfromDialogList"
           :key="item.sdk_name"
           :label="item.sdk_mark"
-          :value="item.id">
+          :value="item.sdk_template_guid">
         </el-option>
       </el-select>
       <el-select v-model="placementTypeValue"
                  style="width: 200px"
                  filterable
+                 clearable
                  size="mini"
                  placeholder="请选择广告位类型"
                  value-key="name"
                  collapse-tags>
         <el-option
-          v-for="item in placementList"
-          :key="item.appkey"
-          :label="item.name"
-          :value="item">
+          v-for="item in adtypeList"
+          :key="item.adtype_guid"
+          :label="item.adtype_name"
+          :value="item.adtype_guid">
         </el-option>
       </el-select>
       <el-date-picker
@@ -96,7 +97,7 @@
             v-for="item in platfromDialogList"
             :key="item.sdk_name"
             :label="item.sdk_mark"
-            :value="item.id">
+            :value="item.sdk_template_guid">
           </el-option>
         </el-select>
       </div>
@@ -143,19 +144,19 @@
       fit
       highlight-current-row>
 
-      <el-table-column label="日期" width="200" align="center" prop="date">
+      <el-table-column label="日期" width="100" align="center" prop="date">
         <template slot-scope="scope" >
           <span>{{ scope.row.dateTime1 }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="应用" prop="id">
+      <el-table-column  width="180" align="center" label="应用" prop="id">
         <template slot-scope="scope">
           <span>{{ scope.row.app_name }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="应用" prop="id">
+      <el-table-column align="center" label="渠道" prop="id">
         <template slot-scope="scope">
           <span>{{ scope.row.channel_mark }}</span>
         </template>
@@ -167,15 +168,20 @@
         </template>
       </el-table-column>
 
-      <el-table-column width="110" label="广告位" align="center" prop="active_user">
+      <el-table-column width="200" label="广告位" align="center" prop="active_user">
         <template slot-scope="scope">
           {{ scope.row.placement_guid }}
         </template>
       </el-table-column>
-
-      <el-table-column width="110" label="广告位类型" align="center" prop="active_user">
+      <el-table-column width="180" label="广告位名称" align="center" prop="active_user">
         <template slot-scope="scope">
-          {{ scope.row.placement_type }}
+          {{ scope.row.placement_name }}
+        </template>
+      </el-table-column>
+
+      <el-table-column width="110" label="广告类型" align="center" prop="active_user">
+        <template slot-scope="scope">
+          {{ scope.row.adtype_name }}
         </template>
       </el-table-column>
 
@@ -228,6 +234,7 @@
 </template>
 <script>
   import {getPlatformHandler,getAppHandler,getAdvertisementHandler} from '@/api/table/datamanager/newDataManager/advertiseData'
+  import {getAdtypeHandler} from '@/api/table/datamanager/newDataManager/advertiseTypeData'
 
   export default {
     data() {
@@ -248,7 +255,7 @@
         fileList: [],
         platfromDialogList: [],
         appList: [],
-        platformList: [],
+        adtypeList: [],
         placementList: [],
         platformValue: '',
         appValue:'',
@@ -266,8 +273,24 @@
     mounted() {
       this.listPlatfrom()
       this.listApp()
+      this.listAdtype()
     },
     methods: {
+      listAdtype(){
+        getAdtypeHandler().then(response=>{
+          if (response.repcode===3000){
+            this.adtypeList=response.data
+          } else {
+            console.error(response)
+          }
+        }).catch(error=>{
+          console.log(error)
+          this.$message({
+            type: 'error',
+            message: `添加广告类型失败！`
+          });
+        })
+      },
       pageChange(page) {
         this.currentPage = page
         let tothis = this
@@ -284,7 +307,7 @@
           typeof (param.endDate)==='undefined'){
           this.$message({
             type: 'error',
-            message: `请选择搜索参数！`
+            message: `请选择日期范围！`
           });
           return
         }

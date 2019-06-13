@@ -200,7 +200,9 @@
           start_date: this.timevalue[0],
           end_date: this.timevalue[1],
         }
+        this.downloadLoading=true
         getgdt(param).then(response => {
+          this.downloadLoading=false
           if (response.repcode === 3000) {
             this.gdtlist=response.data
             this.handlegdtDownload()
@@ -209,6 +211,7 @@
             console.error(response)
           }
         }).catch(error => {
+          this.downloadLoading=false
           console.error(error)
         })
       },
@@ -371,8 +374,8 @@
           return
         }
         import('@/vendor/Export2Excel').then(excel => {
-          const tHeader = ['时间', '广告位类型', '广告位', '广告展示数', '点击量', '预计收入', '千次展示收益', '点击率']
-          const filterVal = ['Date', 'PlacementType', 'PlacementName', 'Pv', 'Click', 'Revenue', 'ECPM', 'ClickRate']
+          const tHeader = ['时间', '广告位类型', '广告位', '广告展示数', '点击量', '预计收入', '千次展示收益', '点击率','广告位ID']
+          const filterVal = ['Date', 'PlacementType', 'PlacementName', 'Pv', 'Click', 'Revenue', 'ECPM', 'ClickRate','PlacementId']
           const data = this.formatJson(filterVal, this.gdtlist)
           excel.export_json_to_excel({
             header: tHeader,

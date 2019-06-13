@@ -370,7 +370,7 @@
               <a style="color: #0000CC;font-size: 14px;margin-top: 14%;display: inline-block;text-decoration:underline"
                  :download=scope.row.filename
                  :href=downloadPath+scope.row.filename+downloadPath1+scope.row.apkguid
-                 target="_blank" >下载</a>
+                 target="_blank">下载</a>
             </div>
 
             <!--<el-button type="success" size="mini" @click="downloadAPK(scope.row)" :disabled="downloadAPKLoading">{{-->
@@ -674,7 +674,7 @@
           channelName: this.uploadChannelName,
           packageName: this.uploadPackageName
         }
-        console.log("发布记录参数",param1)
+        console.log("发布记录参数", param1)
         getProjectPublishLimitMeth(param1).then(response => {
           if (response.repcode === 3000) {
             let cacheList = response.data
@@ -708,10 +708,10 @@
                 // console.log('publishList[0].SHA256  '+publishList[0].SHA256)
                 // console.log('++++++++++++++++++++++++')
                 if (
-                  fileList.applicationLable === publishList[0].app_name.trim()&&
+                  fileList.applicationLable === publishList[0].app_name.trim() &&
                   fileList.basic_packageName === publishList[0].package_name.trim() &&
                   fileList.versionCode === publishList[0].versioncode_update_version.trim() &&
-                  fileList.versionName === publishList[0].version_update.trim()&&
+                  fileList.versionName === publishList[0].version_update.trim() &&
                   fileList.MD5 === publishList[0].MD5.trim() &&
                   fileList.SHA1 === publishList[0].SHA1.trim() &&
                   fileList.SHA256 === publishList[0].SHA256.trim()) {
@@ -771,21 +771,21 @@
               console.log('最新key表', publishList[0])
               console.log('app信息', fileList)
               console.log('++++++++++++++++++++++++')
-              console.log('fileList.applicationLable  '+fileList.applicationLable)
-              console.log('fileList.basic_packageName  '+fileList.basic_packageName)
-              console.log('fileList.versionCode  '+fileList.versionCode)
-              console.log('fileList.versionName  '+fileList.versionName)
-              console.log('fileList.MD5  '+fileList.MD5)
-              console.log('fileList.SHA1  '+fileList.SHA1)
-              console.log('fileList.SHA256  '+fileList.SHA256)
+              console.log('fileList.applicationLable  ' + fileList.applicationLable)
+              console.log('fileList.basic_packageName  ' + fileList.basic_packageName)
+              console.log('fileList.versionCode  ' + fileList.versionCode)
+              console.log('fileList.versionName  ' + fileList.versionName)
+              console.log('fileList.MD5  ' + fileList.MD5)
+              console.log('fileList.SHA1  ' + fileList.SHA1)
+              console.log('fileList.SHA256  ' + fileList.SHA256)
 
-              console.log('publishList[0].app_name  '+publishList[0].app_name)
-              console.log('publishList[0].package_name  '+publishList[0].package_name)
-              console.log('publishList[0].versioncode_update_version  '+publishList[0].versioncode_update_version)
-              console.log('publishList[0].version_update  '+publishList[0].version_update)
-              console.log('publishList[0].MD5  '+publishList[0].MD5)
-              console.log('publishList[0].SHA1  '+publishList[0].SHA1)
-              console.log('publishList[0].SHA256  '+publishList[0].SHA256)
+              console.log('publishList[0].app_name  ' + publishList[0].app_name)
+              console.log('publishList[0].package_name  ' + publishList[0].package_name)
+              console.log('publishList[0].versioncode_update_version  ' + publishList[0].versioncode_update_version)
+              console.log('publishList[0].version_update  ' + publishList[0].version_update)
+              console.log('publishList[0].MD5  ' + publishList[0].MD5)
+              console.log('publishList[0].SHA1  ' + publishList[0].SHA1)
+              console.log('publishList[0].SHA256  ' + publishList[0].SHA256)
               console.log('++++++++++++++++++++++++')
               if (fileList.applicationLable === publishList[0].app_name.trim() &&
                 fileList.packageName === publishList[0].package_name.trim() &&
@@ -795,15 +795,15 @@
                 fileList.sha1 === publishList[0].SHA1.trim() &&
                 fileList.sha256 === publishList[0].SHA256.trim()) {
                 console.log('上传的包信息校验成功')
-                let keyList= publishList[0].paramter
-                let appKey='';
-                for (let i=0;i<keyList.length;i++){
-                  if (keyList[i].param_name==='友盟统计-AppKey'){
-                    appKey=keyList[i].param;
+                let keyList = publishList[0].paramter
+                let appKey = '';
+                for (let i = 0; i < keyList.length; i++) {
+                  if (keyList[i].param_name === '友盟统计-AppKey') {
+                    appKey = keyList[i].param;
                     break
                   }
                 }
-                if (appKey===''){
+                if (appKey === '') {
                   tothis.$notify({
                     title: '',
                     message: '该应用未填写友盟统计key,无法添加到待提醒列表',
@@ -813,13 +813,13 @@
                   return
                 }
                 let remindParam = {
-                  configguid:this.searchguid,//配置表的guid
-                  sdkguid:publishList[0].sdkguid,//发布记录的guid
+                  configguid: this.searchguid,//配置表的guid
+                  sdkguid: publishList[0].sdkguid,//发布记录的guid
                   icon: publishList[0].icon,
-                  appName:  publishList[0].app_name,
-                  channelName:  publishList[0].channel_mark,
-                  versionCode:  publishList[0].version_update,
-                  packageName:  publishList[0].package_name,
+                  appName: publishList[0].app_name,
+                  channelName: publishList[0].channel_mark,
+                  versionCode: publishList[0].version_update,
+                  packageName: publishList[0].package_name,
                   appKey: appKey,
                 }
                 tothis.$notify({
@@ -828,18 +828,18 @@
                   duration: 2000
                 })
                 console.log(remindParam)
-                addNotRemindAppMeth(remindParam).then(response=>{
-                  if(response.repcode===3000){
+                addNotRemindAppMeth(remindParam).then(response => {
+                  if (response.repcode === 3000) {
                     tothis.$notify({
                       title: '成功',
                       message: '添加应用到待提醒列表成功',
                       type: 'success',
                       duration: 2000
                     })
-                  }else{
+                  } else {
                     console.log(repcode)
                   }
-                }).catch(error=>{
+                }).catch(error => {
                   console.log(error)
                   tothis.$notify({
                     title: '失败',
@@ -1050,7 +1050,7 @@
         this.uploadChannelName = param.channel_mark
         this.uploadPackageName = param.package_name
         this.searchguid = param.sdkguid
-        console.log('该应用的guid',this.searchguid)
+        console.log('该应用的guid', this.searchguid)
         this.filepageChange(1)
         console.log(param)
       },//展示文件上传列表
@@ -1201,6 +1201,7 @@
             if (this.options[j].sdk_name === this.checkedSdkTemplate[i]) {
               let param_name = this.options[j].sdk_name
               let newele = {
+                options:this.options[j],
                 param_name: this.options[j].sdk_name + '-' + this.options[j].param_name,
                 param: this.options[j].value,
                 sdk_type: '1',
@@ -1535,6 +1536,7 @@
         this.dialog_secondary_checked = checked
         //结束
         this.sdk.id = param.id
+        this.sdk.sdkguid = param.sdkguid
         this.sdk.timevalue = param.date
         this.sdk.channel_mark = param.channel_mark
         this.sdk.package_name = param.package_name

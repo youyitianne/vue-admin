@@ -264,6 +264,17 @@ export const asyncRouterMap = [
           roles: ['director', 'operatorleader']
         }
       },
+      {
+        path: 'adTypeTable',
+        component: () => import('@/views/table/datamanager/newDataManager/advertiseTypeData.vue'),
+        name: 'guanggaoleixingshuju',
+        meta: {
+          title: '广告类型数据',
+          noCache: true,
+          icon: 'type',
+          roles: ['director', 'operatorleader'],
+        }
+      },
 
     ]
   },

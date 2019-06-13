@@ -1,9 +1,22 @@
 <template>
   <div class="app-container">
     <div class="filter-container" style="margin: 15px;margin-top: -5px">
-      <el-input placeholder="根据广告平台查找" v-model="searchPlatform" style="width: 200px;margin-left: 20px"
-                class="filter-item" size="mini"
-                clearable/>
+      <el-select v-model="searchPlatform"
+                 style="width: 200px"
+                 size="mini"
+                 filterable
+                 clearable
+                 placeholder="请选择广告平台"
+                 value-key="sdk_name"
+                 collapse-tags>
+        <el-option
+          v-for="item in platfromDialogList"
+          :key="item.sdk_name"
+          :label="item.sdk_mark"
+          :value="item.sdk_mark">
+        </el-option>
+      </el-select>
+
       <el-input placeholder="根据广告位ID查找" v-model="searchPlacementId" style="width: 200px;margin-left: 5px"
                 class="filter-item" size="mini"
                 clearable/>
@@ -26,53 +39,52 @@
         border
         fit
         highlight-current-row>
-        <el-table-column label="广告平台" align="center" prop="date">
-          <template slot-scope="scope">
-            <span>{{ scope.row.sdk_mark }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="广告平台ID" align="center" prop="date">
-          <template slot-scope="scope">
-            <span>{{ scope.row.platform_id }}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column label="广告位ID" align="center" prop="id">
-          <template slot-scope="scope">
-            <span>{{ scope.row.placement_id }}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column label="广告位名称" align="center" prop="channel">
+        <el-table-column label="广告位名称" align="center" prop="placement_name" >
           <template slot-scope="scope">
             <span>{{ scope.row.placement_name}}</span>
           </template>
         </el-table-column>
-
-        <el-table-column label="广告类型" align="center" prop="active_user">
+        <el-table-column label="广告位ID" align="center" prop="placement_id" width="300">
           <template slot-scope="scope">
-            {{ scope.row.placement_type }}
+            <span>{{ scope.row.placement_id }}</span>
           </template>
         </el-table-column>
-
-        <el-table-column label="所属应用ID" align="center" prop="install">
+        <el-table-column label="广告平台" align="center" prop="sdk_mark" width="200">
           <template slot-scope="scope">
-            <span>{{ scope.row.app_id }}</span>
+            <span>{{ scope.row.sdk_mark }}</span>
           </template>
         </el-table-column>
-
-        <el-table-column label="渠道" align="center" prop="install">
+        <el-table-column label="渠道" align="center" prop="channel_mark" width="100">
           <template slot-scope="scope">
             <span>{{ scope.row.channel_mark }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="所属应用名称" align="center" prop="launch">
+        <el-table-column label="所属应用名称" align="center" prop="app_name" width="150">
           <template slot-scope="scope">
             <span>{{ scope.row.app_name }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center" width="280px" class-name="small-padding fixed-width">
+
+        <el-table-column label="广告类型" align="center" prop="adtype_name" width="100">
+          <template slot-scope="scope">
+            {{ scope.row.adtype_name }}
+          </template>
+        </el-table-column>
+
+        <!--<el-table-column label="广告平台ID" align="center" prop="date" width="100">-->
+          <!--<template slot-scope="scope">-->
+            <!--<span>{{ scope.row.platform_id }}</span>-->
+          <!--</template>-->
+        <!--</el-table-column>-->
+
+        <!--<el-table-column label="所属应用ID" align="center" prop="install" width="300">-->
+          <!--<template slot-scope="scope">-->
+            <!--<span>{{ scope.row.app_id }}</span>-->
+          <!--</template>-->
+        <!--</el-table-column>-->
+
+        <el-table-column label="操作" align="center" width="160px" class-name="small-padding fixed-width">
           <template slot-scope="scope">
             <el-button type="success" size="mini" @click="showUpdateMeth(scope.row)">{{ "编辑" }}
             </el-button>
@@ -119,16 +131,28 @@
                         prop="placement_name">
             <el-input v-model="placement.placement_name"/>
           </el-form-item>
-          <el-form-item label="广告位类型" prop="placement_type">
-            <el-input v-model="placement.placement_type"/>
-            <!--:rules="{required: true, message: '广告类型不能为空', trigger: 'blur'}"-->
+          <el-form-item label="广告位类型" prop="placement_type"     :rules="{required: true, message: '广告类型不能为空', trigger: 'blur'}">
+
+          <el-select v-model="placement.placement_type"
+                     style="width: 260px"
+                     filterable
+                     placeholder="请选择广告位类型"
+                     value-key="name"
+                     collapse-tags>
+            <el-option
+              v-for="item in adtypeList"
+              :key="item.adtype_guid"
+              :label="item.adtype_name"
+              :value="item.adtype_guid">
+            </el-option>
+          </el-select>
           </el-form-item>
           <el-form-item label="所属应用" :rules="{required: true, message: '所属应用不能为空', trigger: 'blur'}"
                         prop="app">
             <el-select v-model="placement.app"
                        style="width: 260px"
                        filterable
-                       placeholder="请选择广告平台"
+                       placeholder="请选择所属应用"
                        value-key="sdkguid"
                        collapse-tags>
               <el-option
@@ -158,7 +182,7 @@
     editPlacementHandler,
     getPlacementHandler
   } from '@/api/table/datamanager/newDataManager/placementData'
-
+  import {getAdtypeHandler} from '@/api/table/datamanager/newDataManager/advertiseTypeData'
   export default {
     data() {
       return {
@@ -175,15 +199,32 @@
         searchPlacementId: '',
         searchAppName: '',
         searchChannelName: '',
-        listLoading:false
+        listLoading:false,
+        adtypeList:[],
       }
     },
     mounted() {
       this.listPlatfrom()
       this.listApp()
       this.pageChange(1);
+      this.listAdtype()
     },
     methods: {
+      listAdtype(){
+        getAdtypeHandler().then(response=>{
+          if (response.repcode===3000){
+            this.adtypeList=response.data
+          } else {
+            console.error(response)
+          }
+        }).catch(error=>{
+          console.log(error)
+          this.$message({
+            type: 'error',
+            message: `添加广告类型失败！`
+          });
+        })
+      },
       searchMeth(){
         this.pageChange(1)
       },
@@ -233,7 +274,7 @@
               placement_name: this.placement.placement_name,
               placement_type: this.placement.placement_type,
               app_id: this.placement.app.sdkguid,
-              platform_id: this.placement.platform.id,
+              platform_id: this.placement.platform.sdk_template_guid,
             }
             console.log("编辑提交参数", param)
             editPlacementHandler(param).then(response => {
@@ -278,7 +319,7 @@
         for (let i = 0; i < this.platfromDialogList.length; i++) {
           console.log(this.platfromDialogList[i].id)
           console.log(param.platform_id)
-          if (this.platfromDialogList[i].id + '' === param.platform_id) {
+          if (this.platfromDialogList[i].sdk_template_guid + '' === param.platform_id) {
             this.placement.platform = this.platfromDialogList[i]
             break
           }
@@ -324,7 +365,7 @@
               placement_name: this.placement.placement_name,
               placement_type: this.placement.placement_type,
               app_id: this.placement.app.sdkguid,
-              platform_id: this.placement.platform.id,
+              platform_id: this.placement.platform.sdk_template_guid,
             }
             addPlacementHandler(param).then(response => {
               if (response.repcode === 3000) {
@@ -367,6 +408,10 @@
         if (this.appDialogList.length > 0) {
           console.log(this.appDialogList[0])
           this.placement.app = this.appDialogList[0]
+        }
+        if (this.adtypeList.length > 0) {
+          console.log(this.adtypeList[0])
+          this.placement.placement_type = this.adtypeList[0]
         }
         this.placementState = 'add'
         this.placementDialog = true
