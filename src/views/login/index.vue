@@ -96,7 +96,7 @@
       }
     },
     mounted() {
-      this.getInnerIp()
+    //  this.getInnerIp()
     },
     methods: {
       checkPermission,
@@ -108,30 +108,34 @@
         }
       },
       handleLogin() {
-        try {
-          let outip = returnCitySN["cip"]
-          setMyOutIp(outip)
-        } catch (e) {
-          setMyOutIp('0.0.0.0')
-        }
-        let innerip = this.innerip
-        if (innerip.length != 0) {
-          setMyInnerIp(innerip)
-        } else {
-          setMyInnerIp('0.0.0.0')
-        }
+        // try {
+        //   let outip = returnCitySN["cip"]
+        //   setMyOutIp(outip)
+        // } catch (e) {
+        //   setMyOutIp('0.0.0.0')
+        // }
+        // let innerip = this.innerip
+        // if (innerip.length != 0) {
+        //   setMyInnerIp(innerip)
+        // } else {
+        //   setMyInnerIp('0.0.0.0')
+        // }
         //登录按钮
         let tothis = this
+        console.log('开始验证+++++++++++++')
         this.$refs.loginForm.validate(valid => {
           if (valid) {
+            console.log('信息验证完成+++++++++++++')
             this.loading = true
+            console.log('调用登录方法+++++++++++++')
+            console.log(this.loginForm)
             this.$store.dispatch('Login', this.loginForm).then(() => {
+              console.log('登录成功+++++++++++++')
               this.loading = false
-
               this.$router.push({path: '/homepage/route'})
-
               //this.$router.push({ path: this.redirect || '/example/table' })
             }).catch(err => {
+              console.log('登录失败+++++++++++++',err)
               console.log(err)
               tothis.$notify({
                 title: '失败',
@@ -142,6 +146,7 @@
               this.loading = false
             })
           } else {
+            console.log('信息验证失败+++++++++++++')
             return false
           }
         })

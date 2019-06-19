@@ -222,6 +222,7 @@
         getProjectPublishLimitMeth(param).then(response=>{
           if(response.repcode===3000){
             this.hidlist=response.data
+            console.log('配置表发布记录',response.data)
             this.getDatawithParam();
             this.totalPages=response.total
           }else {

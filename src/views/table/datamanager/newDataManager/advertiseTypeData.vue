@@ -4,7 +4,6 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit"
                  @click="showCreateAdtype">{{addButton}}
       </el-button>
-
     </div>
     <el-table
       height="750"
@@ -44,29 +43,29 @@
       :current-page="currentPage"
       @current-change="pageChange">
     </el-pagination>
-
-
     <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :model="adtype" label-position="left" label-width="120px"
                style="width: 400px; margin-left:50px;">
-        <el-form-item label="广告类型名称" :rules="{required: true, message: '广告类型名称不能为空', trigger: 'blur'}" prop="adtype_name">
+        <el-form-item label="广告类型名称" :rules="{required: true, message: '广告类型名称不能为空', trigger: 'blur'}"
+                      prop="adtype_name">
           <el-input v-model="adtype.adtype_name" placeholder="请输入广告类型名称~"/>
         </el-form-item>
       </el-form>
-
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">{{ '取消'}}</el-button>
         <el-button type="primary" @click="dialogStatus==='create'?createAdtype():updateAdtype()">{{ '确认' }}</el-button>
       </div>
     </el-dialog>
-
   </div>
-
-
 </template>
 
 <script>
-  import {addAdtypeHandler, getAdtypeHandler,delAdtypeHandler,editAdtypeHandler} from '@/api/table/datamanager/newDataManager/advertiseTypeData'
+  import {
+    addAdtypeHandler,
+    getAdtypeHandler,
+    delAdtypeHandler,
+    editAdtypeHandler
+  } from '@/api/table/datamanager/newDataManager/advertiseTypeData'
   import {parseTime} from '@/utils'
 
   export default {
@@ -75,36 +74,36 @@
         pageSize: 20,
         totalPages: 0,
         currentPage: 1,
-        listLoading:false,
-        addButton:'添加广告位类型',
-        tableList:[],
-        dialogTitle:'广告位类型',
-        adtype:{},
-        dialogFormVisible:false,
-        dialogStatus:'create',
+        listLoading: false,
+        addButton: '添加广告位类型',
+        tableList: [],
+        dialogTitle: '广告位类型',
+        adtype: {},
+        dialogFormVisible: false,
+        dialogStatus: 'create',
       }
     },
     mounted() {
       this.pageChange(1)
     },
     methods: {
-      showCreateAdtype(){
-        this.adtype={}
+      showCreateAdtype() {
+        this.adtype = {}
         this.$nextTick(() => {
           this.$refs['dataForm'].clearValidate()
         })
-        this.dialogFormVisible=true
-        this.dialogStatus='create'
+        this.dialogFormVisible = true
+        this.dialogStatus = 'create'
       },//展示添加广告位类型
-      createAdtype(){
-        console.log('创建广告类型',this.adtype)
+      createAdtype() {
+        console.log('创建广告类型', this.adtype)
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             let param = {
-              adtype_name:this.adtype.adtype_name
+              adtype_name: this.adtype.adtype_name
             }
-            addAdtypeHandler(param).then(response=>{
-              if (response.repcode===3000){
+            addAdtypeHandler(param).then(response => {
+              if (response.repcode === 3000) {
                 this.$message({
                   type: 'success',
                   message: `添加广告位成功！`
@@ -118,7 +117,7 @@
                 });
                 console.error(response)
               }
-            }).catch(error=>{
+            }).catch(error => {
               console.log(error)
               this.$message({
                 type: 'error',
@@ -132,24 +131,24 @@
         });
 
       },
-      showUpdateAdtype(param){
-        this.adtype=param
+      showUpdateAdtype(param) {
+        this.adtype = param
         this.$nextTick(() => {
           this.$refs['dataForm'].clearValidate()
         })
-        this.dialogFormVisible=true
-        this.dialogStatus='update'
+        this.dialogFormVisible = true
+        this.dialogStatus = 'update'
       },
-      updateAdtype(){
-        console.log('更新广告类型',this.adtype)
+      updateAdtype() {
+        console.log('更新广告类型', this.adtype)
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             let param = {
-              adtype_name:this.adtype.adtype_name,
-              adtype_guid:this.adtype.adtype_guid
+              adtype_name: this.adtype.adtype_name,
+              adtype_guid: this.adtype.adtype_guid
             }
-            editAdtypeHandler(param).then(response=>{
-              if (response.repcode===3000){
+            editAdtypeHandler(param).then(response => {
+              if (response.repcode === 3000) {
                 this.$message({
                   type: 'success',
                   message: `编辑广告位成功！`
@@ -159,7 +158,7 @@
               } else {
                 console.error(response)
               }
-            }).catch(error=>{
+            }).catch(error => {
               console.log(error)
               this.$message({
                 type: 'error',
@@ -172,14 +171,14 @@
           }
         });
       },
-      deleteAdtype(paramter){
+      deleteAdtype(paramter) {
         this.$confirm('确认删除？')
-          .then(()=> {
+          .then(() => {
             let param = {
-              adtype_guid:paramter.adtype_guid
+              adtype_guid: paramter.adtype_guid
             }
-            delAdtypeHandler(param).then(response=>{
-              if (response.repcode===3000){
+            delAdtypeHandler(param).then(response => {
+              if (response.repcode === 3000) {
                 this.$message({
                   type: 'success',
                   message: `删除广告位成功！`
@@ -189,7 +188,7 @@
               } else {
                 console.error(response)
               }
-            }).catch(error=>{
+            }).catch(error => {
               console.log(error)
               this.$message({
                 type: 'error',
@@ -197,7 +196,8 @@
               });
             })
           })
-          .catch(_ => {});
+          .catch(_ => {
+          });
       },
       pageChange(page) {
         this.currentPage = page

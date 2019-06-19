@@ -228,7 +228,7 @@ export const asyncRouterMap = [
           title: '用户数据',
           icon:'userData1',
           noCache: true,
-          roles: ['director', 'operatorleader']
+          roles: ['director']
         }
       },
       {
@@ -239,7 +239,7 @@ export const asyncRouterMap = [
           title: '留存数据',
           icon:'retention2',
           noCache: true,
-          roles: ['director', 'operatorleader']
+          roles: ['director']
         }
       },
       {
@@ -250,7 +250,7 @@ export const asyncRouterMap = [
           title: '广告数据',
           icon:'ad1',
           noCache: true,
-          roles: ['director', 'operatorleader']
+          roles: ['director']
         }
       },
       {
@@ -261,7 +261,7 @@ export const asyncRouterMap = [
           title: '广告位数据',
           icon:'placement1',
           noCache: true,
-          roles: ['director', 'operatorleader']
+          roles: ['director']
         }
       },
       {
@@ -272,7 +272,7 @@ export const asyncRouterMap = [
           title: '广告类型数据',
           noCache: true,
           icon: 'type',
-          roles: ['director', 'operatorleader'],
+          roles: ['director'],
         }
       },
 

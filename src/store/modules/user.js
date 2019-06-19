@@ -37,7 +37,6 @@ const user = {
   },
 
   actions: {
-
     // 动态修改权限
     ChangeRoles({ commit, dispatch }, role) {
       return new Promise(resolve => {
@@ -59,13 +58,20 @@ const user = {
     // 登录
     Login({ commit }, userInfo) {
       const username = userInfo.username.trim()
+      console.log('创建权限对象start+++++++++')
       return new Promise((resolve, reject) => {
+        console.log('创建权限对象end 发送登录请求+++++++++')
         login(username, userInfo.password).then(response => {
+          console.log('登录请求返回 +++++++++')
           const data = response.data
           setToken(data.token)
+          console.log('添加本地token start+++++++++')
           commit('SET_TOKEN', data.token)
+          console.log('添加本地token end+++++++++')
           resolve()
+          console.log(123)
         }).catch(error => {
+          console.error(error)
           reject(error)
         })
       })

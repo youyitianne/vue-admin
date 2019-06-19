@@ -16,6 +16,23 @@
           :value="item.sdkguid">
         </el-option>
       </el-select>
+
+      <el-select v-model="placement_guid"
+                 style="width: 200px"
+                 filterable
+                 clearable
+                 placeholder="请选择广告位"
+                 value-key="placement_guid"
+                 size="mini"
+                 collapse-tags>
+        <el-option
+          v-for="item in placementList"
+          :key="item.placement_guid"
+          :label="item.placement_name"
+          :value="item.placement_guid">
+        </el-option>
+      </el-select>
+
       <el-select v-model="platformValue"
                  style="width: 200px"
                  size="mini"
@@ -26,7 +43,7 @@
                  collapse-tags>
         <el-option
           v-for="item in platfromDialogList"
-          :key="item.sdk_name"
+          :key="item.sdk_template_guid"
           :label="item.sdk_mark"
           :value="item.sdk_template_guid">
         </el-option>
@@ -62,7 +79,7 @@
       </el-button>
 
       <el-button :loading="false" class="filter-item" type="primary" size="mini" style="float: right"
-                 @click="importDialog=true">导入EXCEL
+                 @click="showImport">导入EXCEL
       </el-button>
     </div>
 
@@ -108,6 +125,7 @@
         style="margin-left: 166px;display: inline-block"
         ref="upload"
         :action="url"
+        :accept="acceptType"
         :data="uploadParamter"
         :on-change="fileChange"
         :on-success="uploadSuccess"
@@ -156,26 +174,15 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="渠道" prop="id">
-        <template slot-scope="scope">
-          <span>{{ scope.row.channel_mark }}</span>
-        </template>
-      </el-table-column>
+      <!--<el-table-column align="center" label="渠道" prop="id">-->
+        <!--<template slot-scope="scope">-->
+          <!--<span>{{ scope.row.channel_mark }}</span>-->
+        <!--</template>-->
+      <!--</el-table-column>-->
 
       <el-table-column align="center" label="广告平台" prop="channel">
         <template slot-scope="scope">
           <span>{{ scope.row.sdk_mark }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column width="200" label="广告位" align="center" prop="active_user">
-        <template slot-scope="scope">
-          {{ scope.row.placement_guid }}
-        </template>
-      </el-table-column>
-      <el-table-column width="180" label="广告位名称" align="center" prop="active_user">
-        <template slot-scope="scope">
-          {{ scope.row.placement_name }}
         </template>
       </el-table-column>
 
@@ -184,6 +191,20 @@
           {{ scope.row.adtype_name }}
         </template>
       </el-table-column>
+
+      <!--<el-table-column width="200" label="广告位" align="center" prop="active_user">-->
+        <!--<template slot-scope="scope">-->
+          <!--{{ scope.row.placement_id }}-->
+        <!--</template>-->
+      <!--</el-table-column>-->
+
+      <el-table-column width="280" label="广告位名称" align="center" prop="active_user">
+        <template slot-scope="scope">
+          <a @click="jumptoPlacement(scope.row)">{{ scope.row.placement_name }}</a>
+        </template>
+      </el-table-column>
+
+
 
       <el-table-column align="center" label="展现量" prop="install">
         <template slot-scope="scope">
@@ -235,10 +256,14 @@
 <script>
   import {getPlatformHandler,getAppHandler,getAdvertisementHandler} from '@/api/table/datamanager/newDataManager/advertiseData'
   import {getAdtypeHandler} from '@/api/table/datamanager/newDataManager/advertiseTypeData'
+  import {
+    getPlacementHandler
+  } from '@/api/table/datamanager/newDataManager/placementData'
 
   export default {
     data() {
       return {
+        acceptType: '.csv,.xls,.xlsx',
         listLoading:false,
         pageSize: 20,
         totalPages: 0,
@@ -256,7 +281,6 @@
         platfromDialogList: [],
         appList: [],
         adtypeList: [],
-        placementList: [],
         platformValue: '',
         appValue:'',
         placementTypeValue: '',
@@ -268,14 +292,58 @@
         },
         platformDialogValue: '',
         tableLoading:false,
+        placement_guid:'',
+        placementList:[]
       }
     },
     mounted() {
+      this.getPlacementMeth()
+      this.routerWithParam()
       this.listPlatfrom()
       this.listApp()
       this.listAdtype()
     },
     methods: {
+      getPlacementMeth(){
+        getPlacementHandler().then(response=>{
+          if (response.repcode===3000){
+            this.placementList=response.data
+          } else {
+            console.error(response)
+          }
+        }).catch(error=>{
+          console.error(error)
+          this.$message({
+            type: 'error',
+            message: `添加广告类型失败！`
+          });
+        })
+      },
+      routerWithParam(){
+
+        let placement_guid = this.$route.query.placement_guid
+        if (typeof(placement_guid) != 'undefined') {
+          const end = new Date();
+          const start = new Date();
+          end.setTime(end.getTime() - 3600 * 1000 * 24 *1);
+          start.setTime(start.getTime() - 3600 * 1000 * 24 * 8);
+          this.searchTime=[start,end]
+          this.placement_guid = placement_guid
+          this.pageChange(1)
+        }
+      },
+      jumptoPlacement(param){
+        console.log('跳转参数',param)
+        let routeData = this.$router.resolve({
+          name: 'guanggaoweishuju',
+          query: {placement_id: param.placement_id}
+        });
+        window.open(routeData.href, '_blank');
+      },//跳转到广告位信息
+      showImport(){
+        this.importDialog=true
+        this.fileList=[]
+      },//展示导入数据对话框
       listAdtype(){
         getAdtypeHandler().then(response=>{
           if (response.repcode===3000){
@@ -302,6 +370,7 @@
           placementTypeValue: this.placementTypeValue,
           startDate:this.searchTime[0],
           endDate:this.searchTime[1],
+          placement_guid:this.placement_guid
         }
         if (typeof (param.startDate)==='undefined'||
           typeof (param.endDate)==='undefined'){

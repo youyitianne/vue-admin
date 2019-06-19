@@ -7,7 +7,6 @@ export function login(username, password) {
     data: {
       username,
       password,
-      return_url:'/'
     }
   })
 }

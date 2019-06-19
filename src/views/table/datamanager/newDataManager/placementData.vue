@@ -11,7 +11,7 @@
                  collapse-tags>
         <el-option
           v-for="item in platfromDialogList"
-          :key="item.sdk_name"
+          :key="item.sdk_mark"
           :label="item.sdk_mark"
           :value="item.sdk_mark">
         </el-option>
@@ -44,29 +44,29 @@
             <span>{{ scope.row.placement_name}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="广告位ID" align="center" prop="placement_id" width="300">
+        <el-table-column label="广告位ID" align="center" prop="placement_id" width="320">
           <template slot-scope="scope">
             <span>{{ scope.row.placement_id }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="广告平台" align="center" prop="sdk_mark" width="200">
+        <el-table-column label="广告平台" align="center" prop="sdk_mark" width="220">
           <template slot-scope="scope">
             <span>{{ scope.row.sdk_mark }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="渠道" align="center" prop="channel_mark" width="100">
+        <el-table-column label="渠道" align="center" prop="channel_mark" width="120">
           <template slot-scope="scope">
             <span>{{ scope.row.channel_mark }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="所属应用名称" align="center" prop="app_name" width="150">
+        <el-table-column label="所属应用名称" align="center" prop="app_name" >
           <template slot-scope="scope">
             <span>{{ scope.row.app_name }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="广告类型" align="center" prop="adtype_name" width="100">
+        <el-table-column label="广告类型" align="center" prop="adtype_name" width="120">
           <template slot-scope="scope">
             {{ scope.row.adtype_name }}
           </template>
@@ -84,8 +84,10 @@
           <!--</template>-->
         <!--</el-table-column>-->
 
-        <el-table-column label="操作" align="center" width="160px" class-name="small-padding fixed-width">
+        <el-table-column label="操作" align="center" width="290px" class-name="small-padding fixed-width">
           <template slot-scope="scope">
+            <el-button type="success" size="mini" @click="showRecentData(scope.row)">{{ "查看近日数据" }}
+            </el-button>
             <el-button type="success" size="mini" @click="showUpdateMeth(scope.row)">{{ "编辑" }}
             </el-button>
             <el-button type="danger" size="mini" @click="deleteMeth(scope.row)">{{ "删除" }}
@@ -125,7 +127,8 @@
           </el-form-item>
           <el-form-item label="广告位ID" :rules="{required: true, message: '广告位ID不能为空', trigger: 'blur'}"
                         prop="placement_id">
-            <el-input v-model="placement.placement_id"/>
+            <el-input v-model="placement.placement_id" v-if="this.placementState==='add'"/>
+            <el-input v-model="placement.placement_id" disabled="" v-if="this.placementState==='edit'"/>
           </el-form-item>
           <el-form-item label="广告位名称" :rules="{required: true, message: '广告位名称不能为空', trigger: 'blur'}"
                         prop="placement_name">
@@ -204,12 +207,27 @@
       }
     },
     mounted() {
+      this.routerWithParam()
       this.listPlatfrom()
       this.listApp()
       this.pageChange(1);
       this.listAdtype()
     },
     methods: {
+      showRecentData(param){
+        console.log('跳转参数',param)
+        let routeData = this.$router.resolve({
+          name: 'guanggaoshuju',
+          query: {placement_guid: param.placement_guid}
+        });
+        window.open(routeData.href, '_blank');
+      },//查看近日广告数据
+      routerWithParam(){
+        let placement_id = this.$route.query.placement_id
+        if (typeof(placement_id) != 'undefined') {
+          this.searchPlacementId = placement_id
+        }
+      },
       listAdtype(){
         getAdtypeHandler().then(response=>{
           if (response.repcode===3000){
@@ -377,6 +395,10 @@
                 this.placementDialog = false
               } else {
                 console.error(response)
+                this.$message({
+                  type: 'error',
+                  message: `添加广告位失败，有重复！`
+                });
               }
             }).catch(error => {
               console.log(error)
