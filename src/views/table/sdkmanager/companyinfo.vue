@@ -229,7 +229,7 @@
         fetchKeystoreInfo().then(response => {
           if (response.repcode === 0) {
             this.keystoreList = response.data
-            console.log(this.keystoreList)
+            console.log('keystore列表',this.keystoreList)
           }else {
             tothis.$notify({
               title: '初始化keystore失败',
@@ -253,6 +253,7 @@
         getcompanyInfoMeth().then(response => {
           if (response.repcode === 3000) {
             this.tableData = response.data
+            console.log('公司信息',response.data)
           } else {
             tothis.$notify({
               title: '初始化公司信息失败',

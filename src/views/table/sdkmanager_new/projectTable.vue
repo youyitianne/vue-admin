@@ -8,7 +8,6 @@
       <el-input placeholder="根据项目名查找" v-model="inputName" style="width: 200px;margin-left: 20px" class="filter-item"
                 clearable/>
       <el-button @click="searchTable">搜索</el-button>
-
     </div>
     <el-table
       height="740"
@@ -34,8 +33,9 @@
                 <el-table-column
                   label="图标">
                   <template slot-scope="scope">
-                    <span @click="bigPicture(scope.row.path)" style="width: 100%" v-if="scope.row.icon!=='暂无'"><img :src="iconPath+scope.row.icon"  min-width="70" height="70" /></span>
-                    <span @click="bigPicture(scope.row.path)" style="width: 100%" v-if="scope.row.icon==='暂无'">暂无</span>
+                    <span @click="bigPicture(scope.row.path)" style="width: 100%" v-if="scope.row.icon==='暂无'||scope.row.icon===''">暂无</span>
+                         <span @click="bigPicture(scope.row.path)" style="width: 100%" v-else>
+                      <img :src="iconPath+scope.row.icon"  min-width="70" height="70" /></span>
                   </template>
                 </el-table-column>
                 <el-table-column
@@ -227,6 +227,7 @@
   import waves from '@/directive/waves'
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
   import {getcompanyInfoMeth} from '@/api/table/sdkmanager/companyInfo'
+  import {listAppInfo} from '@/api/table/sdkmanager/appInfo'
 
   export default {
     components: {Pagination},
@@ -455,12 +456,11 @@
         function S4() {
           return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
         }
-
         return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
       },//生成guid
       link_Edit(val) {
         let routeData = this.$router.resolve({
-          name: 'ProjectConfigManager',
+          name: 'yyliebiao',
           query: {package_name: val.package_name, channel: val.channel}
         });
         window.open(routeData.href, '_blank');
@@ -473,10 +473,11 @@
           });
           return
         }
+        //todo
         let app_info = {
           app_name: this.project_value.app_name,
           channel: this.project_value.channel_mark,
-          sdkguid: this.project_value.sdkguid,
+          sdkguid: this.project_value.app_guid,
           key: Date.now(),
           package_name: this.project_value.package_name,
           project: {}
@@ -499,14 +500,9 @@
           });
           return
         }
-
       },//添加应用
       initProjectList() {
-        let name = {
-          start: '1',
-          end: '2'
-        }
-        getProjectConfig(name).then(response => {
+        listAppInfo().then(response => {
           let data1 = response.data
           let data2 = []
           for (let i = 0; i < data1.length; i++) {

@@ -96,7 +96,6 @@
       }
     },
     mounted() {
-    //  this.getInnerIp()
     },
     methods: {
       checkPermission,
@@ -139,7 +138,7 @@
               console.log(err)
               tothis.$notify({
                 title: '失败',
-                message: err,
+                message: '登录失败',
                 type: 'error',
                 duration: 2000
               })

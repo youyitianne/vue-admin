@@ -84,9 +84,9 @@
           <!--</template>-->
         <!--</el-table-column>-->
 
-        <el-table-column label="操作" align="center" width="290px" class-name="small-padding fixed-width">
+        <el-table-column label="操作" align="center" width="200px" class-name="small-padding fixed-width">
           <template slot-scope="scope">
-            <el-button type="success" size="mini" @click="showRecentData(scope.row)">{{ "查看近日数据" }}
+            <el-button type="success" size="mini" @click="showRecentData(scope.row)" v-if="false">{{ "查看近日数据" }}
             </el-button>
             <el-button type="success" size="mini" @click="showUpdateMeth(scope.row)">{{ "编辑" }}
             </el-button>
@@ -151,7 +151,7 @@
           </el-select>
           </el-form-item>
           <el-form-item label="所属应用" :rules="{required: true, message: '所属应用不能为空', trigger: 'blur'}"
-                        prop="app">
+                        prop="app" v-if="false">
             <el-select v-model="placement.app"
                        style="width: 260px"
                        filterable
@@ -209,7 +209,7 @@
     mounted() {
       this.routerWithParam()
       this.listPlatfrom()
-      this.listApp()
+      //this.listApp()
       this.pageChange(1);
       this.listAdtype()
     },
@@ -231,6 +231,7 @@
       listAdtype(){
         getAdtypeHandler().then(response=>{
           if (response.repcode===3000){
+            console.log('广告位类型列表',response.data)
             this.adtypeList=response.data
           } else {
             console.error(response)
@@ -335,8 +336,6 @@
           }
         }
         for (let i = 0; i < this.platfromDialogList.length; i++) {
-          console.log(this.platfromDialogList[i].id)
-          console.log(param.platform_id)
           if (this.platfromDialogList[i].sdk_template_guid + '' === param.platform_id) {
             this.placement.platform = this.platfromDialogList[i]
             break
@@ -381,10 +380,11 @@
             let param = {
               placement_id: this.placement.placement_id,
               placement_name: this.placement.placement_name,
-              placement_type: this.placement.placement_type,
+              placement_type: this.placement.placement_type.adtype_guid,
               app_id: this.placement.app.sdkguid,
               platform_id: this.placement.platform.sdk_template_guid,
             }
+            console.log('添加广告位参数',param)
             addPlacementHandler(param).then(response => {
               if (response.repcode === 3000) {
                 this.$message({

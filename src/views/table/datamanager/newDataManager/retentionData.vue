@@ -134,7 +134,7 @@
     getUmengChannelHandler,
     getUmengVersionHandler,
     getUmengRetentionHandler
-  } from "@/api/table/datamanager/newDataManager/retentionData" ;
+  } from "@/api/table/datamanager/newDataManager/originalData/retentionData" ;
 
   export default {
     data() {

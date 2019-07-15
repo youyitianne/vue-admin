@@ -61,20 +61,13 @@
       </el-button>
     </div>
     <el-table
-      height="750"
+      height="700"
       v-loading="tableLoading"
       :data="tableList"
       element-loading-text="Loading"
       border
       fit
       highlight-current-row>
-
-      <!--<el-table-column label="id" width="110" style="display: none">-->
-      <!--<template slot-scope="scope">-->
-      <!--{{ scope.row.id }}-->
-      <!--</template>-->
-      <!--</el-table-column>-->
-
       <el-table-column label="日期" width="110" align="center" prop="date">
         <template slot-scope="scope">
           <span>{{ scope.row.date }}</span>
@@ -105,11 +98,11 @@
         </template>
       </el-table-column>
 
-      <!--<el-table-column align="center" label="升级用户" prop="launch">-->
-        <!--<template slot-scope="scope">-->
-          <!--<span>{{ scope.row.dau }}</span>-->
-        <!--</template>-->
-      <!--</el-table-column>-->
+      <el-table-column align="center" label="升级用户" prop="launch">
+        <template slot-scope="scope">
+          <span>{{ scope.row.dau }}</span>
+        </template>
+      </el-table-column>
 
       <el-table-column align="center" label="活跃用户" prop="duration">
         <template slot-scope="scope">
@@ -117,11 +110,11 @@
         </template>
       </el-table-column>
 
-      <!--<el-table-column align="center" label="累计用户" prop="duration">-->
-        <!--<template slot-scope="scope">-->
-          <!--<span>{{ scope.row.duration }}</span>-->
-        <!--</template>-->
-      <!--</el-table-column>-->
+      <el-table-column align="center" label="累计用户" prop="duration">
+        <template slot-scope="scope">
+          <span>{{ scope.row.duration }}</span>
+        </template>
+      </el-table-column>
 
       <el-table-column align="center" label="人均启动次数" prop="launch">
         <template slot-scope="scope">
@@ -153,7 +146,7 @@ import {
   getUmengChannelHandler,
   getUmengVersionHandler,
   getUmengDataHandler
-} from "@/api/table/datamanager/newDataManager/userData" ;
+} from "@/api/table/datamanager/newDataManager/originalData/userData" ;
 
   export default {
     data() {
@@ -177,6 +170,7 @@ import {
     },
     mounted() {
       this.ListUmengApp()
+      this.initdate()
     },
     methods: {
       ListUmengApp(){
@@ -295,7 +289,16 @@ import {
             duration: 2000
           })
         })
-      }
+      },
+      initdate() {
+        const end = new Date();
+        const start = new Date();
+        start.setTime(start.getTime() - 3600 * 1000 * 24);
+        end.setTime(end.getTime() - 3600 * 1000 * 24);
+        this.timeValue.push(start)
+        this.timeValue.push(end)
+      },//页面渲染初始化日期
+
     }
   }
 </script>

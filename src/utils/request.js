@@ -2,7 +2,6 @@ import axios from 'axios'
 import { Message, MessageBox } from 'element-ui'
 import store from '../store'
 import { getToken } from '@/utils/auth'
-import { getMyOutIp,getMyInnerIp } from '@/utils/ip'
 
 
 // 创建axios实例
@@ -17,8 +16,6 @@ service.interceptors.request.use(
   config => {
     if (store.getters.token) {
       let token = 'Bearer '+getToken()
-      let outerip=getMyOutIp()
-      let innerip=getMyInnerIp()
       //config.headers['ip'] = outerip+','+innerip // 让每个请求携带自定义token 请根据实际情况自行修改
       config.headers['Authorization'] = token // 让每个请求携带自定义token 请根据实际情况自行修改
     }
@@ -97,12 +94,13 @@ service.interceptors.response.use(
           type: 'error',
           duration: 5 * 1000
         })
-        return  Promise.reject('bad code')
+        return  Promise.reject(res)
       }
-      return Promise.reject('bad code')
+      return Promise.reject(res)
     } else {
       return response.data
     }
+
   },
   error => {
     console.log( "请检查网络连接"+error) // for debug

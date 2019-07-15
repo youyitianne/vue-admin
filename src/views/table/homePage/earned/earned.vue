@@ -107,7 +107,7 @@
               <div v-if="true" class="line-chart" style="margin-right: 100px;margin-top: 40px">
                 <div class="font_cline" style="margin-left: 10px">七日收益趋势</div>
                 <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px">
-                  <line-chart :chart-data=" earned_chart_list" :title="1"/>
+                  <line-chart :chart-data="earned_chart_list" :title="1"/>
                 </el-row>
               </div>
               <table class="gridtable">

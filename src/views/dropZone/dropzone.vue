@@ -113,6 +113,7 @@
     components: {Dropzone},
     data() {
       return {
+        checked1:'',
         dialogMessageVisible: false,
         dataObj: {'Authorization': ''},
         token: {

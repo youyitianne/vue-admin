@@ -221,23 +221,26 @@ export const asyncRouterMap = [
         }
       },
       {
-        path: 'yonghusju',
-        component: () => import('@/views/table/datamanager/newDataManager/userData'),
-        name: 'yonghusju',
+        path: 'ceshizujian',
+        component: () => import('@/views/originalData/originalData'),
+        name: 'ceshizujian',
+        hidden:true,
         meta: {
-          title: '用户数据',
-          icon:'userData1',
+          title: '原始数据',
+          icon:'rmb',
           noCache: true,
           roles: ['director']
         }
       },
       {
-        path: 'liucunshuju',
-        component: () => import('@/views/table/datamanager/newDataManager/retentionData'),
-        name: 'liucunshuju',
+        path: 'youxifenxi',
+        component: () => import('@/views/gameAnalysis/gameAnalysis'),
+        name: 'youxifenxi',
+        hidden:true,
         meta: {
-          title: '留存数据',
-          icon:'retention2',
+          title: '游戏分析',
+          hidden:true,
+          icon:'rmb',
           noCache: true,
           roles: ['director']
         }
@@ -246,36 +249,14 @@ export const asyncRouterMap = [
         path: 'guanggaoshuju',
         component: () => import('@/views/table/datamanager/newDataManager/advertiseData'),
         name: 'guanggaoshuju',
+        hidden:true,
         meta: {
           title: '广告数据',
           icon:'ad1',
           noCache: true,
           roles: ['director']
         }
-      },
-      {
-        path: 'guanggaoweishuju',
-        component: () => import('@/views/table/datamanager/newDataManager/placementData'),
-        name: 'guanggaoweishuju',
-        meta: {
-          title: '广告位数据',
-          icon:'placement1',
-          noCache: true,
-          roles: ['director']
-        }
-      },
-      {
-        path: 'adTypeTable',
-        component: () => import('@/views/table/datamanager/newDataManager/advertiseTypeData.vue'),
-        name: 'guanggaoleixingshuju',
-        meta: {
-          title: '广告类型数据',
-          noCache: true,
-          icon: 'type',
-          roles: ['director'],
-        }
-      },
-
+      }
     ]
   },
   {
@@ -338,7 +319,7 @@ export const asyncRouterMap = [
         name: 'showtimeTable1',
         component: () => import('@/views/table/datamanager/showtime_1table'),
         meta: {
-          title: '展次表（旧）',
+          title: '展次表（弃用）',
           icon: 'showtime',
           roles: ['director', 'operatorleader', 'operator', 'planner']
         }
@@ -455,11 +436,21 @@ export const asyncRouterMap = [
     },
     children: [
       {
-        path: 'projectTable',
-        component: () => import('@/views/table/projectmanager/projectTable'),
+        path: 'xiangmuliebiao',
+        component: () => import('@/views/table/sdkmanager_new/projectTable'),
         name: 'ProjectTable',
         meta: {
           title: '项目列表',
+          noCache: true,
+          icon: 'project2',
+        }
+      },
+      {
+        path: 'projectTable1',
+        component: () => import('@/views/table/projectmanager/projectTable'),
+        name: 'ProjectTable1',
+        meta: {
+          title: '项目列表（弃用）',
           noCache: true,
           icon: 'project2',
         }
@@ -478,11 +469,52 @@ export const asyncRouterMap = [
     },
     children: [
       {
+        path: 'yyliebiao',
+        component: () => import('@/views/table/sdkmanager_new/appInfo'),
+        name: 'yyliebiao',
+        meta: {
+          title: '应用列表',
+          icon: 'sdkset1',
+        }
+      },
+      {
+        path: 'peizhijilu',
+        component: () => import('@/views/table/sdkmanager_new/app_config_record'),
+        name: 'peizhijilu',
+        meta: {
+          title: '配置记录',
+          icon: 'sdkshow',
+        }
+      },
+      {
+        path: 'guanggaoweishuju',
+        component: () => import('@/views/table/datamanager/newDataManager/placementData'),
+        name: 'guanggaoweishuju',
+        meta: {
+          title: '广告位列表',
+          icon:'placement1',
+          noCache: true,
+          roles: ['director']
+        }
+      },
+      {
+        path: 'adTypeTable',
+        component: () => import('@/views/table/datamanager/newDataManager/advertiseTypeData.vue'),
+        name: 'guanggaoleixingshuju',
+        meta: {
+          title: '广告类型列表',
+          noCache: true,
+          icon: 'type',
+          roles: ['director'],
+        }
+      },
+
+      {
         path: 'projectconfig',
         component: () => import('@/views/table/sdkmanager/projectconfigtable'),
         name: 'ProjectConfigManager',
         meta: {
-          title: '应用列表',
+          title: '应用列表（弃用）',
           icon: 'sdkset1',
         }
       }, {
@@ -490,7 +522,7 @@ export const asyncRouterMap = [
         component: () => import('@/views/table/sdkmanager/projectconfigtable_publish'),
         name: 'ProjectConfigList',
         meta: {
-          title: '应用配置记录',
+          title: '应用配置记录（弃用）',
           icon: 'sdkshow',
         }
       },
@@ -512,8 +544,6 @@ export const asyncRouterMap = [
           icon: 'reminded',
         }
       },
-
-
     ]
   },
   {
@@ -528,14 +558,37 @@ export const asyncRouterMap = [
     },
     children: [
       {
-        path: 'sdklist',
-        component: () => import('@/views/table/sdkmanager/sdklisttable'),
-        name: 'SDKManager',
+        path: 'sdkleixing',
+        component: () => import('@/views/table/sdkmanager_new/sdklisttable_new'),
+        name: 'sdkleixing',
         meta: {
           title: 'SDK类型',
           icon: 'model4',
         }
       },
+      {
+        path: 'sdklist',
+        component: () => import('@/views/table/sdkmanager/sdklisttable'),
+        name: 'SDKManager',
+        meta: {
+          title: 'SDK类型(弃用)',
+          icon: 'model4',
+        }
+      },
+    ]
+  },
+  {
+    path: '/sdkqjt',
+    component: Layout,
+    redirect: '/sdkqjt/sdkleixing',
+    name: 'Component',
+    hidden:true,
+    meta: {
+      title: 'sdk全家桶',
+      icon: 'excel',
+      roles: ['admin'],
+    },
+    children: [
     ]
   },
   {
@@ -663,6 +716,7 @@ export const asyncRouterMap = [
       icon: '',
       roles: ['admin']
     },
+    hidden:true,
     children: [
       {
         path: 'co_companyInfo',

@@ -1,5 +1,6 @@
 import { login, logout, getInfo} from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
+import axios from 'axios'
 
 const user = {
   state: {
@@ -57,23 +58,46 @@ const user = {
   },
     // 登录
     Login({ commit }, userInfo) {
-      const username = userInfo.username.trim()
+      //const username = userInfo.username.trim()
       console.log('创建权限对象start+++++++++')
       return new Promise((resolve, reject) => {
         console.log('创建权限对象end 发送登录请求+++++++++')
-        login(username, userInfo.password).then(response => {
+        axios({
+          headers: {'Content-Type': 'application/json;charset=UTF-8'},
+          method: 'post',
+          url: 'http://192.168.1.144:8084/login/login',
+          data: {
+            "username":userInfo.username,
+          "password":userInfo.password
+          }
+        }).then(response=>{
+          if(response.data.code===50020){
+            reject('登录失败')
+          }
           console.log('登录请求返回 +++++++++')
-          const data = response.data
+          const data = response.data.data
           setToken(data.token)
           console.log('添加本地token start+++++++++')
           commit('SET_TOKEN', data.token)
+          console.log('token',data.token)
           console.log('添加本地token end+++++++++')
           resolve()
-          console.log(123)
-        }).catch(error => {
+        }).catch(error=>{
           console.error(error)
           reject(error)
-        })
+        });
+        // login(username, userInfo.password).then(response => {
+        //   console.log('登录请求返回 +++++++++')
+        //   const data = response.data
+        //   setToken(data.token)
+        //   console.log('添加本地token start+++++++++')
+        //   commit('SET_TOKEN', data.token)
+        //   console.log('添加本地token end+++++++++')
+        //   resolve()
+        // }).catch(error => {
+        //   console.error(error)
+        //   reject(error)
+        // })
       })
     },
 

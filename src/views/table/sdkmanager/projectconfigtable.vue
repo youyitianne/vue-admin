@@ -171,6 +171,9 @@
           </el-upload>
         </div>
         <br/>
+
+
+
         <!--筛选输入框-->
         <el-input placeholder="SDK模版筛选" v-model="sdk_template_name" v-if="this.dialogStatus === 'update'"
                   style="width: 200px;margin-bottom: 10px" class="filter-item" clearable
@@ -230,8 +233,10 @@
                     style="margin-right: 20px;font-size: 14px;font-family: Microsoft YaHei;width:200px;display: inline-block">
                     {{domain.param_name1}}：
                   </span>
-                  <el-input v-model="domain.param" style="width: 300px;margin-right: 25px" placeholder="必填" v-if="domain.sdk_type!='3'"/>
-                  <el-input v-model="domain.param" style="width: 300px;margin-right: 25px;display: inline-block" placeholder="必填" disabled v-if="domain.sdk_type==='3'" />
+                  <el-input v-model="domain.param" style="width: 300px;margin-right: 25px" placeholder="必填"
+                            v-if="domain.sdk_type!='3'"/>
+                  <el-input v-model="domain.param" style="width: 300px;margin-right: 25px;display: inline-block"
+                            placeholder="必填" disabled v-if="domain.sdk_type==='3'"/>
                   <el-select v-model="domain.param"
                              v-if="domain.sdk_type==='3'"
                              style="width: 300px;display: inline-block"
@@ -257,10 +262,13 @@
             </div>
           </el-tab-pane>
         </el-tabs>
+
+
+
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="updateData(true)">{{ '保存' }}</el-button>
-        <el-button type="success" @click="updateData(false)">发布</el-button>
+        <el-button type="primary" @click="updateData(true)" v-if="false">{{ '保存' }}</el-button>
+        <el-button type="success" @click="updateData(false)" v-if="false">发布</el-button>
       </div>
     </el-dialog>
     <el-dialog
@@ -281,8 +289,10 @@
         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
       </el-upload>
       <div style="margin-left: 10px;margin-top: 10px">
-          复制APK链接:&nbsp&nbsp<el-input v-model="link" placeholder="Please input" style="max-width:100%;width: 900px" disabled/>
-        <el-button v-clipboard:copy="link" v-clipboard:success="clipboardSuccess" type="primary" icon="document">复制</el-button>
+        复制APK链接:&nbsp&nbsp
+        <el-input v-model="link" placeholder="Please input" style="max-width:100%;width: 900px" disabled/>
+        <el-button v-clipboard:copy="link" v-clipboard:success="clipboardSuccess" type="primary" icon="document">复制
+        </el-button>
       </div>
       <el-table
         v-loading="fileTableLoading"
@@ -491,7 +501,6 @@
   import clipboard from '@/directive/clipboard/index' // use clipboard by v-directive
 
 
-
   export default {
     directives: {
       clipboard
@@ -514,12 +523,12 @@
     },
     data() {
       return {
-        link:'',
+        link: '',
         dataObj: {'Content-Type': 'multipart/form-data'},
         fileTableLoading: false,
         downloadAPKLoading: false,
         picture: '',
-        filepageSize: 10,
+        filepageSize: 30,
         filetotalPages: 0,
         filecurrentPage: 1,
         previewDialogVisible: false,
@@ -540,6 +549,7 @@
         totalPages: 0,
         currentPage: 1,
         user: '',
+        resPath1: 'http://filehost.tomatojoy.com:8091/file',
         resPath: 'http://filehost.tomatojoy.com:8091/file',
         imageUrl_splash: '',
         imageUrl_icon: '',
@@ -628,12 +638,12 @@
         uploadChannelName: '',
         uploadPackageName: '',
         searchguid: '',
-        placementList:[],
-        hidplacementList:[],
-        searchPlacementList:[],
-        testPlacement:{},
-        loading:false,
-        form_init_placementList:[]
+        placementList: [],
+        hidplacementList: [],
+        searchPlacementList: [],
+        testPlacement: {},
+        loading: false,
+        form_init_placementList: []
       }
     },
     created() {
@@ -642,7 +652,7 @@
       this.routeWithParam()//跳转赋值
       this.pageChange(1) //初始化表格
       this.listKeyStoreInfo()//获取keystore列表
-      this.getPlacementMeth()
+     // this.getPlacementMeth()
     },
     methods: {
       remoteMethod(query) {
@@ -658,7 +668,7 @@
         } else {
           this.placementList = [];
         }
-        this.placementList=this.placementList.concat(this.form_init_placementList)
+        this.placementList = this.placementList.concat(this.form_init_placementList)
       },//选择器远程搜索
       clipboardSuccess() {
         this.$message({
@@ -667,17 +677,17 @@
           duration: 1500
         })
       },//剪贴板复制成功
-      getPlacementMeth(){
-        getPlacementHandler().then(response=>{
-          if(response.repcode===3000){
-     //       this.hidplacementList=response.data
-            console.log('广告位列表',response.data)
-            this.testPlacement=response.json
-          }else {
+      getPlacementMeth() {
+        getPlacementHandler().then(response => {
+          if (response.repcode === 3000) {
+            //       this.hidplacementList=response.data
+            console.log('广告位列表', response.data)
+            this.testPlacement = response.json
+          } else {
 
             console.log(response)
           }
-        }).catch(error=>{
+        }).catch(error => {
           console.log(error)
           this.$message({
             type: 'error',
@@ -695,7 +705,6 @@
           this.apkcheckForm.publishPackageName = param.checkInfo.package_name
           this.apkcheckForm.publishVersionCode = param.checkInfo.versioncode_update_version
           this.apkcheckForm.publishVersionName = param.checkInfo.version_update
-
           this.apkcheckForm.publishMD5 = param.checkInfo.MD5
           this.apkcheckForm.publishSHA1 = param.checkInfo.SHA1
           this.apkcheckForm.publishSHA256 = param.checkInfo.SHA256
@@ -1125,8 +1134,8 @@
         console.log(param)
       },//查看apk详细信息
       showFileListVisible(param) {
-        this.link='http://system.tomatojoy.com/AppManager/projectconfig?package_name='+param.package_name+'&channel='+param.channel_mark
-        console.log('apk管理点击事件',param)
+        this.link = 'http://system.tomatojoy.com/AppManager/projectconfig?package_name=' + param.package_name + '&channel=' + param.channel_mark
+        console.log('apk管理点击事件', param)
         this.hidfileListTableData = []
         this.fileListVisible = true
         this.uploadChannelName = param.channel_mark
@@ -1152,7 +1161,7 @@
           if (response.repcode === 3000) {
             this.hidlist = response.data
             this.list = response.data
-            console.log('配置表list',response.data)
+            console.log('配置表list', response.data)
             this.totalPages = response.total
           } else {
             tothis.$notify({
@@ -1235,31 +1244,31 @@
         this.placementList = [];
         console.log("编辑配置表-标签页-点击事件", tab)
         this.tag_name = tab.label
-        let test=this.testPlacement
-        let eValue=eval('test.'+tab.label);
-        this.hidplacementList=eValue
-       // this.placementList=eValue
-        console.log('eValue',eValue)
+        // let test=this.testPlacement
+        // let eValue=eval('test.'+tab.label);
+        // this.hidplacementList=eValue
+        // this.placementList=eValue
+        // console.log('eValue',eValue)
         this.change_pagename(tab.label)
-        //找到表单内容中，此页面中sdk type为3的所有对象
-        let formList=this.sdk.form.domains;
-        this.form_init_placementList=[]
-        for(let i=0;i<formList.length;i++){
-          if (formList[i].param_name.split('-')[0]===tab.label&&formList[i].sdk_type==='3'){
-            if (formList[i].param===''){
-              console.log('通过tab找到的表单对象为空')
-            }else{
-              console.log('通过tab找到的表单对象',formList[i].param)
-              for (let j=0;j<this.hidplacementList.length;j++){
-                if(this.hidplacementList[j].placement_id===formList[i].param){
-                  this.form_init_placementList.push(this.hidplacementList[j])
-                }
-              }
-            }
-          }
-        }
-        this.placementList=this.placementList.concat(this.form_init_placementList)
-        console.log('test表单内容',this.sdk.form.domains)
+        // //找到表单内容中，此页面中sdk type为3的所有对象
+        // let formList = this.sdk.form.domains;
+        // this.form_init_placementList = []
+        // for (let i = 0; i < formList.length; i++) {
+        //   if (formList[i].param_name.split('-')[0] === tab.label && formList[i].sdk_type === '3') {
+        //     if (formList[i].param === '') {
+        //       console.log('通过tab找到的表单对象为空')
+        //     } else {
+        //       console.log('通过tab找到的表单对象', formList[i].param)
+        //       for (let j = 0; j < this.hidplacementList.length; j++) {
+        //         if (this.hidplacementList[j].placement_id === formList[i].param) {
+        //           this.form_init_placementList.push(this.hidplacementList[j])
+        //         }
+        //       }
+        //     }
+        //   }
+        // }
+        // this.placementList = this.placementList.concat(this.form_init_placementList)
+        // console.log('test表单内容', this.sdk.form.domains)
       },//获取对话框内标签页 名触发事件
       publish() {
         let tothis = this
@@ -1308,7 +1317,7 @@
             if (this.options[j].sdk_name === this.checkedSdkTemplate[i]) {
               let param_name = this.options[j].sdk_name
               let newele = {
-                options:this.options[j],
+                options: this.options[j],
                 param_name: this.options[j].sdk_name + '-' + this.options[j].param_name,
                 param: this.options[j].value,
                 sdk_type: '1',

@@ -970,8 +970,7 @@
         return fmt;
       },padLeftZero(str) {
         return ('00' + str).substr(str.length);
-      }
-      ,
+      },
       open3() {
         this.$message({
           message: '请选择查询范围~',

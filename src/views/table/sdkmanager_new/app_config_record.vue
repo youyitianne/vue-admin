@@ -3,12 +3,9 @@
     <div class="filter-container" style="margin: 15px;margin-top: -5px">
       <span style="margin-left: 15px;margin-right: 5px">应用名:</span>
       <el-input v-model="secondary_game" style="width: 200px" class="filter-item" clearable/>
-      <span style="margin-left: 15px;margin-right: 5px">渠道:</span>
-      <el-input v-model="secondary_channel" style="width: 200px" class="filter-item" clearable/>
-      <span style="margin-left: 15px;margin-right: 5px">包名:</span>
-      <el-input  v-model="secondary_package" style="width: 200px" class="filter-item" clearable/>
+        <span style="margin-left: 15px;margin-right: 5px">应用GUID:</span>
+      <el-input v-model="search_app_guid" style="width: 200px" class="filter-item" clearable/>
       <el-button style="margin-left: 20px" @click="searchTable">搜索</el-button>
-      <el-checkbox v-model="checked" border style="margin-left: 15px" @change="getDatawithParam">展示最新配置表 </el-checkbox>
     </div>
     <el-table
       height="750"
@@ -20,23 +17,22 @@
       stripe
       border
       highlight-current-row>
-      <el-table-column label="发布时间" prop="date1" width="200">
+      <el-table-column label="发布时间" prop="time" width="200">
       </el-table-column>
-      <el-table-column label="应用名" prop="app_name" width="150">
+      <el-table-column label="应用名" prop="productName" width="150">
       </el-table-column>
-      <el-table-column label="渠道" prop="channel_mark" width="100px">
+      <el-table-column label="渠道" prop="channel" width="100px">
       </el-table-column>
-      <el-table-column label="包名" prop="package_name" width="300px">
+      <el-table-column label="包名" prop="packageName" width="300px">
       </el-table-column>
-      <el-table-column label="外部版本-在线" prop="version_update" width="120px">
+      <el-table-column label="外部版本-在线" prop="versionName_online" width="120px">
       </el-table-column>
-      <el-table-column label="内部版本-更新" prop="versioncode_update_version"  width="120px">
+      <el-table-column label="内部版本-更新" prop="versionCode"  width="120px">
       </el-table-column>
       <el-table-column label="备注" prop="note">
       </el-table-column>
       <el-table-column label="操作" align="center" width="150px" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button type="danger" size="mini" @click="handleDelete(scope.row)" v-if="checkPermission(['director','admin','sdksuport','operatorleader'])">{{ "删除" }}</el-button>
           <el-button type="success" size="mini" @click="handleView(scope.row)" >{{ "查看" }}</el-button>
         </template>
       </el-table-column>
@@ -55,37 +51,37 @@
       width="70%">
       <el-form label-position="left" inline class="demo-table-expand" :model="dialogForm" label-width="150px">
         <el-form-item label="时间:">
-          <span>{{ dialogForm.date1}}</span>
+          <span>{{ dialogForm.time}}</span>
         </el-form-item>
         <el-form-item label="出表人">
           <span>{{ dialogForm.publisher}}</span>
         </el-form-item>
         <el-form-item label="游戏名:">
-          <span>{{ dialogForm.app_name }}</span>
+          <span>{{ dialogForm.productName }}</span>
         </el-form-item>
         <el-form-item label="包名:">
-          <span>{{ dialogForm.package_name }}</span>
+          <span>{{ dialogForm.packageName }}</span>
         </el-form-item>
         <el-form-item label="渠道标记:">
-          <span>{{ dialogForm.channel_mark }}</span>
+          <span>{{ dialogForm.channel }}</span>
         </el-form-item>
         <el-form-item label="外部版本-在线:">
-          <span>{{ dialogForm.version_online }}</span>
+          <span>{{ dialogForm.versionName_online }}</span>
         </el-form-item>
         <el-form-item label="内部版本-在线:">
-          <span>{{ dialogForm.versioncode_online_version }}</span>
+          <span>{{ dialogForm.versionCode_online }}</span>
         </el-form-item>
         <el-form-item label="外部版本-更新:">
-          <span>{{ dialogForm.version_update }}</span>
+          <span>{{ dialogForm.versionName }}</span>
         </el-form-item>
         <el-form-item label="内部版本_更新:">
-          <span>{{ dialogForm.versioncode_update_version }}</span>
+          <span>{{ dialogForm.versionCode }}</span>
         </el-form-item>
         <el-form-item label="icon:">
-          <span>{{ dialogForm.icon }}</span>
+          <span>{{ dialogForm.defaultIcon }}</span>
         </el-form-item>
         <el-form-item label="splash:">
-          <span>{{ dialogForm.splash }}</span>
+          <span>{{ dialogForm.splashImage }}</span>
         </el-form-item>
         <el-form-item label="keystorePath:">
           <span>{{ dialogForm.keystorePath }}</span>
@@ -115,22 +111,22 @@
       <el-table
         stripe
         border
-        :data="projectObject.paramter"
+        :data="projectObject"
         style="width: 90%;margin-bottom: 30px;margin-top: 30px"
         :span-method="objectSpanMethod">
         <el-table-column
-          prop="mark"
-          label="模块名"
+          prop="sdk_type"
+          label="SDK类型"
           style="width: 200px">
         </el-table-column>
         <el-table-column
-          prop="param_name1"
-          label="参数名"
+          prop="sdk_param_type"
+          label="SDK参数类型"
           style="width: 300px">
         </el-table-column>
         <el-table-column
-          prop="param"
-          label="参数">
+          prop="sdk_param"
+          label="SDK参数">
         </el-table-column>
       </el-table>
       <span>
@@ -146,12 +142,10 @@
 
 <script>
   import waves from '@/directive/waves'
-
   import checkPermission from '@/utils/permission' // 权限判断函数
   //import {getSdkTemplate,getChannel} from '@/api/table/sdkmanager/projectconfigtable'
-  import {updateProjectConfig,getProjectPublishLimitMeth} from '@/api/table/sdkmanager/projectconfigtable_publish'
-  import store from '@/store'
   import clipboard from '@/directive/clipboard/index' // use clipboard by v-directive
+  import {listAppConfigInfoRecord} from '@/api/sdkmanager_new/app_config_record'
 
 
   export default {
@@ -170,12 +164,13 @@
     },
     data() {
       return {
+        search_app_guid:'',
         pageSize:30,
         totalPages:0,
         currentPage:1,
         link:'',
         dialogForm:{},
-        projectObject:{},
+        projectObject:[],
         dialogVisible:false,
         secondary_package: '',
         value: [],
@@ -187,7 +182,7 @@
         names: [],
         directives: {waves},
         layout: '',
-        list: null,
+        list: [],
         listLoading: false,
         names: [],
         hidlist: '',
@@ -212,15 +207,15 @@
         let param={
           page:page,
           limit:this.pageSize,
-          appName:this.secondary_game,
-          channelName:this.secondary_channel,
-          packageName:this.secondary_package,
+          app_name:this.secondary_game,
+          app_guid:this.search_app_guid,
         }
-        getProjectPublishLimitMeth(param).then(response=>{
+        console.log('应用配置记录列表',param)
+        listAppConfigInfoRecord(param).then(response=>{
           if(response.repcode===3000){
             this.hidlist=response.data
+            this.list=response.data
             console.log('配置表发布记录',response.data)
-            this.getDatawithParam();
             this.totalPages=response.total
           }else {
             tothis.$notify({
@@ -250,21 +245,19 @@
       handleView(value){
         console.log(value)
           //测试服  8089
-        this.link='http://system.tomatojoy.com/sdkapi?package_name='+value.package_name+'&channel_mark='+value.channel_mark
+       // this.link='http://system.tomatojoy.com/sdkapi?package_name='+value.package_name+'&channel_mark='+value.channel_mark
+        this.link='http://system.tomatojoy.com:8330/tjsdk/getAppConfigInfoRecord?app_guid='+value.app_guid
         this.dialogForm=value
-        this.getSpanArr(value.paramter)
-        this.projectObject=value
+        this.getSpanArr(value.paramList)
+
+        this.projectObject=value.paramList
         this.dialogVisible=true
 
       },//查看按钮
       routeWithParam() {
-        let name = this.$route.query.package_name
-        if (typeof(name) != 'undefined') {
-          this.secondary_package = name
-        }
-        let channel = this.$route.query.channel
-        if (typeof(channel) != 'undefined') {
-          this.secondary_channel = channel
+        let app_guid = this.$route.query.app_guid
+        if (typeof(app_guid) != 'undefined') {
+          this.search_app_guid = app_guid
         }
       },//带参跳转
       handleDelete(data) {
@@ -291,67 +284,6 @@
           this.channel_mark_list_dia = response.data
         })
       }, //初始化渠道标记
-      getDatawithParam() {
-        this.listLoading = true
-        let param = this.secondary_channel
-        let data = []
-        if (param!=''){
-          for (let i = 0; i < this.hidlist.length; i++) {
-            if (this.hidlist[i].channel_mark.search(param) != -1) {
-              data.push(this.hidlist[i])
-            }
-          }
-        } else {
-          data=this.hidlist
-        }
-
-
-        let game = this.secondary_game
-        let data1 = []
-        if (game!=''){
-          for (let i = 0; i < data.length; i++) {
-            if (data[i].app_name.search(game) != -1) {
-              data1.push(data[i])
-            }
-          }
-        } else {
-          data1=data
-        }
-
-
-        let statuse = this.checked       //最新
-        let data2 = []
-        if (statuse === true) {
-          for (let i = 0; i < data1.length; i++) {
-            let flag = true
-            for (let j = 0; j < data2.length; j++) {
-              if (data1[i].channel_mark === data2[j].channel_mark && data1[i].package_name === data2[j].package_name) {
-                flag = false
-              }
-            }
-            if (flag) {
-              data2.push(data1[i])
-            }
-          }
-        } else {
-          data2 = data1
-        }
-
-        let packageName = this.secondary_package
-        let data3 = []
-        if (packageName!=''){
-          for (let i = 0; i < data2.length; i++) {
-            if (data2[i].package_name.search(packageName) != -1) {
-              data3.push(data2[i])
-            }
-          }
-        } else {
-          data3=data2
-        }
-
-        this.list = data3
-        this.listLoading = false
-      }, //table二次筛选
       checkPermission,
       getSpanArr(data) {
         this.spanArr.length = 0
@@ -361,7 +293,7 @@
             this.pos = 0
           } else {
             // 判断当前元素与上一个元素是否相同
-            if (data[i].mark === data[i - 1].mark) {
+            if (data[i].sdk_type === data[i - 1].sdk_type) {
               this.spanArr[this.pos] += 1;
               this.spanArr.push(0);
             } else {
