@@ -494,7 +494,7 @@ export const asyncRouterMap = [
           title: '广告位列表',
           icon:'placement1',
           noCache: true,
-          roles: ['director']
+          roles: ['director','operatorleader']
         }
       },
       {
@@ -505,7 +505,7 @@ export const asyncRouterMap = [
           title: '广告类型列表',
           noCache: true,
           icon: 'type',
-          roles: ['director'],
+          roles: ['director','operatorleader'],
         }
       },
 

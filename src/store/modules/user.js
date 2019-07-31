@@ -1,13 +1,15 @@
 import { login, logout, getInfo} from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import axios from 'axios'
+import { Aside } from 'element-ui';
 
 const user = {
   state: {
     token: getToken(),
     name: '',
     avatar: '',
-    roles: []
+    roles: [],
+    groups:[]
   },
 
   mutations: {
@@ -34,28 +36,31 @@ const user = {
     },
     SET_ROLES: (state, roles) => {
       state.roles = roles
+    },
+    SET_GROUPS: (state, groups) => {
+      state.groups = groups
     }
   },
 
   actions: {
-    // 动态修改权限
-    ChangeRoles({ commit, dispatch }, role) {
-      return new Promise(resolve => {
-      commit('SET_TOKEN', role)
-      setToken(role)
-      getUserInfo(role).then(response => {
-        const data = response.data
-        commit('SET_ROLES', data.roles)
-        commit('SET_NAME', data.name)
-        commit('SET_AVATAR', data.avatar)
-        commit('SET_INTRODUCTION', data.introduction)
-        console.log('----------')
-        dispatch('GenerateRoutes', data) // 动态修改权限后 重绘侧边菜单.
-        console.log('----------')
-        resolve()
-      })
-    })
-  },
+  //   // 动态修改权限
+  //   ChangeRoles({ commit, dispatch }, role) {
+  //     return new Promise(resolve => {
+  //     commit('SET_TOKEN', role)
+  //     setToken(role)
+  //     getUserInfo(role).then(response => {
+  //       const data = response.data
+  //       commit('SET_ROLES', data.roles)
+  //       commit('SET_NAME', data.name)
+  //       commit('SET_AVATAR', data.avatar)
+  //       commit('SET_INTRODUCTION', data.introduction)
+  //       console.log('----------')
+  //       dispatch('GenerateRoutes', data) // 动态修改权限后 重绘侧边菜单.
+  //       console.log('----------')
+  //       resolve()
+  //     })
+  //   })
+  // },
     // 登录
     Login({ commit }, userInfo) {
       //const username = userInfo.username.trim()
@@ -65,7 +70,8 @@ const user = {
         axios({
           headers: {'Content-Type': 'application/json;charset=UTF-8'},
           method: 'post',
-          url: 'http://192.168.1.144:8084/login/login',
+          //url: 'http://192.168.1.144:8084/login/login',
+          url: 'http://192.168.1.187:8084/login/login',
           data: {
             "username":userInfo.username,
           "password":userInfo.password
@@ -81,6 +87,7 @@ const user = {
           commit('SET_TOKEN', data.token)
           console.log('token',data.token)
           console.log('添加本地token end+++++++++')
+       
           resolve()
         }).catch(error=>{
           console.error(error)
@@ -137,7 +144,9 @@ const user = {
           commit('SET_NAME', data.name)
           commit('SET_AVATAR', data.avatar)
           commit('SET_INTRODUCTION', data.introduction)
-         // console.log(114)
+          commit('SET_GROUPS', ['TEST1','TEST1','TEST1','TEST1'])
+          console.log(114)
+          console.log(state)
           resolve(response)
         }).catch(error => {
          // console.log(112)

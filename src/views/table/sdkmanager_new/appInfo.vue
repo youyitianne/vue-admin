@@ -989,12 +989,9 @@ export default {
       for (let i = 0; i < publishParam.paramList.length; i++) {
         if (publishParam.paramList[i].sdk_param_type_type === "3") {
           try {
-            publishParam.paramList[
-              i
-            ].placement_value = this.placementList_hashMap[
-              publishParam.paramList[i].sdk_param_value
-            ].placement_id;
+            publishParam.paramList[i].placement_value = this.placementList_hashMap[publishParam.paramList[i].sdk_param_value].placement_id;
           } catch (e) {
+            console.log(publishParam.paramList[i])
             tothis.$notify({
               title: "发布失败！",
               message: "广告位未选择，请检查选中SDK内所有红色字体的参数是否都已选中对应的广告位。",
@@ -1119,9 +1116,9 @@ export default {
       //展示对应广告类型的所有广告位参数
       this.form_init_placementList = [];
       this.hidplacementList = this.placementList_hash[tab.label];
-      console.log("++++++++");
       console.log(this.placement_value_list);
       for (let i = 0; i < this.placement_value_list.length; i++) {
+        if(typeof(this.hidplacementList) ==='undefined')continue;
         for (let j = 0; j < this.hidplacementList.length; j++) {
           if (
             this.hidplacementList[j].placement_guid ===
@@ -1876,6 +1873,8 @@ export default {
       this.change_pagename(this.tag_name);
     }, //sdk模版根据多选框变动
     handleUpdate(param) {
+     
+      
       this.resetForm();
       console.log("更新对象", param);
       this.appInfo.app_name = param.app_name;
@@ -1919,6 +1918,8 @@ export default {
             console.log(checked);
             console.log("sdk_type_checked", this.sdk_type_checked);
             let params = response.param;
+            //将sdk参数为广告位的已经存入placement_value_list的清空
+            this.placement_value_list=[]
             for (let i = 0; i < params.length; i++) {
               let paramValue = params[i].sdk_param_value;
               for (let j = 0; j < this.sdk_param_type_list.length; j++) {
@@ -1936,6 +1937,14 @@ export default {
                 }
               }
             }
+               console.log('开始验证')
+         console.log(this.tabName!='')
+      if(this.tabName!=''){
+        console.log(this.tabName+'+++++++++++++++++++++++++++++++++++++++')
+        this.tabNameClick({
+          label:this.tabName
+        },'')
+      }
           } else {
             console.error(response);
           }
